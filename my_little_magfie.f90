@@ -3,23 +3,14 @@ module my_little_magfie
 
 contains
 
-    subroutine init(equilibrium_file, convex_wall_file)
-        use tetra_grid_settings_mod, only: g_file_filename, convex_wall_filename
-
-        character(len=*), intent(in) :: equilibrium_file, convex_wall_file
-
-        g_file_filename = equilibrium_file
-        convex_wall_filename = convex_wall_file
-    end subroutine init
-
     subroutine eval_field_B(x, B)
         real(8), intent(in) :: x(3)
         real(8), intent(inout) :: B(3)
 
         real(8) :: dummy
 
-        call field(x(1),x(2),x(3),B(1),B(2),B(3),dummy,dummy,dummy   &
-            ,dummy,dummy,dummy,dummy,dummy,dummy)
+        call field(x(1),x(2),x(3),B(1),B(2),B(3),dummy,dummy,dummy, &
+            dummy,dummy,dummy,dummy,dummy,dummy)
     end subroutine eval_field_B
 
     subroutine eval_field_B_and_A(x, y, z, Bx, By, Bz, Ax, Ay, Az)

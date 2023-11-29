@@ -26,23 +26,19 @@ endif
 $(info Target suffix: $(TARGET_SUFFIX))
 
 # List of source files
-SOURCES = spline5_RZ.f90 field_divB0.f90 bdivfree.f90 \
-	tetra_grid_settings_mod.f90
+SOURCES = spline5_RZ.f90 field_divB0.f90 bdivfree.f90
 
-# Prepend ../GORILLA/SRC/ to each source file
-SOURCES := $(addprefix ../GORILLA/SRC/,$(SOURCES))
-
-all: libfield_gorilla.so my_little_magfie.$(TARGET_SUFFIX) clean_objects
+all: libfield.so my_little_magfie.$(TARGET_SUFFIX) clean_objects
 
 clean_objects:
 	rm -f *.o
 
-my_little_magfie.$(TARGET_SUFFIX): libfield_gorilla.so my_little_magfie.f90
-	LDFLAGS=-Wl,-rpath,. f2py -c -m my_little_magfie my_little_magfie.f90 -L. -lfield_gorilla \
+my_little_magfie.$(TARGET_SUFFIX): libfield.so my_little_magfie.f90
+	LDFLAGS=-Wl,-rpath,. f2py -c -m my_little_magfie my_little_magfie.f90 -L. -lfield
 
 
-# Target for shared library containing GORILLA magnetic field routines
-libfield_gorilla.so: $(SOURCES)
+# Target for shared library containing magnetic field routines
+libfield.so: $(SOURCES)
 	$(FC) $(FFLAGS) -shared -o $@ $^
 
 clean:
