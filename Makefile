@@ -1,6 +1,6 @@
 # Compiler with debugging flags
 FC = gfortran
-FFLAGS = -g -fPIC
+FFLAGS = -g -fPIC -O3 -march=native -mtune=native
 
 # Determine the Python version dynamically
 PYTHON_VERSION := $(shell python3 -c "import sys; print('{}{}'.format(sys.version_info.major, sys.version_info.minor))")
