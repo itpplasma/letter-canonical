@@ -9,7 +9,8 @@ import numpy as np
 import matplotlib.pyplot as plt
 
 equilibrium_file = "../GORILLA/MHD_EQUILIBRIA/g_file_for_test"
-convex_wall_file = "../GORILLA/MHD_EQUILIBRIA/convex_wall_for_test.dat"
+#convex_wall_file = "../GORILLA/MHD_EQUILIBRIA/convex_wall_for_test.dat"
+convex_wall_file = "convexwall_aug_rmp.dat"
 
 # %%
 from my_little_magfie import my_little_magfie
@@ -57,6 +58,10 @@ for kr in range(nr):
 
 # %% Plot
 
+convex_wall = np.loadtxt(convex_wall_file)
+Rwall = convex_wall[:, 0]
+Zwall = convex_wall[:, 1]
+
 fig, ax = plt.subplots(1, 3, figsize=(12, 4))
 
 ax[0].contourf(RR[:, 0, :], ZZ[:, 0, :], BR[:, 0, :])
@@ -69,20 +74,25 @@ ax[2].set_title("BZ")
 plt.savefig("PLOT/Bfield.pdf")
 
 for k in range(3):
+    ax[k].plot(Rwall, Zwall, "k")
     ax[k].set_xlabel("R")
     ax[k].set_ylabel("Z")
+    ax[k].set_aspect("equal")
 
 fig.tight_layout()
 
-plt.figure()
+plt.figure(figsize=(8, 8))
 plt.contourf(
     RR[:, 0, :],
     ZZ[:, 0, :],
     np.sqrt(BR[:, 0, :] ** 2 + BP[:, 0, :] ** 2 + BZ[:, 0, :] ** 2),
 )
+plt.plot(Rwall, Zwall, "k")
+
 plt.title("|B|")
 plt.xlabel("R")
 plt.ylabel("Z")
+plt.axis("equal")
 
 plt.colorbar()
 
@@ -100,6 +110,8 @@ ax.quiver(
     BR[::skip, 0, ::skip],
     BZ[::skip, 0, ::skip]
 )
+
+ax.plot(Rwall, Zwall, "k")
 
 ax.axis("equal")
 ax.set_xlabel("R")

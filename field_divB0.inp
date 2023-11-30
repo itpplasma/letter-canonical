@@ -6,7 +6,7 @@
 4                                 icftype      ! type of coil file
 '../GORILLA/MHD_EQUILIBRIA/g_file_for_test'    gfile        ! equilibrium file
 '/proj/plasma/DATA/AUG/COILS/MESH3D_31135odd/field.dat'  !'DATA/ASDEX/MESH3D_30835/field.dat'    pfile        ! coil        file
-'../GORILLA/MHD_EQUILIBRIA/convex_wall_for_test.dat'  convexfile   ! convex file for stretchcoords
+'convexwall_aug_rmp.dat'  convexfile   ! convex file for stretchcoords
 'DATA/ASDEX/FLUXDATA'                  fluxdatapath ! directory with data in flux coord.
 0                                 window size for filtering of psi array over R
 0                                 window size for filtering of psi array over Z
