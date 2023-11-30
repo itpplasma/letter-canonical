@@ -679,10 +679,8 @@ subroutine field_c(rrr,ppp,zzz,Brad,Bphi,Bzet,dBrdR,dBrdp,dBrdZ  &
   endif
   !------- end first call ----------------------------------------------
 !
-print *,'field_divfree'
   call field_divfree(rrr,ppp,zzz,Brad,Bphi,Bzet,dBrdR,dBrdp,dBrdZ    &
                     ,dBpdR,dBpdp,dBpdZ,dBzdR,dBzdp,dBzdZ)
-print *,'end field_divfree'
 !
   return
 end subroutine field_c
