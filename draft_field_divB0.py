@@ -9,8 +9,9 @@ import numpy as np
 import matplotlib.pyplot as plt
 
 equilibrium_file = "../GORILLA/MHD_EQUILIBRIA/g_file_for_test"
-#convex_wall_file = "../GORILLA/MHD_EQUILIBRIA/convex_wall_for_test.dat"
-convex_wall_file = "convexwall_aug_rmp.dat"
+convex_wall_file = "../GORILLA/MHD_EQUILIBRIA/convex_wall_for_test.dat"
+#convex_wall_file = "convexwall_aug_rmp.dat"
+#convex_wall_file = "convexwall_aug_test.dat"
 
 # %%
 from my_little_magfie import my_little_magfie
@@ -52,6 +53,7 @@ for kr in range(nr):
             x[1] = PP[kr, kph, kz]
             x[2] = ZZ[kr, kph, kz]
             my_little_magfie.eval_field_b(x, B)
+
             BR[kr, kph, kz] = B[0]
             BP[kr, kph, kz] = B[1]
             BZ[kr, kph, kz] = B[2]
@@ -82,10 +84,12 @@ for k in range(3):
 fig.tight_layout()
 
 plt.figure(figsize=(8, 8))
+Bmod = np.sqrt(BR ** 2 + BP ** 2 + BZ ** 2)
+
 plt.contourf(
     RR[:, 0, :],
     ZZ[:, 0, :],
-    np.sqrt(BR[:, 0, :] ** 2 + BP[:, 0, :] ** 2 + BZ[:, 0, :] ** 2),
+    Bmod[:, 0, :],
 )
 plt.plot(Rwall, Zwall, "k")
 
@@ -134,4 +138,35 @@ ax.set_xlabel("R")
 ax.set_ylabel("Z")
 
 plt.savefig("PLOT/streamlines.pdf")
+# %%
+
+nr = 1024
+nz = 8
+
+x[1] = 0.5
+x[2] = 40.0
+
+R = np.linspace(75.0, 267.0, nr)
+Z = np.linspace(-150.0, 150.0, nz)
+
+RR, ZZ = np.meshgrid(R, Z, indexing="ij")
+
+BR = np.empty((nr, nz))
+BP = np.empty((nr, nz))
+BZ = np.empty((nr, nz))
+
+for kr in range(nr):
+    for kz in range(nz):
+        x[0] = RR[kr, kz]
+        x[2] = ZZ[kr, kz]
+        my_little_magfie.eval_field_b(x, B)
+
+        BR[kr, kz] = B[0]
+        BP[kr, kz] = B[1]
+        BZ[kr, kz] = B[2]
+
+plt.figure(figsize=(8, 8))
+
+for kz in range(nz):
+    plt.plot(R, BR[:, kz], label=f"Z={Z[kz]}")
 # %%
