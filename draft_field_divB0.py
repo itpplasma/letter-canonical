@@ -9,9 +9,16 @@ import numpy as np
 import matplotlib.pyplot as plt
 
 equilibrium_file = "../GORILLA/MHD_EQUILIBRIA/g_file_for_test"
-convex_wall_file = "../GORILLA/MHD_EQUILIBRIA/convex_wall_for_test.dat"
+#convex_wall_file = "../GORILLA/MHD_EQUILIBRIA/convex_wall_for_test.dat"
 #convex_wall_file = "convexwall_aug_rmp.dat"
-#convex_wall_file = "convexwall_aug_test.dat"
+convex_wall_file = "convexwall_aug_test.dat"
+
+convex_wall = np.loadtxt(convex_wall_file)
+Rwall = convex_wall[:, 0]
+Zwall = convex_wall[:, 1]
+plt.plot(Rwall, Zwall, "k")
+
+plt.axis("equal")
 
 # %%
 from my_little_magfie import my_little_magfie
@@ -60,9 +67,6 @@ for kr in range(nr):
 
 # %% Plot
 
-convex_wall = np.loadtxt(convex_wall_file)
-Rwall = convex_wall[:, 0]
-Zwall = convex_wall[:, 1]
 
 fig, ax = plt.subplots(1, 3, figsize=(12, 4))
 
