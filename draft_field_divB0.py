@@ -9,6 +9,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 
 equilibrium_file = "../GORILLA/MHD_EQUILIBRIA/g_file_for_test"
+perturbation_file = "/proj/plasma/DATA/AUG/COILS/MESH3D_31135odd/field.dat"
 #convex_wall_file = "../GORILLA/MHD_EQUILIBRIA/convex_wall_for_test.dat"
 #convex_wall_file = "convexwall_aug_rmp.dat"
 convex_wall_file = "convexwall_aug_test.dat"
@@ -39,9 +40,9 @@ my_little_magfie.eval_field_b(x, B)
 print(B)
 
 # %%
-nr = 64
+nr = 150
 nph = 1
-nz = 128
+nz = 300
 
 R = np.linspace(75.0, 267.0, nr)
 P = np.linspace(0.0, 2 * np.pi, nph)
@@ -65,27 +66,32 @@ for kr in range(nr):
             BP[kr, kph, kz] = B[1]
             BZ[kr, kph, kz] = B[2]
 
-# %% Plot
+levels = np.linspace(-100.0, 100.0, 51)
 
+plt.figure(figsize=(5, 6.4))
+plt.contour(RR[:, 0, :], ZZ[:, 0, :], BR[:, 0, :], levels=levels)
+plt.plot(Rwall, Zwall, "k")
+plt.title("BR")
+plt.axis("equal")
+plt.colorbar()
+plt.savefig("PLOT/BR.pdf")
 
-fig, ax = plt.subplots(1, 3, figsize=(12, 4))
+plt.figure(figsize=(5, 6.4))
+plt.contour(RR[:, 0, :], ZZ[:, 0, :], BP[:, 0, :], levels=levels)
+plt.plot(Rwall, Zwall, "k")
+plt.title("BP")
+plt.axis("equal")
+plt.colorbar()
+plt.savefig("PLOT/BP.pdf")
 
-ax[0].contourf(RR[:, 0, :], ZZ[:, 0, :], BR[:, 0, :])
-ax[0].set_title("BR")
-ax[1].contourf(RR[:, 0, :], ZZ[:, 0, :], BP[:, 0, :])
-ax[1].set_title("BP")
-ax[2].contourf(RR[:, 0, :], ZZ[:, 0, :], BZ[:, 0, :])
-ax[2].set_title("BZ")
+plt.figure(figsize=(5, 6.4))
+plt.contour(RR[:, 0, :], ZZ[:, 0, :], BZ[:, 0, :], levels=levels)
+plt.plot(Rwall, Zwall, "k")
+plt.title("BZ")
+plt.axis("equal")
+plt.colorbar()
+plt.savefig("PLOT/BZ.pdf")
 
-plt.savefig("PLOT/Bfield.pdf")
-
-for k in range(3):
-    ax[k].plot(Rwall, Zwall, "k")
-    ax[k].set_xlabel("R")
-    ax[k].set_ylabel("Z")
-    ax[k].set_aspect("equal")
-
-fig.tight_layout()
 
 plt.figure(figsize=(8, 8))
 Bmod = np.sqrt(BR ** 2 + BP ** 2 + BZ ** 2)
@@ -173,4 +179,58 @@ plt.figure(figsize=(8, 8))
 
 for kz in range(nz):
     plt.plot(R, BR[:, kz], label=f"Z={Z[kz]}")
+
+# %% Load perturbation field directly for compatison
+
+# Open the file for reading
+with open(perturbation_file, 'r') as iunit:
+    # Read header information
+    nr, nph, nz, _ = map(int, next(iunit).split())
+    rmin, rmax = map(float, next(iunit).split())
+    pmin, pmax = map(float, next(iunit).split())
+    zmin, zmax = map(float, next(iunit).split())
+
+    # Initialize arrays
+    Br = np.zeros((nr, nph, nz), dtype=float)
+    Bp = np.zeros((nr, nph, nz), dtype=float)
+    Bz = np.zeros((nr, nph, nz), dtype=float)
+
+    # Read data into arrays
+    for i in range(nr):
+        for j in range(nph):
+            for k in range(nz):
+                Br[i, j, k], Bp[i, j, k], Bz[i, j, k] = map(float, next(iunit).split())
+
+# %% Plot
+import matplotlib.cm as cm
+
+R = np.linspace(75.0, 267.0, nr)
+P = np.linspace(0.0, 2 * np.pi, nph)
+Z = np.linspace(-150.0, 150.0, nz)
+
+RR, PP, ZZ = np.meshgrid(R, P, Z, indexing="ij")
+
+levels = np.linspace(-100.0, 100.0, 51)
+
+plt.figure(figsize=(5, 6.4))
+plt.contour(RR[:, 0, :], ZZ[:, 0, :], Br[:, 0, :], levels=levels)
+plt.plot(Rwall, Zwall, "k")
+plt.title("BR")
+plt.axis("equal")
+plt.colorbar()
+
+plt.figure(figsize=(5, 6.4))
+plt.contour(RR[:, 0, :], ZZ[:, 0, :], Bp[:, 0, :], levels=levels)
+plt.plot(Rwall, Zwall, "k")
+plt.title("BP")
+plt.axis("equal")
+plt.colorbar()
+
+plt.figure(figsize=(5, 6.4))
+plt.contour(RR[:, 0, :], ZZ[:, 0, :], Bz[:, 0, :], levels=levels)
+plt.plot(Rwall, Zwall, "k")
+plt.title("BZ")
+plt.axis("equal")
+plt.colorbar()
+
 # %%
