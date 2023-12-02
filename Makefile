@@ -26,7 +26,30 @@ endif
 $(info Target suffix: $(TARGET_SUFFIX))
 
 # List of source files
-SOURCES = spline5_RZ.f90 field_divB0.f90 bdivfree.f90
+
+# For old version here
+# SOURCES = spline5_RZ.f90 field_divB0.f90 bdivfree.f90
+
+# For libneo new version
+
+SOURCES = libneo_kinds.f90 math_constants.f90 spl_three_to_five.f90
+
+MAGFIE_SOURCES = spline5_RZ.f90 \
+    theta_rz_mod.f90 \
+    extract_fluxcoord_mod.f90 \
+    amn_mod.f90 \
+    field_mod.f90 \
+    field_eq_mod.f90 \
+    field_c_mod.f90 \
+    input_files.f90 \
+    input_files.f90 \
+    inthecore_mod.f90 \
+    field_divB0.f90 \
+    bdivfree_mod.f90 \
+    bdivfree.f90
+
+SOURCES += $(addprefix magfie/, $(MAGFIE_SOURCES))
+SOURCES := $(addprefix ../libneo/src/, $(SOURCES))
 
 all: libfield.so my_little_magfie.$(TARGET_SUFFIX) clean_objects
 
