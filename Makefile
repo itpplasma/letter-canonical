@@ -2,6 +2,9 @@
 FC = gfortran
 FFLAGS = -g -fPIC -O3 -march=native -mtune=native
 
+# Which field variant: local, libneo, GORILLA
+FIELD_VARIANT ?= libneo
+
 # Determine the Python version dynamically
 PYTHON_VERSION := $(shell python3 -c "import sys; print('{}{}'.format(sys.version_info.major, sys.version_info.minor))")
 
@@ -25,16 +28,13 @@ endif
 # Print suffix
 $(info Target suffix: $(TARGET_SUFFIX))
 
-# List of source files
+# List of source files depending on variant
+ifeq ($(FIELD_VARIANT), local)
+    SOURCES = spline5_RZ.f90 field_divB0.f90 bdivfree.f90
+else ifeq ($(FIELD_VARIANT), libneo)
+    SOURCES = libneo_kinds.f90 math_constants.f90 spl_three_to_five.f90
 
-# For old version here
-# SOURCES = spline5_RZ.f90 field_divB0.f90 bdivfree.f90
-
-# For libneo new version
-
-SOURCES = libneo_kinds.f90 math_constants.f90 spl_three_to_five.f90
-
-MAGFIE_SOURCES = spline5_RZ.f90 \
+    MAGFIE_SOURCES = spline5_RZ.f90 \
     theta_rz_mod.f90 \
     extract_fluxcoord_mod.f90 \
     amn_mod.f90 \
@@ -48,8 +48,14 @@ MAGFIE_SOURCES = spline5_RZ.f90 \
     bdivfree_mod.f90 \
     bdivfree.f90
 
-SOURCES += $(addprefix magfie/, $(MAGFIE_SOURCES))
-SOURCES := $(addprefix ../libneo/src/, $(SOURCES))
+    SOURCES += $(addprefix magfie/, $(MAGFIE_SOURCES))
+    SOURCES := $(addprefix ../libneo/src/, $(SOURCES))
+else ifeq ($(FIELD_VARIANT), GORILLA)
+    SOURCES = spline5_RZ.f90 field_divB0.f90 bdivfree.f90
+    SOURCES := $(addprefix ../GORILLA/SRC/, $(SOURCES))
+else
+    $(error Unsupported field variant: $(FIELD_VARIANT))
+endif
 
 all: libfield.so my_little_magfie.$(TARGET_SUFFIX) clean_objects
 

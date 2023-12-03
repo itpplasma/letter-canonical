@@ -8,10 +8,8 @@ Does some checks and plots of the equilibrium + perturbation field interface
 import numpy as np
 import matplotlib.pyplot as plt
 
-equilibrium_file = "../GORILLA/MHD_EQUILIBRIA/g_file_for_test"
-perturbation_file = "/proj/plasma/DATA/AUG/COILS/MESH3D_31135odd/field.dat"
-#convex_wall_file = "../GORILLA/MHD_EQUILIBRIA/convex_wall_for_test.dat"
-#convex_wall_file = "convexwall_aug_rmp.dat"
+equilibrium_file = "/proj/plasma/DATA/AUG/EQDSK/g_file_for_test"
+perturbation_file = "/proj/plasma/DATA/AUG/COILS/MESH3D_31135odd/field_small.dat"
 convex_wall_file = "convexwall_aug_test.dat"
 
 convex_wall = np.loadtxt(convex_wall_file)
@@ -40,9 +38,9 @@ my_little_magfie.eval_field_b(x, B)
 print(B)
 
 # %%
-nr = 150
+nr = 75
 nph = 1
-nz = 300
+nz = 150
 
 R = np.linspace(75.0, 267.0, nr)
 P = np.linspace(0.0, 2 * np.pi, nph)
@@ -180,33 +178,13 @@ plt.figure(figsize=(8, 8))
 for kz in range(nz):
     plt.plot(R, BR[:, kz], label=f"Z={Z[kz]}")
 
-# %% Load perturbation field directly for compatison
+# %% Load perturbation field directly for comparison
 
-# Open the file for reading
-with open(perturbation_file, 'r') as iunit:
-    # Read header information
-    nr, nph, nz, _ = map(int, next(iunit).split())
-    rmin, rmax = map(float, next(iunit).split())
-    pmin, pmax = map(float, next(iunit).split())
-    zmin, zmax = map(float, next(iunit).split())
+from pert_field import read_field_dat, get_grid
 
-    # Initialize arrays
-    Br = np.zeros((nr, nph, nz), dtype=float)
-    Bp = np.zeros((nr, nph, nz), dtype=float)
-    Bz = np.zeros((nr, nph, nz), dtype=float)
+Br, Bp, Bz, bounds = read_field_dat(perturbation_file)
 
-    # Read data into arrays
-    for i in range(nr):
-        for j in range(nph):
-            for k in range(nz):
-                Br[i, j, k], Bp[i, j, k], Bz[i, j, k] = map(float, next(iunit).split())
-
-# %% Plot
-import matplotlib.cm as cm
-
-R = np.linspace(75.0, 267.0, nr)
-P = np.linspace(0.0, 2 * np.pi, nph)
-Z = np.linspace(-150.0, 150.0, nz)
+R, P, Z = get_grid(bounds, Br.shape)
 
 RR, PP, ZZ = np.meshgrid(R, P, Z, indexing="ij")
 
