@@ -22,6 +22,8 @@ plt.axis("equal")
 # %%
 from my_little_magfie import my_little_magfie
 
+my_little_magfie.init()
+
 # %%
 
 x = np.zeros(3)

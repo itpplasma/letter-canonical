@@ -2,6 +2,23 @@ module my_little_magfie
     implicit none
 
 contains
+
+    subroutine init
+        use field_mod, only : icall, ipert, ampl
+        use field_c_mod, only : icall_c
+
+        if (icall < 1) then
+            call read_field_input
+            icall = 1
+            print *, 'Perturbation field', ipert, 'Ampl', ampl
+        end if
+
+        if (ipert > 0 .and. icall_c < 1) then
+            call read_field_input_c
+            icall_c = 1
+        end if
+    end subroutine init
+
     ! Compute physical components of B in cylindrical coordinates x = (r,phi,z).
     subroutine eval_field_B(x, B)
         real(8), intent(in) :: x(3)
@@ -36,7 +53,7 @@ contains
     subroutine my_field(r,p,z,Br,Bp,Bz,dBrdR,dBrdp,dBrdZ   &
                     ,dBpdR,dBpdp,dBpdZ,dBzdR,dBzdp,dBzdZ)
 
-    use field_mod, only : icall, ipert, iequil, ampl
+    use field_mod, only : ipert, iequil, ampl
     use inthecore_mod, only : incore
     use libneo_kinds, only : real_kind
 
@@ -45,12 +62,6 @@ contains
                         ,dBpdR,dBpdp,dBpdZ,dBzdR,dBzdp,dBzdZ
     real(kind=real_kind) :: rm,zm,Brc,Bpc,Bzc,dBrdRc,dBrdpc,dBrdZc &
                         ,dBpdRc,dBpdpc,dBpdZc,dBzdRc,dBzdpc,dBzdZc
-
-    if(icall .eq. 0) then
-        call read_field_input
-        icall = 1
-        print *, 'Perturbation field', ipert, 'Ampl', ampl
-    end if
 
     call stretch_coords(r,z,rm,zm)
 
@@ -66,7 +77,7 @@ contains
         ! vacuum perturbation coil field
         incore=-1
 
-        call my_field_c(rm,p,zm,Brc,Bpc,Bzc,dBrdRc,dBrdpc,dBrdZc,   &
+        call my_field_divfree(rm,p,zm,Brc,Bpc,Bzc,dBrdRc,dBrdpc,dBrdZc,   &
                         dBpdRc,dBpdpc,dBpdZc,dBzdRc,dBzdpc,dBzdZc)
 
         call add_scaled(  &
@@ -78,29 +89,78 @@ contains
 
     end subroutine my_field
 
-    ! ===========================================================================
-    subroutine my_field_c(rrr,ppp,zzz,Brad,Bphi,Bzet,dBrdR,dBrdp,dBrdZ  &
-                    ,dBpdR,dBpdp,dBpdZ,dBzdR,dBzdp,dBzdZ)
 
-    use field_c_mod, only : icall_c
-    use libneo_kinds, only : real_kind
+    subroutine my_field_divfree(r,phi,z,Br,Bp,Bz,dBrdR,dBrdp,dBrdZ    &
+                            ,dBpdR,dBpdp,dBpdZ,dBzdR,dBzdp,dBzdZ)
+
+    use bdivfree_mod, only : nr,nz,ntor,icp,ipoint,hr,hz,pfac,&
+        & rpoi,zpoi,apav,rbpav_coef
+    use libneo_kinds, only : complex_kind, real_kind
 
     implicit none
 
-    real(kind=real_kind) :: rrr,ppp,zzz,Brad,Bphi,Bzet,dBrdR,dBrdp,dBrdZ  &
-                        ,dBpdR,dBpdp,dBpdZ,dBzdR,dBzdp,dBzdZ
+    double precision, intent(in) :: r, phi, z
+    double precision, intent(out) :: Br, Bp, Bz, dBrdR, dBrdp, dBrdZ,   &
+                                & dBpdR, dBpdp, dBpdZ, dBzdR, dBzdp, dBzdZ
 
-    !-------first call: read data from disk-------------------------------
-    if(icall_c .lt. 1) then
-        call read_field_input_c
-        icall_c = 1
-    end if
-    !------- end first call ----------------------------------------------
+    integer :: n,ierr
+    real(kind=real_kind) :: f,fr,fz,frr,frz,fzz
+    real(kind=real_kind) :: delBr,delBz,delBp
+    real(kind=real_kind) :: deldBrdR,deldBrdp,deldBrdZ
+    real(kind=real_kind) :: deldBpdR,deldBpdp,deldBpdZ
+    real(kind=real_kind) :: deldBzdR,deldBzdp,deldBzdZ
+    complex(kind=complex_kind) :: expon,anr,anz,anr_r,anr_z,anz_r,anz_z
+    complex(kind=complex_kind) :: anr_rr,anr_rz,anr_zz,anz_rr,anz_rz,anz_zz
+    complex(kind=complex_kind) :: pfac_imaginary
 
-    call field_divfree(rrr,ppp,zzz,Brad,Bphi,Bzet,dBrdR,dBrdp,dBrdZ    &
-                        ,dBpdR,dBpdp,dBpdZ,dBzdR,dBzdp,dBzdZ)
 
-    end subroutine my_field_c
+    call spline(nr,nz,rpoi,zpoi,hr,hz,icp,rbpav_coef,ipoint,r,z,         &
+                f,fr,fz,frr,frz,fzz,ierr)
+    Bp = f/r
+    dBpdR = fr/r - Bp/r
+    dBpdZ = fz/r
+    dBpdp = 0.d0
+
+    call spline(nr,nz,rpoi,zpoi,hr,hz,icp,apav,ipoint,r,z,         &
+                f,fr,fz,frr,frz,fzz,ierr)
+
+    Br=-fz/r
+    Bz=fr/r
+    dBrdR=fz/r**2-frz/r
+    dBrdZ=-fzz/r
+    dBzdR=-fr/r**2+frr/r
+    dBzdZ=frz/r
+    dBrdp=0.d0
+    dBzdp=0.d0
+
+    do n=1,ntor
+        call spline_vector_potential_n(n, r, z, anr,anz,anr_r,anr_z,anz_r,anz_z, &
+        anr_rr,anr_rz,anr_zz,anz_rr,anz_rz,anz_zz)
+
+        pfac_imaginary = cmplx(0.0, pfac, kind=complex_kind)
+
+        expon=exp(cmplx(0.d0,n*pfac*phi, kind=complex_kind))
+        delBr=2.d0*real(pfac_imaginary*n*anz*expon/r, kind=real_kind)
+        delBz=-2.d0*real(pfac_imaginary*n*anr*expon/r, kind=real_kind)
+        delBp=2.d0*real((anr_z-anz_r)*expon, kind=real_kind)
+        deldBrdR=-delbr/r+2.d0*real(pfac_imaginary*n*anz_r*expon/r, kind=real_kind)
+        deldBrdZ=2.d0*real(pfac_imaginary*n*anz_z*expon/r, kind=real_kind)
+        deldBrdp=-2.d0*real((pfac*n)**2*anz*expon/r, kind=real_kind)
+        deldBzdR=-delbz/r-2.d0*real(pfac_imaginary*n*anr_r*expon/r, kind=real_kind)
+        deldBzdZ=-2.d0*real(pfac_imaginary*n*anr_z*expon/r, kind=real_kind)
+        deldBzdp=2.d0*real((pfac*n)**2*anr*expon/r, kind=real_kind)
+        deldBpdR=2.d0*real((anr_rz-anz_rr)*expon, kind=real_kind)
+        deldBpdZ=2.d0*real((anr_zz-anz_rz)*expon, kind=real_kind)
+        deldBpdp=2.d0*real(pfac_imaginary*n*(anr_z-anz_r)*expon, kind=real_kind)
+
+        call add_scaled(  &
+            Br,Bp,Bz,dBrdR,dBrdp,dBrdZ,dBpdR,dBpdp,dBpdZ,dBzdR,dBzdp,dBzdZ,  &
+            delBr,delBp,delBz,deldBrdR,deldBrdp,deldBrdZ,deldBpdR,deldBpdp,  &
+            deldBpdZ,deldBzdR,deldBzdp,deldBzdZ,1.d0)
+
+    end do
+
+    end subroutine my_field_divfree
 
 
     subroutine read_field_input_c
