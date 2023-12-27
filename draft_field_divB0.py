@@ -42,9 +42,14 @@ nr = 75
 nph = 1
 nz = 150
 
-R = np.linspace(75.0, 267.0, nr)
+Rmin = 75.0
+Rmax = 267.0
+Zmin = -150.0
+Zmax = 150.0
+
+R = np.linspace(Rmin, Rmax, nr)
 P = np.linspace(0.0, 2 * np.pi, nph)
-Z = np.linspace(-150.0, 150.0, nz)
+Z = np.linspace(Zmin, Zmax, nz)
 
 RR, PP, ZZ = np.meshgrid(R, P, Z, indexing="ij")
 
@@ -64,7 +69,10 @@ for kr in range(nr):
             BP[kr, kph, kz] = B[1]
             BZ[kr, kph, kz] = B[2]
 
-levels = np.linspace(-100.0, 100.0, 51)
+# levels = np.linspace(-100.0, 100.0, 51)
+levels = np.linspace(-30000.0, 10000.0, 51)
+
+# %%
 
 plt.figure(figsize=(5, 6.4))
 plt.contour(RR[:, 0, :], ZZ[:, 0, :], BR[:, 0, :], levels=levels)
@@ -74,6 +82,8 @@ plt.axis("equal")
 plt.colorbar()
 plt.savefig("PLOT/BR.pdf")
 
+# %%
+
 plt.figure(figsize=(5, 6.4))
 plt.contour(RR[:, 0, :], ZZ[:, 0, :], BP[:, 0, :], levels=levels)
 plt.plot(Rwall, Zwall, "k")
@@ -81,6 +91,8 @@ plt.title("BP")
 plt.axis("equal")
 plt.colorbar()
 plt.savefig("PLOT/BP.pdf")
+
+# %%
 
 plt.figure(figsize=(5, 6.4))
 plt.contour(RR[:, 0, :], ZZ[:, 0, :], BZ[:, 0, :], levels=levels)
@@ -90,7 +102,7 @@ plt.axis("equal")
 plt.colorbar()
 plt.savefig("PLOT/BZ.pdf")
 
-
+# %%
 plt.figure(figsize=(8, 8))
 Bmod = np.sqrt(BR ** 2 + BP ** 2 + BZ ** 2)
 
@@ -154,8 +166,8 @@ nz = 8
 x[1] = 0.5
 x[2] = 40.0
 
-R = np.linspace(75.0, 267.0, nr)
-Z = np.linspace(-150.0, 150.0, nz)
+R = np.linspace(Rmin, Rmax, nr)
+Z = np.linspace(Zmin, Zmax, nz)
 
 RR, ZZ = np.meshgrid(R, Z, indexing="ij")
 
@@ -210,5 +222,41 @@ plt.plot(Rwall, Zwall, "k")
 plt.title("BZ")
 plt.axis("equal")
 plt.colorbar()
+
+# %% Do Poincare plot for field lines
+from scipy.integrate import solve_ivp
+
+num_cut = 512
+steps_per_cut = 2
+num_orbit = 4
+
+Rstart = np.linspace(200, 210, num_orbit)
+
+def fieldline_direction(t, x):
+    B = np.zeros(3)
+
+    my_little_magfie.eval_field_b(x, B)
+
+    # Normalize by contravariant Bphi component for field line pitch
+    B[0] = B[0] / (B[1] / x[0])
+    B[2] = B[2] / (B[1] / x[0])
+    B[1] = 1.0
+
+    return B
+
+plt.figure(figsize=(10, 12.8))
+for k in range(num_orbit):
+    xstart = np.array([Rstart[k], 0.0, 0.0])
+
+    t = np.linspace(0.0, 2*np.pi*num_cut, steps_per_cut*num_cut + 1)
+    sol = solve_ivp(fieldline_direction, [0.0, 2*np.pi*num_cut], xstart, t_eval=t,
+                    method="RK45", rtol=1e-8, atol=1e-8)
+
+    plt.plot(sol.y[0, ::steps_per_cut], sol.y[2, ::steps_per_cut], ",")
+
+plt.xlim(Rmin, Rmax)
+plt.ylim(Zmin, Zmax)
+plt.plot(Rwall, Zwall, "k")
+plt.axis("equal")
 
 # %%
