@@ -228,9 +228,9 @@ plt.colorbar()
 # %% Do Poincare plot for field lines
 from scipy.integrate import solve_ivp
 
-num_cut = 512
+num_cut = 256
 steps_per_cut = 2
-num_orbit = 4
+num_orbit = 5
 
 Rstart = np.linspace(200, 210, num_orbit)
 

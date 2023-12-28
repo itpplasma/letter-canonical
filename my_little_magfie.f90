@@ -5,7 +5,9 @@ contains
 
     subroutine init
         use field_mod, only : icall, ipert, ampl
-        use field_c_mod, only : icall_c
+        use field_c_mod, only : icall_c, ntor
+
+        ntor = 6
 
         if (icall < 1) then
             call read_field_input
@@ -77,14 +79,14 @@ contains
         ! vacuum perturbation coil field
         incore=-1
 
-        ! call my_field_divfree(rm,p,zm,Brc,Bpc,Bzc,dBrdRc,dBrdpc,dBrdZc,   &
-        !                dBpdRc,dBpdpc,dBpdZc,dBzdRc,dBzdpc,dBzdZc)
+        call my_field_divfree(rm,p,zm,Brc,Bpc,Bzc,dBrdRc,dBrdpc,dBrdZc,   &
+                      dBpdRc,dBpdpc,dBpdZc,dBzdRc,dBzdpc,dBzdZc)
 
         ! call field_divfree(rm,p,zm,Brc,Bpc,Bzc,dBrdRc,dBrdpc,dBrdZc,   &
         ! dBpdRc,dBpdpc,dBpdZc,dBzdRc,dBzdpc,dBzdZc)
 
-        call field_c(rm,p,zm,Brc,Bpc,Bzc,dBrdRc,dBrdpc,dBrdZc   &
-               ,dBpdRc,dBpdpc,dBpdZc,dBzdRc,dBzdpc,dBzdZc)
+        ! call field_c(rm,p,zm,Brc,Bpc,Bzc,dBrdRc,dBrdpc,dBrdZc   &
+        !        ,dBpdRc,dBpdpc,dBpdZc,dBzdRc,dBzdpc,dBzdZc)
 
         call add_scaled(  &
             Br,Bp,Bz,dBrdR,dBrdp,dBrdZ,dBpdR,dBpdp,dBpdZ,dBzdR,dBzdp,dBzdZ,  &
@@ -120,12 +122,14 @@ contains
     complex(kind=complex_kind) :: pfac_imaginary
 
 
-    call spline(nr,nz,rpoi,zpoi,hr,hz,icp,rbpav_coef,ipoint,r,z,         &
-                f,fr,fz,frr,frz,fzz,ierr)
-    Bp = f/r
-    dBpdR = fr/r - Bp/r
-    dBpdZ = fz/r
-    dBpdp = 0.d0
+    ! TODO: Solve this with a vector potential being an integral over Bp*r
+    !
+    ! call spline(nr,nz,rpoi,zpoi,hr,hz,icp,rbpav_coef,ipoint,r,z,         &
+    !             f,fr,fz,frr,frz,fzz,ierr)
+    ! Bp = f/r
+    ! dBpdR = fr/r - Bp/r
+    ! dBpdZ = fz/r
+    ! dBpdp = 0.d0
 
     call spline(nr,nz,rpoi,zpoi,hr,hz,icp,apav,ipoint,r,z,         &
                 f,fr,fz,frr,frz,fzz,ierr)
