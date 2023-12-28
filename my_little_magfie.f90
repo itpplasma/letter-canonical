@@ -77,8 +77,14 @@ contains
         ! vacuum perturbation coil field
         incore=-1
 
-        call my_field_divfree(rm,p,zm,Brc,Bpc,Bzc,dBrdRc,dBrdpc,dBrdZc,   &
-                        dBpdRc,dBpdpc,dBpdZc,dBzdRc,dBzdpc,dBzdZc)
+        ! call my_field_divfree(rm,p,zm,Brc,Bpc,Bzc,dBrdRc,dBrdpc,dBrdZc,   &
+        !                dBpdRc,dBpdpc,dBpdZc,dBzdRc,dBzdpc,dBzdZc)
+
+        ! call field_divfree(rm,p,zm,Brc,Bpc,Bzc,dBrdRc,dBrdpc,dBrdZc,   &
+        ! dBpdRc,dBpdpc,dBpdZc,dBzdRc,dBzdpc,dBzdZc)
+
+        call field_c(rm,p,zm,Brc,Bpc,Bzc,dBrdRc,dBrdpc,dBrdZc   &
+               ,dBpdRc,dBpdpc,dBpdZc,dBzdRc,dBzdpc,dBzdZc)
 
         call add_scaled(  &
             Br,Bp,Bz,dBrdR,dBrdp,dBrdZ,dBpdR,dBpdp,dBpdZ,dBzdR,dBzdp,dBzdZ,  &
@@ -153,10 +159,18 @@ contains
         deldBpdZ=2.d0*real((anr_zz-anz_rz)*expon, kind=real_kind)
         deldBpdp=2.d0*real(pfac_imaginary*n*(anr_z-anz_r)*expon, kind=real_kind)
 
-        call add_scaled(  &
-            Br,Bp,Bz,dBrdR,dBrdp,dBrdZ,dBpdR,dBpdp,dBpdZ,dBzdR,dBzdp,dBzdZ,  &
-            delBr,delBp,delBz,deldBrdR,deldBrdp,deldBrdZ,deldBpdR,deldBpdp,  &
-            deldBpdZ,deldBzdR,deldBzdp,deldBzdZ,1.d0)
+        br=br+delbr
+        bz=bz+delbz
+        bp=bp+delbp
+        dBrdR=dBrdR+deldBrdR
+        dBrdZ=dBrdZ+deldBrdZ
+        dBrdp=dBrdp+deldBrdp
+        dBzdR=dBzdR+deldBzdR
+        dBzdZ=dBzdZ+deldBzdZ
+        dBzdp=dBzdp+deldBzdp
+        dBpdR=dBpdR+deldBpdR
+        dBpdZ=dBpdZ+deldBpdZ
+        dBpdp=dBpdp+deldBpdp
 
     end do
 
@@ -189,4 +203,6 @@ contains
 
         deallocate(Br,Bp,Bz)
     end subroutine read_field_input_c
+
+
 end module my_little_magfie

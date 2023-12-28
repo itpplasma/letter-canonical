@@ -259,6 +259,6 @@ for k in range(num_orbit):
 plt.xlim(Rmin, Rmax)
 plt.ylim(Zmin, Zmax)
 plt.plot(Rwall, Zwall, "k")
-plt.axis("equal")
+#plt.axis("equal")
 
 # %%
