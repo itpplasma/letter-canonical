@@ -5,9 +5,8 @@ contains
 
     subroutine init
         use field_mod, only : icall, ipert, ampl
-        use field_c_mod, only : icall_c, ntor
-
-        ntor = 6
+        use field_c_mod, only : icall_c
+        use libneo_kinds, only : real_kind
 
         if (icall < 1) then
             call read_field_input
@@ -79,7 +78,7 @@ contains
         incore=-1
 
         call my_field_divfree(rm,p,zm,Brc,Bpc,Bzc,dBrdRc,dBrdpc,dBrdZc,   &
-                      dBpdRc,dBpdpc,dBpdZc,dBzdRc,dBzdpc,dBzdZc,Arc,Apc,Azc)
+                    dBpdRc,dBpdpc,dBpdZc,dBzdRc,dBzdpc,dBzdZc,Arc,Apc,Azc)
 
         call add_scaled(  &
             Br,Bp,Bz,dBrdR,dBrdp,dBrdZ,dBpdR,dBpdp,dBpdZ,dBzdR,dBzdp,dBzdZ,  &
@@ -105,7 +104,7 @@ contains
     implicit none
 
     double precision, intent(in) :: r, phi, z
-    double precision, intent(out) :: Br, Bp, Bz, dBrdR, dBrdp, dBrdZ,   &
+    double precision, intent(inout) :: Br, Bp, Bz, dBrdR, dBrdp, dBrdZ,   &
                                      dBpdR, dBpdp, dBpdZ, dBzdR, dBzdp, dBzdZ,   &
                                      Ar, Ap, Az
 
@@ -120,6 +119,7 @@ contains
     complex(kind=complex_kind) :: pfac_imaginary
 
 
+    Bp = 0.0d0
     ! TODO: Solve this with a vector potential being Az = -int Bp dr with gauge Ar=0
     !
     ! call spline(nr,nz,rpoi,zpoi,hr,hz,icp,rbpav_coef,ipoint,r,z,         &

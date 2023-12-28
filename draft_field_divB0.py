@@ -28,6 +28,7 @@ my_little_magfie.init()
 
 x = np.zeros(3)
 B = np.zeros(3)
+A = np.zeros(3)
 
 x[0] = 100.0
 x[1] = 0.0
@@ -59,17 +60,25 @@ BR = np.empty((nr, nph, nz))
 BP = np.empty((nr, nph, nz))
 BZ = np.empty((nr, nph, nz))
 
+AR = np.empty((nr, nph, nz))
+AP = np.empty((nr, nph, nz))
+AZ = np.empty((nr, nph, nz))
+
 for kr in range(nr):
     for kph in range(nph):
         for kz in range(nz):
             x[0] = RR[kr, kph, kz]
             x[1] = PP[kr, kph, kz]
             x[2] = ZZ[kr, kph, kz]
-            my_little_magfie.eval_field_b(x, B)
+            my_little_magfie.eval_field_b_and_a(x, B, A)
 
             BR[kr, kph, kz] = B[0]
             BP[kr, kph, kz] = B[1]
             BZ[kr, kph, kz] = B[2]
+
+            AR[kr, kph, kz] = A[0]
+            AP[kr, kph, kz] = A[1]
+            AZ[kr, kph, kz] = A[2]
 
 # levels = np.linspace(-100.0, 100.0, 51)
 levels = np.linspace(-30000.0, 10000.0, 51)
@@ -84,7 +93,6 @@ plt.axis("equal")
 plt.colorbar()
 plt.savefig("PLOT/BR.pdf")
 
-# %%
 
 plt.figure(figsize=(5, 6.4))
 plt.contour(RR[:, 0, :], ZZ[:, 0, :], BP[:, 0, :], levels=levels)
@@ -94,7 +102,6 @@ plt.axis("equal")
 plt.colorbar()
 plt.savefig("PLOT/BP.pdf")
 
-# %%
 
 plt.figure(figsize=(5, 6.4))
 plt.contour(RR[:, 0, :], ZZ[:, 0, :], BZ[:, 0, :], levels=levels)
@@ -103,6 +110,35 @@ plt.title("BZ")
 plt.axis("equal")
 plt.colorbar()
 plt.savefig("PLOT/BZ.pdf")
+
+
+# %%
+
+plt.figure(figsize=(5, 6.4))
+plt.contour(RR[:, 0, :], ZZ[:, 0, :], AR[:, 0, :])
+plt.plot(Rwall, Zwall, "k")
+plt.title("AR")
+plt.axis("equal")
+plt.colorbar()
+plt.savefig("PLOT/AR.pdf")
+
+
+plt.figure(figsize=(5, 6.4))
+plt.contour(RR[:, 0, :], ZZ[:, 0, :], AP[:, 0, :])
+plt.plot(Rwall, Zwall, "k")
+plt.title("AP")
+plt.axis("equal")
+plt.colorbar()
+plt.savefig("PLOT/AP.pdf")
+
+
+plt.figure(figsize=(5, 6.4))
+plt.contour(RR[:, 0, :], ZZ[:, 0, :], AZ[:, 0, :])
+plt.plot(Rwall, Zwall, "k")
+plt.title("AZ")
+plt.axis("equal")
+plt.colorbar()
+plt.savefig("PLOT/AZ.pdf")
 
 # %%
 plt.figure(figsize=(8, 8))
@@ -228,9 +264,9 @@ plt.colorbar()
 # %% Do Poincare plot for field lines
 from scipy.integrate import solve_ivp
 
-num_cut = 256
-steps_per_cut = 2
-num_orbit = 5
+num_cut = 128
+steps_per_cut = 1
+num_orbit = 3
 
 Rstart = np.linspace(200, 210, num_orbit)
 
@@ -260,5 +296,15 @@ plt.xlim(Rmin, Rmax)
 plt.ylim(Zmin, Zmax)
 plt.plot(Rwall, Zwall, "k")
 #plt.axis("equal")
+
+# %%
+
+B = np.zeros(3)
+A = np.zeros(3)
+x = np.array([Rstart[0], 0.0, 0.0])
+my_little_magfie.eval_field_b_and_a(x, B, A)
+
+print(B)
+print(A)
 
 # %%
