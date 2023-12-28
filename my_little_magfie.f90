@@ -141,6 +141,10 @@ contains
     dBrdp=0.d0
     dBzdp=0.d0
 
+    Ar = 0.d0
+    Ap = 0.d0
+    Az = 0.d0
+
     do n=1,ntor
         call spline_vector_potential_n(n, r, z, anr,anz,anr_r,anr_z,anz_r,anz_z, &
         anr_rr,anr_rz,anr_zz,anz_rr,anz_rz,anz_zz)
@@ -174,6 +178,8 @@ contains
         dBpdZ=dBpdZ+deldBpdZ
         dBpdp=dBpdp+deldBpdp
 
+        Ar = Ar + 2.d0*real(anr*expon, kind=real_kind)
+        Az = Az + 2.d0*real(anz*expon, kind=real_kind)
     end do
 
     end subroutine my_field_divfree
