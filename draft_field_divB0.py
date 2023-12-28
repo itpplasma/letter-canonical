@@ -115,7 +115,7 @@ plt.savefig("PLOT/BZ.pdf")
 # %%
 
 plt.figure(figsize=(5, 6.4))
-plt.contour(RR[:, 0, :], ZZ[:, 0, :], AR[:, 0, :])
+plt.contour(RR[:, 0, :], ZZ[:, 0, :], AR[:, 0, :], levels=np.linspace(-2e3, 2e3, 51))
 plt.plot(Rwall, Zwall, "k")
 plt.title("AR")
 plt.axis("equal")
@@ -124,7 +124,7 @@ plt.savefig("PLOT/AR.pdf")
 
 
 plt.figure(figsize=(5, 6.4))
-plt.contour(RR[:, 0, :], ZZ[:, 0, :], AP[:, 0, :])
+plt.contour(RR[:, 0, :], ZZ[:, 0, :], AP[:, 0, :], levels=np.linspace(0, 3e5, 21))
 plt.plot(Rwall, Zwall, "k")
 plt.title("AP")
 plt.axis("equal")
@@ -133,7 +133,7 @@ plt.savefig("PLOT/AP.pdf")
 
 
 plt.figure(figsize=(5, 6.4))
-plt.contour(RR[:, 0, :], ZZ[:, 0, :], AZ[:, 0, :])
+plt.contour(RR[:, 0, :], ZZ[:, 0, :], AZ[:, 0, :], levels=np.linspace(1e7, 1.7e7, 21))
 plt.plot(Rwall, Zwall, "k")
 plt.title("AZ")
 plt.axis("equal")
