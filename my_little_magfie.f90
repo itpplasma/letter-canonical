@@ -28,51 +28,50 @@ contains
         real(8) :: dummy
 
         call my_field(x(1),x(2),x(3),B(1),B(2),B(3),dummy,dummy,dummy, &
-            dummy,dummy,dummy,dummy,dummy,dummy)
+            dummy,dummy,dummy,dummy,dummy,dummy,dummy,dummy,dummy)
     end subroutine eval_field_B
 
     ! Compute physical components of B and A in cylindrical coordinates x = (r,phi,z).
     ! This routine derives from GORILLA vector_potential_rphiz (there it's covariant).
     subroutine eval_field_B_and_A(x, B, A)
-        use field_eq_mod, only : rtf,btf,psif
 
         real(8), intent(in) :: x(3)
         real(8), intent(inout) :: B(3), A(3)
-        real(8) :: dummy, Bmod
+        real(8) :: dummy
 
         call my_field(x(1),x(2),x(3),B(1),B(2),B(3),dummy,dummy,dummy, &
-                   dummy,dummy,dummy,dummy,dummy,dummy)
-
-        bmod=sqrt(B(1)**2+B(2)**2+B(3)**2)
-
-        A(1)=0.d0
-        A(2)=psif/x(1)
-        A(3)=-rtf*btf*log(x(1))
-
-        ! TODO: Add perturbation field
+                   dummy,dummy,dummy,dummy,dummy,dummy,A(1),A(2),A(3))
     end subroutine eval_field_B_and_A
 
     subroutine my_field(r,p,z,Br,Bp,Bz,dBrdR,dBrdp,dBrdZ   &
-                    ,dBpdR,dBpdp,dBpdZ,dBzdR,dBzdp,dBzdZ)
+                    ,dBpdR,dBpdp,dBpdZ,dBzdR,dBzdp,dBzdZ,Ar,Ap,Az)
 
     use field_mod, only : ipert, iequil, ampl
+    use field_eq_mod, only : rtf,btf,psif
     use inthecore_mod, only : incore
     use libneo_kinds, only : real_kind
 
-    real(kind=real_kind), intent(in) :: r, z
-    real(kind=real_kind) :: p,Br,Bp,Bz,dBrdR,dBrdp,dBrdZ         &
-                        ,dBpdR,dBpdp,dBpdZ,dBzdR,dBzdp,dBzdZ
+    real(kind=real_kind), intent(in) :: r, z, p
+    real(kind=real_kind), intent(inout) :: Br,Bp,Bz,dBrdR,dBrdp,dBrdZ         &
+                        ,dBpdR,dBpdp,dBpdZ,dBzdR,dBzdp,dBzdZ,Ar,Ap,Az
     real(kind=real_kind) :: rm,zm,Brc,Bpc,Bzc,dBrdRc,dBrdpc,dBrdZc &
-                        ,dBpdRc,dBpdpc,dBpdZc,dBzdRc,dBzdpc,dBzdZc
+                        ,dBpdRc,dBpdpc,dBpdZc,dBzdRc,dBzdpc,dBzdZc,Arc,Apc,Azc
 
     call stretch_coords(r,z,rm,zm)
 
     if(iequil.eq.0) then
         call set_zero(Br,Bp,Bz,dBrdR,dBrdp,dBrdZ,   &
                     dBpdR,dBpdp,dBpdZ,dBzdR,dBzdp,dBzdZ)
+        Ar=0.d0
+        Ap=0.d0
+        Az=0.d0
     else
         call field_eq(rm,p,zm,Br,Bp,Bz,dBrdR,dBrdp,dBrdZ   &
                 ,dBpdR,dBpdp,dBpdZ,dBzdR,dBzdp,dBzdZ)
+
+            Ar=0.d0
+            Ap=psif/r
+            Az=-rtf*btf*log(r)
     end if
 
     if(ipert.gt.0) then
@@ -80,18 +79,16 @@ contains
         incore=-1
 
         call my_field_divfree(rm,p,zm,Brc,Bpc,Bzc,dBrdRc,dBrdpc,dBrdZc,   &
-                      dBpdRc,dBpdpc,dBpdZc,dBzdRc,dBzdpc,dBzdZc)
-
-        ! call field_divfree(rm,p,zm,Brc,Bpc,Bzc,dBrdRc,dBrdpc,dBrdZc,   &
-        ! dBpdRc,dBpdpc,dBpdZc,dBzdRc,dBzdpc,dBzdZc)
-
-        ! call field_c(rm,p,zm,Brc,Bpc,Bzc,dBrdRc,dBrdpc,dBrdZc   &
-        !        ,dBpdRc,dBpdpc,dBpdZc,dBzdRc,dBzdpc,dBzdZc)
+                      dBpdRc,dBpdpc,dBpdZc,dBzdRc,dBzdpc,dBzdZc,Arc,Apc,Azc)
 
         call add_scaled(  &
             Br,Bp,Bz,dBrdR,dBrdp,dBrdZ,dBpdR,dBpdp,dBpdZ,dBzdR,dBzdp,dBzdZ,  &
             Brc,Bpc,Bzc,dBrdRc,dBrdpc,dBrdZc,dBpdRc,dBpdpc,dBpdZc,dBzdRc,dBzdpc,  &
             dBzdZc,ampl)
+
+        Ar = Ar + ampl*Arc
+        Ap = Ap + ampl*Apc
+        Az = Az + ampl*Azc
 
     end if
 
@@ -99,7 +96,7 @@ contains
 
 
     subroutine my_field_divfree(r,phi,z,Br,Bp,Bz,dBrdR,dBrdp,dBrdZ    &
-                            ,dBpdR,dBpdp,dBpdZ,dBzdR,dBzdp,dBzdZ)
+                            ,dBpdR,dBpdp,dBpdZ,dBzdR,dBzdp,dBzdZ,Ar,Ap,Az)
 
     use bdivfree_mod, only : nr,nz,ntor,icp,ipoint,hr,hz,pfac,&
         & rpoi,zpoi,apav,rbpav_coef
@@ -109,7 +106,8 @@ contains
 
     double precision, intent(in) :: r, phi, z
     double precision, intent(out) :: Br, Bp, Bz, dBrdR, dBrdp, dBrdZ,   &
-                                & dBpdR, dBpdp, dBpdZ, dBzdR, dBzdp, dBzdZ
+                                     dBpdR, dBpdp, dBpdZ, dBzdR, dBzdp, dBzdZ,   &
+                                     Ar, Ap, Az
 
     integer :: n,ierr
     real(kind=real_kind) :: f,fr,fz,frr,frz,fzz
@@ -122,7 +120,7 @@ contains
     complex(kind=complex_kind) :: pfac_imaginary
 
 
-    ! TODO: Solve this with a vector potential being an integral over Bp*r
+    ! TODO: Solve this with a vector potential being Az = -int Bp dr with gauge Ar=0
     !
     ! call spline(nr,nz,rpoi,zpoi,hr,hz,icp,rbpav_coef,ipoint,r,z,         &
     !             f,fr,fz,frr,frz,fzz,ierr)
