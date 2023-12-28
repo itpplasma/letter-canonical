@@ -64,17 +64,17 @@ num_cut = 128
 steps_per_cut = 1
 num_orbit = 2
 
-Rstart = np.linspace(1.0, 2.0, num_orbit)
+Rstart = np.linspace(1.5, 2.0, num_orbit)
 
 
-plt.figure(figsize=(10, 12.8))
+plt.figure(figsize=(10, 10))
 for k in range(num_orbit):
     xstart = np.array([Rstart[k], 0.0, 0.0])
 
     t = np.linspace(0.0, 2*np.pi*num_cut, steps_per_cut*num_cut + 1)
     sol = solve_ivp(simple_cyl.fieldline_direction,
                     [0.0, 2*np.pi*num_cut], xstart, t_eval=t,
-                    method="RK45", rtol=1e-4, atol=1e-4)
+                    method="RK45", rtol=1e-6, atol=1e-6)
 
     plt.plot(sol.y[0, ::steps_per_cut], sol.y[2, ::steps_per_cut], ",")
 
