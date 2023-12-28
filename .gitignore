@@ -4,3 +4,4 @@
 __pycache__
 *.pdf
 fort.*
+stellarator/coils.c09r00
