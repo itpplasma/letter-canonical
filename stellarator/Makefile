@@ -10,7 +10,7 @@ clean_objects:
 	rm -f *.o
 
 simple_cyl.$(TARGET_SUFFIX): simple_cyl.f90
-	LDFLAGS=-Wl,-rpath,. f2py -c -m simple_cyl simple_cyl.f90 -L. -lstell -lblas -llapack -I$(HOME)/bin/libstell_dir
+	LDFLAGS=-Wl,-rpath,. f2py -c -m simple_cyl simple_cyl.f90 -L$(HOME)/bin -lstell -lblas -llapack -I$(HOME)/bin/libstell_dir
 
 coils.c09r00:
 	wget https://princetonuniversity.github.io/STELLOPT/examples/coils.c09r00
