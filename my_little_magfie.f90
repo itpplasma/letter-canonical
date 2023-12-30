@@ -98,7 +98,7 @@ contains
                             ,dBpdR,dBpdp,dBpdZ,dBzdR,dBzdp,dBzdZ,Ar,Ap,Az)
 
     use bdivfree_mod, only : nr,nz,ntor,icp,ipoint,hr,hz,pfac,&
-        & rpoi,zpoi,apav,rbpav_coef
+        & rpoi,zpoi,apav
     use libneo_kinds, only : complex_kind, real_kind
 
     implicit none
