@@ -1,0 +1,31 @@
+name: Makefile CI
+
+on:
+  push:
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
+
+jobs:
+  build:
+
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v3
+
+    - name: Install dependencies
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y --no-install-recommends \
+          gfortran \
+          make
+
+    - name: Get libneo dependency
+      run: |
+        cd ..
+        git clone https://github.com/itpplasma/libneo
+        cd -
+
+    - name: Build
+      run: make
