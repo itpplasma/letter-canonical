@@ -36,7 +36,11 @@ else
     $(error Unsupported field variant: $(FIELD_VARIANT))
 endif
 
-all: libfield.so my_little_magfie.$(TARGET_SUFFIX) clean_objects
+all: libfield.so my_little_magfie.$(TARGET_SUFFIX) letter-canonical.x \
+	clean_objects
+
+letter-canonical.x: canonical.f90 my_little_magfie.f90 main.f90
+	$(FC) $(FFLAGS) -o $@ $^ -L. -lfield
 
 clean_objects:
 	rm -f *.o
