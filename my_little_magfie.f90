@@ -5,12 +5,14 @@ contains
 
     subroutine init
         use field_mod, only : icall, ipert, ampl
+        use field_eq_mod, only : icall_eq
         use field_c_mod, only : icall_c
         use libneo_kinds, only : real_kind
 
         if (icall < 1) then
             call read_field_input
             icall = 1
+            icall_eq = 1
             print *, 'Perturbation field', ipert, 'Ampl', ampl
         end if
 

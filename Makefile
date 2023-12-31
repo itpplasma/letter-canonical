@@ -2,7 +2,7 @@ include FindPython.mk
 
 # Compiler with debugging flags
 FC = gfortran
-FFLAGS = -g -fPIC -O3 -march=native -mtune=native
+FFLAGS = -g -fPIC -O3 -fopenmp -march=native -mtune=native
 
 FFLAGS += -Wall -Wuninitialized -Wno-unused-label -Wno-unused-dummy-argument -Werror -Wfatal-errors
 
