@@ -3,7 +3,7 @@ program main
 
     implicit none
 
-    integer, parameter :: n_r=50, n_phi=32, n_z=75
+    integer, parameter :: n_r=50, n_phi=64, n_z=75
     real(8), parameter :: rmin = 75.d0, rmax = 264.42281879194627d0, &
                           zmin = -150.d0, zmax = 147.38193979933115d0
 

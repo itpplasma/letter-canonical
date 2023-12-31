@@ -37,7 +37,7 @@ contains
         h_phi = 2.d0*pi/dble(n_phi-1)
         h_z = (zmax-zmin)/dble(n_z-1)
 
-        !$omp parallel private(y, dy, i_r, i_phi, i_z, r1, r2, r, dG_dt, dG_dp)
+        !$omp parallel private(y, dy, i_r, i_phi, i_z, z_c, phi_c, r1, r2)
         !$omp critical
             allocate(y(ndim),dy(ndim))
         !$omp end critical
@@ -51,7 +51,7 @@ contains
             do i_phi=1,n_phi
                 phi_c = h_phi*dble(i_phi-1)
 
-                delta_phi(1, i_z, i_phi)=0.d0
+                delta_phi(1, i_phi, i_z) = 0.d0
 
                 y(1) = 0.d0
 
@@ -61,11 +61,12 @@ contains
 
                     call odeint_allroutines(y, ndim, r1, r2, relerr, derivs)
 
-                    delta_phi(i_r,i_phi,i_z)=y(1)
+                    delta_phi(i_r, i_phi, i_z) = y(1)
                 enddo
             enddo
         enddo
         !$omp end do
+        !$omp end parallel
 
         contains
 

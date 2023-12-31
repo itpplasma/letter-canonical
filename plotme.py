@@ -4,7 +4,7 @@ import matplotlib.pyplot as plt
 
 data = np.loadtxt("fort.10")
 
-data = data.reshape((75, 32, 50))
+data = data.reshape((75, 64, 50))
 
 # Plot 2D slice as contour
 plt.figure()
