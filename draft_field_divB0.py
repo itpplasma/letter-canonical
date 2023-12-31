@@ -306,11 +306,11 @@ plt.colorbar()
 # %% Do Poincare plot for field lines
 from scipy.integrate import solve_ivp
 
-num_cut = 128
+num_cut = 256
 steps_per_cut = 1
-num_orbit = 3
+num_orbit = 4
 
-Rstart = np.linspace(200, 210, num_orbit)
+Rstart = np.linspace(190, 206, num_orbit)
 
 def fieldline_direction(t, x):
     B = np.zeros(3)
@@ -332,7 +332,7 @@ for k in range(num_orbit):
     sol = solve_ivp(fieldline_direction, [0.0, 2*np.pi*num_cut], xstart, t_eval=t,
                     method="RK45", rtol=1e-8, atol=1e-8)
 
-    plt.plot(sol.y[0, ::steps_per_cut], sol.y[2, ::steps_per_cut], ",")
+    plt.plot(sol.y[0, ::steps_per_cut], sol.y[2, ::steps_per_cut], ".")
 
 plt.xlim(Rmin, Rmax)
 plt.ylim(Zmin, Zmax)
