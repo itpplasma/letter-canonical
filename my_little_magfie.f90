@@ -11,9 +11,11 @@ contains
 
         if (icall < 1) then
             call read_field_input
-            icall = 1
-            icall_eq = 1
             print *, 'Perturbation field', ipert, 'Ampl', ampl
+            call init_stretch_coords
+            icall = 1
+            call init_field_eq
+            icall_eq = 1
         end if
 
         if (ipert > 0 .and. icall_c < 1) then
@@ -185,6 +187,185 @@ contains
     end do
 
     end subroutine my_field_divfree
+
+
+    subroutine init_stretch_coords
+        use input_files, only : iunit, convexfile
+        use libneo_kinds, only : real_kind
+        use math_constants, only : TWOPI
+
+        integer, parameter :: nrzmx=100 ! possible max. of nrz
+        integer i, j, nrz ! number of points "convex wall" in input file
+        integer, parameter :: nrhotht=360
+        integer :: iflag
+
+        ! points "convex wall"
+        real(kind=real_kind), dimension(0:1000) :: rad_w, zet_w
+        real(kind=real_kind), dimension(:), allocatable :: rho_w, tht_w
+        real(kind=real_kind), dimension(nrhotht) :: rho_wall, tht_wall ! polar coords
+
+        real(kind=real_kind) R0,Rw, Zw, htht, a, b, dummy
+
+        nrz = 0
+        rad_w = 0.
+        zet_w = 0.
+        open(iunit,file=trim(convexfile))
+        do i=1,nrzmx
+            read(iunit,*,END=10)rad_w(i),zet_w(i)
+            nrz = nrz + 1
+        end do
+    10  continue
+        close(iunit)
+
+        allocate(rho_w(0:nrz+1), tht_w(0:nrz+1))
+        R0 = (maxval(rad_w(1:nrz)) +  minval(rad_w(1:nrz)))*0.5
+        do i=1,nrz
+            rho_w(i) = sqrt( (rad_w(i)-R0)**2 + zet_w(i)**2 )
+            tht_w(i) = atan2(zet_w(i),(rad_w(i)-R0))
+            if(tht_w(i) .lt. 0.) tht_w(i) = tht_w(i) + TWOPI
+        end do
+
+        ! make sure points are ordered according to tht_w.
+        do
+            iflag = 0
+            do i=1,nrz-1
+                if (tht_w(i) > tht_w(i+1)) then
+                iflag = 1
+                dummy = rad_w(i+1)
+                rad_w(i+1) = rad_w(i)
+                rad_w(i) = dummy
+                dummy = zet_w(i+1)
+                zet_w(i+1) = zet_w(i)
+                zet_w(i) = dummy
+                dummy = rho_w(i+1)
+                rho_w(i+1) = rho_w(i)
+                rho_w(i) = dummy
+                dummy = tht_w(i+1)
+                tht_w(i+1) = tht_w(i)
+                tht_w(i) = dummy
+                end if
+            end do
+            if (iflag == 0) exit
+        end do
+        rad_w(0) = rad_w(nrz)
+        zet_w(0) = zet_w(nrz)
+        tht_w(0) = tht_w(nrz) - TWOPI
+        rho_w(0) = rho_w(nrz)
+        rad_w(nrz+1) = rad_w(1)
+        zet_w(nrz+1) = zet_w(1)
+        tht_w(nrz+1) = tht_w(1) + TWOPI
+        rho_w(nrz+1) = rho_w(1)
+
+        htht = TWOPI/(nrhotht-1)
+        do i=2,nrhotht
+            tht_wall(i) = htht*(i-1)
+            do j=0,nrz
+                if(tht_wall(i).ge.tht_w(j) .and. tht_wall(i).le.tht_w(j+1)) then
+                if( abs((rad_w(j+1) - rad_w(j))/rad_w(j)) .gt. 1.e-3) then
+                    a = (zet_w(j+1) - zet_w(j))/(rad_w(j+1) - rad_w(j))
+                    b = zet_w(j) - a*(rad_w(j) - R0)
+                    Rw = b/(tan(tht_wall(i)) - a) + R0
+                    Zw = a*(Rw - R0) + b
+                else
+                    a = (rad_w(j+1) - rad_w(j))/(zet_w(j+1) - zet_w(j))
+                    b = rad_w(j)-R0 - a*zet_w(j)
+                    Zw = b/(1./tan(tht_wall(i)) - a)
+                    Rw = a*Zw + b + R0
+                end if
+                end if
+            end do
+            rho_wall(i) = sqrt((Rw-R0)**2 + Zw**2)
+        end do
+        tht_wall(1) = 0.
+        rho_wall(1) = rho_wall(nrhotht)
+
+    end subroutine init_stretch_coords
+
+
+    subroutine init_field_eq
+        use input_files, only : ieqfile
+        use field_eq_mod, only : use_fpol,skip_read,nrad,nzet,icp,nwindow_r,&
+          nwindow_z,psib,btf,rtf,hrad,hzet,psi_axis,psi_sep,&
+          psi,psi0,splfpol,splpsi,rad,zet,imi,ima,jmi,jma,ipoint
+        use libneo_kinds, only : real_kind
+
+        integer :: i
+
+        if (.not. skip_read) then
+        if (ieqfile == 0) then
+            call read_dimeq0(nrad, nzet)
+        elseif (ieqfile == 2) then
+            call read_dimeq_west(nrad, nzet)
+        else
+            call read_dimeq1(nrad, nzet)
+        end if
+        allocate(rad(nrad), zet(nzet))
+        allocate(psi0(nrad, nzet), psi(nrad, nzet))
+        end if
+        if (use_fpol) then
+        if (.not. skip_read) then
+            allocate(splfpol(0:5, nrad))
+            call read_eqfile2(nrad, nzet, psi_axis, psi_sep, btf, rtf, &
+                            splfpol(0, :), rad, zet, psi)
+        end if
+        psib = -psi_axis
+        psi_sep = (psi_sep - psi_axis) * 1.d8
+        splfpol(0, :) = splfpol(0, :) * 1.d6
+        call spline_fpol
+        else
+        if (.not. skip_read) then
+            if (ieqfile == 0) then
+            call read_eqfile0(nrad, nzet, psib, btf, rtf, rad, zet, psi)
+            elseif (ieqfile == 2) then
+            call read_eqfile_west(nrad, nzet, psib, btf, rtf, rad, zet, psi)
+            else
+            call read_eqfile1(nrad, nzet, psib, btf, rtf, rad, zet, psi)
+            end if
+        end if
+        end if
+
+        ! Filtering:
+        do i=1,nzet
+        call window_filter(nrad,nwindow_r,psi(:,i),psi0(:,i))
+        end do
+
+        do i=1,nrad
+        call window_filter(nzet,nwindow_z,psi0(i,:),psi(i,:))
+        end do
+        ! End filtering
+
+        rad = rad*1.d2 ! cm
+        zet = zet*1.d2 ! cm
+        rtf = rtf*1.d2 ! cm
+        psi = psi*1.d8
+        psib= psib*1.d8
+        btf = btf*1.d4
+
+        psi=psi+psib
+
+        hrad = rad(2) - rad(1)
+        hzet = zet(2) - zet(1)
+
+        ! rectangular domain:
+        allocate( imi(nzet),ima(nzet),jmi(nrad),jma(nrad) )
+        imi = 1
+        ima = nrad
+        jmi = 1
+        jma = nzet
+
+        !  Computation of the number of data in splpsi
+        icp = 0
+        do i=1,nzet
+        if ( imi(i) .gt. 0 .and. ima(i) .gt. 0 ) then
+            icp = icp + ima(i) - imi(i) + 1
+        end if
+        end do
+        write(6,*) 'number of points in the table:  ',icp
+
+        allocate( splpsi(6,6,icp), ipoint(nrad,nzet) )
+
+        call s2dcut(nrad,nzet,hrad,hzet,psi,imi,ima,jmi,jma,icp,splpsi,ipoint)
+    end subroutine init_field_eq
 
 
     subroutine read_field_input_c
