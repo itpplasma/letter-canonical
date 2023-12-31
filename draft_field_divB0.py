@@ -202,7 +202,6 @@ nr = 1024
 nz = 8
 
 x[1] = 0.5
-x[2] = 40.0
 
 R = np.linspace(Rmin, Rmax, nr)
 Z = np.linspace(Zmin, Zmax, nz)
@@ -227,6 +226,49 @@ plt.figure(figsize=(8, 8))
 
 for kz in range(nz):
     plt.plot(R, BR[:, kz], label=f"Z={Z[kz]}")
+
+
+# %% Plot over phi
+nph = 128
+
+P = np.linspace(0.0, 2 * np.pi, nph)
+
+x[0] = 0.5*(Rmin + Rmax)
+x[2] = 0.5*(Zmin + Zmax)
+
+BR = np.empty(nph)
+BP = np.empty(nph)
+BZ = np.empty(nph)
+
+for kph in range(nph):
+    x[1] = P[kph]
+    my_little_magfie.eval_field_b(x, B)
+
+    BR[kph] = B[0]
+    BP[kph] = B[1]
+    BZ[kph] = B[2]
+
+Bmod = np.sqrt(BR**2 + BP**2 + BZ**2)
+
+plt.figure()
+plt.plot(P, BR)
+plt.xlabel("phi")
+plt.ylabel("BR")
+
+plt.figure()
+plt.plot(P, BP)
+plt.xlabel("phi")
+plt.ylabel("BP")
+
+plt.figure()
+plt.plot(P, BZ)
+plt.xlabel("phi")
+plt.ylabel("BZ")
+
+plt.figure()
+plt.plot(P, Bmod)
+plt.xlabel("phi")
+plt.ylabel("|B|")
 
 # %% Load perturbation field directly for comparison
 
