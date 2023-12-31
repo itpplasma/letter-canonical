@@ -6,3 +6,4 @@ __pycache__
 fort.*
 stellarator/coils.c09r00
 *.x
+*.out
