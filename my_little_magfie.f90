@@ -1,4 +1,6 @@
 module my_little_magfie
+    use field_c_mod, only : rmin, pmin, zmin, rmax, pmax, zmax
+
     implicit none
 
 contains
