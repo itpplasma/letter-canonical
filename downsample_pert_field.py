@@ -29,9 +29,16 @@ R_new = R[::nr_factor]
 P_new = P[::np_factor]
 Z_new = Z[::nz_factor]
 
+# Append last point to make periodic
+Br_new = np.append(Br_new, Br_new[:, 0:1, :], axis=1)
+Bp_new = np.append(Bp_new, Bp_new[:, 0:1, :], axis=1)
+Bz_new = np.append(Bz_new, Bz_new[:, 0:1, :], axis=1)
+
+P_new = np.append(P_new, 2 * np.pi)
+
 bounds_new = (
     (R_new.min(), R_new.max()),
-    (P_new.min(), 2 * np.pi),
+    (P_new.min(), 2 * np.pi),``
     (Z_new.min(), Z_new.max()),
 )
 # %% Write
