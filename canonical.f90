@@ -61,7 +61,7 @@ contains
 
                     call odeint_allroutines(y, ndim, r1, r2, relerr, derivs)
 
-                    delta_phi(i_r,i_z,i_phi)=y(1)
+                    delta_phi(i_r,i_phi,i_z)=y(1)
                 enddo
             enddo
         enddo
