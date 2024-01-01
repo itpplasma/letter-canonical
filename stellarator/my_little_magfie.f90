@@ -1,15 +1,15 @@
-module simple_cyl
+module my_little_magfie
 
     implicit none
 
 contains
 
     subroutine test()
-        print *, "Hello from simple_cyl"
+        print *, "Hello from Stellarator magfie"
     end subroutine test
 
     ! This initializes an NCSX vacuum field
-    subroutine init_ncsx()
+    subroutine init
         use biotsavart, only: initialize_biotsavart
 
         real(8) :: extcur(10) = &
@@ -19,10 +19,10 @@ contains
            4.55138737653200E+04 /)
 
         call initialize_biotsavart(extcur, "c09r00")
-    end subroutine init_ncsx
+    end subroutine init
 
 
-    subroutine eval_bfield(x, B)
+    subroutine eval_field_B(x, B)
         use biotsavart, only: bfield
 
         real(8), intent(in) :: x(3)
@@ -31,15 +31,22 @@ contains
         call bfield (x(1), x(2), x(3), B(1), B(2), B(3))
     end subroutine eval_bfield
 
-    subroutine eval_afield(x, A)
+    subroutine eval_field_A(x, A)
         use biotsavart, only: afield
 
         real(8), intent(in) :: x(3)
         real(8), intent(out) :: A(3)
 
         call afield (x(1), x(2), x(3), A(1), A(2), A(3))
-    end subroutine eval_afield
+    end subroutine eval_field_A
 
+    subroutine eval_field_B_and_A(x, B, A)
+        real(8), intent(in) :: x(3)
+        real(8), intent(inout) :: B(3), A(3)
+
+        call eval_field_B(x, B)
+        call eval_field_A(x, A)
+    end subroutine eval_field_B_and_A
 
     function fieldline_direction(t, x)
         real(8), intent(in) :: t

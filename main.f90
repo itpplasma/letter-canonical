@@ -12,7 +12,7 @@ program main
 
     allocate(delta_phi(n_r, n_phi, n_z), chi_gauge(n_r, n_phi, n_z))
 
-    call init
+    call init(n_r, n_phi, n_z)
     call get_transformation(delta_phi, chi_gauge)
 
     open(newunit=outfile_unit, file="delta_phi.out")

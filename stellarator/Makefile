@@ -4,13 +4,23 @@ include ../FindPython.mk
 FC = gfortran
 FFLAGS = -g -fPIC -O3 -march=native -mtune=native
 
-all: simple_cyl.$(TARGET_SUFFIX) clean_objects coils.c09r00
+all: simple_cyl.$(TARGET_SUFFIX) clean_objects coils.c09r00 \
+	letter-canonical-stel.x
 
 clean_objects:
 	rm -f *.o
 
-simple_cyl.$(TARGET_SUFFIX): simple_cyl.f90
-	LDFLAGS=-Wl,-rpath,. f2py -c -m simple_cyl simple_cyl.f90 -L$(HOME)/bin -lstell -lblas -llapack -I$(HOME)/bin/libstell_dir
+letter-canonical-stel.x: canonical.o my_little_magfie.o main.f90
+	$(FC) $(FFLAGS) -o $@ $^ -L. -lfield
+
+canonical.o: ../canonical.f90 my_little_magfie.o
+	$(FC) $(FFLAGS) -c $^
+
+my_little_magfie.o: my_little_magfie.f90 libfield.so
+	$(FC) $(FFLAGS) -c $^
+
+simple_cyl.$(TARGET_SUFFIX): my_little_magfie.f90
+	LDFLAGS=-Wl,-rpath,. f2py -c -m simple_cyl my_little_magfie.f90 -L$(HOME)/bin -lstell -lblas -llapack -I$(HOME)/bin/libstell_dir
 
 coils.c09r00:
 	wget https://princetonuniversity.github.io/STELLOPT/examples/coils.c09r00
