@@ -1,14 +1,14 @@
 # %%
 import numpy as np
 import matplotlib.pyplot as plt
-from simple_cyl import simple_cyl
+from simple_cyl import my_little_magfie
 
-simple_cyl.test()
-simple_cyl.init_ncsx()
+my_little_magfie.test()
+my_little_magfie.init()
 
 # %%
-B = simple_cyl.eval_bfield([1.0, 0.0, 0.0])
-A = simple_cyl.eval_afield([1.0, 0.0, 0.0])
+B = my_little_magfie.eval_field_b([1.0, 0.0, 0.0])
+A = my_little_magfie.eval_field_a([1.0, 0.0, 0.0])
 
 print(f"B = {B}")
 print(f"A = {A}")
@@ -37,8 +37,8 @@ for kr in range(nr):
             r = RR[kr, kph, kz]
             ph = PP[kr, kph, kz]
             z = ZZ[kr, kph, kz]
-            BB[kr, kph, kz] = simple_cyl.eval_bfield([r, ph, z])
-            AA[kr, kph, kz] = simple_cyl.eval_afield([r, ph, z])
+            BB[kr, kph, kz] = my_little_magfie.eval_field_b([r, ph, z])
+            AA[kr, kph, kz] = my_little_magfie.eval_field_a([r, ph, z])
 
 # %%
 kph = 0
@@ -72,7 +72,7 @@ for k in range(num_orbit):
     xstart = np.array([Rstart[k], 0.0, 0.0])
 
     t = np.linspace(0.0, 2*np.pi*num_cut, steps_per_cut*num_cut + 1)
-    sol = solve_ivp(simple_cyl.fieldline_direction,
+    sol = solve_ivp(my_little_magfie.fieldline_direction,
                     [0.0, 2*np.pi*num_cut], xstart, t_eval=t,
                     method="RK45", rtol=1e-6, atol=1e-6)
 
