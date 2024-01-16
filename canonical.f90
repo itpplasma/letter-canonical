@@ -4,7 +4,7 @@ module canonical
     implicit none
 
     real(8), parameter :: pi = atan(1.d0)*4.d0
-    real(8), parameter :: twopi = atan(1.d0)*2.d0
+    real(8), parameter :: twopi = atan(1.d0)*8.d0
 
     integer, parameter :: nper = 1  ! Number of periods (TODO: make thi_r a variable)
     integer, parameter :: spl_order = 5
