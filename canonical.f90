@@ -13,8 +13,8 @@ module canonical
     !$omp threadprivate(phi_c, z_c)
 
     ! Number and spacing of grid points
-    integer :: n_r, n_phi, n_z
-    real(8) :: h_r, h_phi, h_z
+    integer :: n_r, n_z, n_phi
+    real(8) :: h_r, h_z, h_phi
 
     ! Precomputed factors for spline derivatives
     real(8), dimension(spl_order+1) :: derf1, derf2, derf3
