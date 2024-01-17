@@ -2,8 +2,8 @@ include FindPython.mk
 
 # Compiler with debugging flags
 FC = gfortran
-# FFLAGS = -g -fPIC -O3 -fopenmp -march=native -mtune=native
-FFLAGS = -g -fPIC -Og -fopenmp
+FFLAGS = -g -fPIC -O3 -fopenmp -march=native -mtune=native
+# FFLAGS = -g -fPIC -Og -fopenmp
 
 FFLAGS += -Wall -Wuninitialized -Wno-unused-label -Wno-unused-dummy-argument -Werror -Wfatal-errors -I../bspline-fortran/build/lib
 

@@ -46,7 +46,7 @@ program main
     do kr = 1, n_r
         do kz = 1, n_z
             do kphi = 1, n_phi
-                test_function(kr, kz, kphi) = cos(phi(kphi))
+                test_function(kr, kz, kphi) = r(kr)*z(kz)*cos(phi(kphi))
             end do
         end do
     end do
@@ -66,6 +66,7 @@ program main
     call construct_splines(spl_lam_chi)
 
     call test_splines
+    call test_spline_derivatives
 
     ! TODO: Compute A, h, Bmod from splines on grid in canonical coordinates
     ! TODO: Spline A, h, Bmod on grid in canonical coordinates
@@ -75,10 +76,10 @@ program main
 contains
 
     subroutine test_splines
-        use canonical, only : eval_splines
+        use canonical, only : eval_splines_der2
 
         real(8) :: x(3)
-        real(8) :: y
+        real(8) :: y, dy(3), d2y(6)
 
         integer :: kr, kz, kphi
 
@@ -90,18 +91,18 @@ contains
         x(2) = z(kz)
         x(3) = phi(kphi)
 
-        call eval_splines(spl_lam_chi(1,:,:,:,:,:,:), x, y)
+        call eval_splines_der2(spl_lam_chi(1,:,:,:,:,:,:), x, y, dy, d2y)
 
         print *, "lam_phi = ", lam_phi(kr, kz, kphi), y
 
 
-        call eval_splines(spl_lam_chi(2,:,:,:,:,:,:), x, y)
+        call eval_splines_der2(spl_lam_chi(2,:,:,:,:,:,:), x, y, dy, d2y)
 
         print *, "chi_gauge = ", chi_gauge(kr, kz, kphi), y
 
-        call eval_splines(spl_lam_chi(3,:,:,:,:,:,:), x, y)
+        call eval_splines_der2(spl_lam_chi(3,:,:,:,:,:,:), x, y, dy, d2y)
 
-        print *, "test = ", test_function(kr, kz, kphi), y
+        print *, "test = ", r(kr)*z(kz)*cos(phi(kphi)), y
 
         do kphi = 1, n_phi
             x(3) = phi(kphi)
@@ -109,11 +110,11 @@ contains
                 x(2) = z(kz)
                 do kr = 1, n_r
                     x(1) = r(kr)
-                    call eval_splines(spl_lam_chi(1,:,:,:,:,:,:), x, y)
+                    call eval_splines_der2(spl_lam_chi(1,:,:,:,:,:,:), x, y, dy, d2y)
                     lam_phi(kr, kz, kphi) = y
-                    call eval_splines(spl_lam_chi(2,:,:,:,:,:,:), x, y)
+                    call eval_splines_der2(spl_lam_chi(2,:,:,:,:,:,:), x, y, dy, d2y)
                     chi_gauge(kr, kz, kphi) = y
-                    call eval_splines(spl_lam_chi(3,:,:,:,:,:,:), x, y)
+                    call eval_splines_der2(spl_lam_chi(3,:,:,:,:,:,:), x, y, dy, d2y)
                     test_function(kr, kz, kphi) = y
                 end do
             end do
@@ -131,4 +132,31 @@ contains
             write(outfile_unit, *) test_function
         close(outfile_unit)
     end subroutine test_splines
+
+    subroutine test_spline_derivatives
+        use canonical, only : eval_splines_der2
+
+        real(8) :: x(3)
+        real(8) :: y, dy(3), d2y(6)
+
+        integer :: kr, kz, kphi
+
+        kr=23
+        kz=32
+        kphi=25
+
+        x(1) = r(kr)
+        x(2) = z(kz)
+        x(3) = phi(kphi)
+
+        call eval_splines_der2(spl_lam_chi(3,:,:,:,:,:,:), x, y, dy, d2y)
+
+        print *, "d/dr test   = ", z(kz)*cos(phi(kphi)), dy(1)
+        print *, "d/dz test   = ", r(kr)*cos(phi(kphi)), dy(2)
+        print *, "d/dphi test = ", -r(kr)*z(kz)*sin(phi(kphi)), dy(3)
+
+        print *, "d2/dr2 test   = ", 0.0, d2y(1)
+
+
+    end subroutine test_spline_derivatives
 end program main

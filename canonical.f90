@@ -209,52 +209,49 @@ contains
         !
         ! Begin interpolation over $x1$
         !
-        stp_all(1:nsp1,1:nsp1)=spl_data(nsp1,:,:,i_r,i_z,i_phi)
-        dstp_all_ds(1:nsp1,1:nsp1)=stp_all(1:nsp1,1:nsp1)*derf1(nsp1)
-        d2stp_all_ds2(1:nsp1,1:nsp1)=stp_all(1:nsp1,1:nsp1)*derf2(nsp1)
+        stp_all = spl_data(nsp1,:,:,i_r,i_z,i_phi)
+        dstp_all_ds = stp_all*derf1(nsp1)
+        d2stp_all_ds2 = stp_all*derf2(nsp1)
         !
-        do k=spl_order,3,-1
-            stp_all(1:nsp1,1:nsp1)=spl_data(k,:,:,i_r,i_z,i_phi) &
-                + dr*stp_all(1:nsp1,1:nsp1)
-            dstp_all_ds(1:nsp1,1:nsp1)=spl_data(k,:,:,i_r,i_z,i_phi)*derf1(k) &
-                + dr*dstp_all_ds(1:nsp1,1:nsp1)
-            d2stp_all_ds2(1:nsp1,1:nsp1)=spl_data(k,:,:,i_r,i_z,i_phi)*derf2(k) &
-                + dr*d2stp_all_ds2(1:nsp1,1:nsp1)
+        do k=spl_order,1,-1
+            stp_all=spl_data(k,:,:,i_r,i_z,i_phi) + dr*stp_all
+            if (k > 1) then
+                dstp_all_ds = spl_data(k,:,:,i_r,i_z,i_phi)*derf1(k) + dr*dstp_all_ds
+            end if
+            if (k > 2) then
+                d2stp_all_ds2 = spl_data(k,:,:,i_r,i_z,i_phi)*derf2(k) &
+                    + dr*d2stp_all_ds2
+            end if
         enddo
-        !
-        stp_all(1:nsp1,1:nsp1)=spl_data(1,:,:,i_r,i_z,i_phi) &
-             + dr*(spl_data(2,:,:,i_r,i_z,i_phi)+dr*stp_all(1:nsp1,1:nsp1))
-        dstp_all_ds(1:nsp1,1:nsp1)=spl_data(2,:,:,i_r,i_z,i_phi) &
-            + dr*dstp_all_ds(1:nsp1,1:nsp1)
+
         !
         ! End interpolation over $x1$
         !-------------------------------
         ! Begin interpolation over $x2$
         !
-        sp_all(1:nsp1)=stp_all(nsp1,1:nsp1)
-        dsp_all_ds(1:nsp1)=dstp_all_ds(nsp1,1:nsp1)
-        d2sp_all_ds2(1:nsp1)=d2stp_all_ds2(nsp1,1:nsp1)
-        dsp_all_dt(1:nsp1)=sp_all(1:nsp1)*derf1(nsp1)
-        d2sp_all_dsdt(1:nsp1)=dsp_all_ds(1:nsp1)*derf1(nsp1)
-        d2sp_all_dt2(1:nsp1)=sp_all(1:nsp1)*derf2(nsp1)
+        sp_all=stp_all(nsp1,1:nsp1)
+        dsp_all_ds=dstp_all_ds(nsp1,1:nsp1)
+        d2sp_all_ds2=d2stp_all_ds2(nsp1,1:nsp1)
+        dsp_all_dt=sp_all*derf1(nsp1)
+        d2sp_all_dsdt=dsp_all_ds*derf1(nsp1)
+        d2sp_all_dt2=sp_all*derf2(nsp1)
 
         do k=spl_order,3,-1
-            sp_all(1:nsp1)=stp_all(k,1:nsp1)+dz*sp_all(1:nsp1)
-            dsp_all_ds(1:nsp1)=dstp_all_ds(k,1:nsp1)+dz*dsp_all_ds(1:nsp1)
-            d2sp_all_ds2(1:nsp1)=d2stp_all_ds2(k,1:nsp1)+dz*d2sp_all_ds2(1:nsp1)
-            dsp_all_dt(1:nsp1)=stp_all(k,1:nsp1)*derf1(k)+dz*dsp_all_dt(1:nsp1)
-            d2sp_all_dsdt(1:nsp1)=dstp_all_ds(k,1:nsp1)*derf1(k) &
-                + dz*d2sp_all_dsdt(1:nsp1)
-            d2sp_all_dt2(1:nsp1)=stp_all(k,1:nsp1)*derf2(k)+dz*d2sp_all_dt2(1:nsp1)
+            sp_all=stp_all(k,1:nsp1)+dz*sp_all
+            dsp_all_ds=dstp_all_ds(k,1:nsp1)+dz*dsp_all_ds
+            d2sp_all_ds2=d2stp_all_ds2(k,1:nsp1)+dz*d2sp_all_ds2
+            dsp_all_dt=stp_all(k,1:nsp1)*derf1(k)+dz*dsp_all_dt
+            d2sp_all_dsdt=dstp_all_ds(k,1:nsp1)*derf1(k) &
+                + dz*d2sp_all_dsdt
+            d2sp_all_dt2=stp_all(k,1:nsp1)*derf2(k)+dz*d2sp_all_dt2
         enddo
 
-        sp_all(1:nsp1)=stp_all(1,1:nsp1) + dz*(stp_all(2,1:nsp1)+dz*sp_all(1:nsp1))
-        dsp_all_ds(1:nsp1)=dstp_all_ds(1,1:nsp1) &
-                            + dz*(dstp_all_ds(2,1:nsp1)+dz*dsp_all_ds(1:nsp1))
-        d2sp_all_ds2(1:nsp1)=d2stp_all_ds2(1,1:nsp1) &
-                            + dz*(d2stp_all_ds2(2,1:nsp1)+dz*d2sp_all_ds2(1:nsp1))
-        dsp_all_dt(1:nsp1)=stp_all(2,1:nsp1)+dz*dsp_all_dt(1:nsp1)
-        d2sp_all_dsdt(1:nsp1)=dstp_all_ds(2,1:nsp1)+dz*d2sp_all_dsdt(1:nsp1)
+        sp_all=stp_all(1,1:nsp1) + dz*(stp_all(2,1:nsp1)+dz*sp_all)
+        dsp_all_ds=dstp_all_ds(1,1:nsp1) + dz*(dstp_all_ds(2,1:nsp1)+dz*dsp_all_ds)
+        d2sp_all_ds2=d2stp_all_ds2(1,1:nsp1) &
+            + dz*(d2stp_all_ds2(2,1:nsp1)+ dz*d2sp_all_ds2)
+        dsp_all_dt=stp_all(2,1:nsp1)+dz*dsp_all_dt
+        d2sp_all_dsdt=dstp_all_ds(2,1:nsp1)+dz*d2sp_all_dsdt
         !
         ! End interpolation over $x2$
         !--------------------------------
