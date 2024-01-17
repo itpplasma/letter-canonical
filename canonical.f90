@@ -124,19 +124,19 @@ contains
         real(8), dimension(spl_order+1) :: sp_y
         real(8), dimension(spl_order+1, spl_order+1) :: stp_y
 
-        dr=x(1)/h_r
+        dr=(x(1)-rmin)/h_r
         i_r=max(0,min(n_r-1,int(dr)))
         dr=(dr-dble(i_r))*h_r
         i_r=i_r+1
 
-        dz=x(2)/h_z
+        dz=(x(2)-zmin)/h_z
         i_z=max(0,min(n_z-1,int(dz)))
         dz=(dz-dble(i_z))*h_z
         i_z=i_z+1
 
         dphi=modulo(x(3),twopi/dble(nper))/h_phi
-        i_phi=max(0,min(n_phi-1,int(h_phi)))
-        dphi=(h_phi-dble(i_phi))*h_phi
+        i_phi=max(0,min(n_phi-1,int(dphi)))
+        dphi=(dphi-dble(i_phi))*h_phi
         i_phi=i_phi+1
 
         nsp1 = spl_order+1

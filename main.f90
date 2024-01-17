@@ -46,10 +46,12 @@ program main
     do kr = 1, n_r
         do kz = 1, n_z
             do kphi = 1, n_phi
-                test_function(kr,kz,kphi) = r(kr) * z(kz) * sin(phi(kphi))
+                test_function(kr, kz, kphi) = cos(phi(kphi))
             end do
         end do
     end do
+
+    print *, "test_function(1,1,1) = ", test_function(1,1,1)
 
     open(newunit=outfile_unit, file="test_function.out")
         write(outfile_unit, *) test_function
@@ -90,12 +92,16 @@ contains
 
         call eval_splines(spl_lam_chi(1,:,:,:,:,:,:), x, y)
 
-        print *, "y = ", y, lam_phi(kr, kz, kphi)
+        print *, "lam_phi = ", lam_phi(kr, kz, kphi), y
 
 
         call eval_splines(spl_lam_chi(2,:,:,:,:,:,:), x, y)
 
-        print *, "y = ", y, chi_gauge(kr, kz, kphi)
+        print *, "chi_gauge = ", chi_gauge(kr, kz, kphi), y
+
+        call eval_splines(spl_lam_chi(3,:,:,:,:,:,:), x, y)
+
+        print *, "test = ", test_function(kr, kz, kphi), y
 
         do kphi = 1, n_phi
             x(3) = phi(kphi)
