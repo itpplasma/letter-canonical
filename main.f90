@@ -1,5 +1,5 @@
 program main
-    use canonical, only : init, get_transformation, construct_splines, spl_order
+    use canonical, only : init_canonical, get_transformation, construct_splines, spl_order, twopi
 
     implicit none
 
@@ -7,16 +7,32 @@ program main
     real(8), parameter :: rmin = 75.d0, rmax = 264.42281879194627d0, &
                           zmin = -150.d0, zmax = 147.38193979933115d0
 
-    real(8), dimension(:,:,:), allocatable :: lam_phi, chi_gauge
+    real(8), dimension(:,:,:), allocatable :: lam_phi, chi_gauge, test_function
     real(8), dimension(:,:,:,:,:,:,:), allocatable :: spl_lam_chi
     real(8), dimension(:,:,:,:,:,:,:), allocatable :: spl_magfie  ! A2, A3, h2, h3, Bmod
-    integer :: outfile_unit
 
-    allocate(lam_phi(n_r, n_z, n_phi), chi_gauge(n_r, n_z, n_phi))
-    allocate(spl_lam_chi(2,spl_order+1,spl_order+1,spl_order+1,n_r,n_z,n_phi))
+    real(8), dimension(:), allocatable :: r, z, phi
+
+    integer :: kr, kz, kphi, outfile_unit
+
+    allocate(lam_phi(n_r, n_z, n_phi), chi_gauge(n_r, n_z, n_phi), test_function(n_r, n_z, n_phi))
+    allocate(spl_lam_chi(3,spl_order+1,spl_order+1,spl_order+1,n_r,n_z,n_phi))
     allocate(spl_magfie(5,spl_order+1,spl_order+1,spl_order+1,n_r,n_z,n_phi))
+    allocate(r(n_r), z(n_z), phi(n_phi))
 
-    call init(n_r, n_z, n_phi)
+    do kr = 1, n_r
+        r(kr) = rmin + (rmax - rmin) * (kr - 1) / (n_r - 1)
+    end do
+
+    do kz = 1, n_z
+        z(kz) = zmin + (zmax - zmin) * (kz - 1) / (n_z - 1)
+    end do
+
+    do kphi = 1, n_phi
+        phi(kphi) = twopi * (kphi - 1) / n_phi
+    end do
+
+    call init_canonical(n_r, n_z, n_phi)
     call get_transformation(lam_phi, chi_gauge)
 
     open(newunit=outfile_unit, file="lam_phi.out")
@@ -27,8 +43,22 @@ program main
         write(outfile_unit, *) chi_gauge
     close(outfile_unit)
 
+    do kr = 1, n_r
+        do kz = 1, n_z
+            do kphi = 1, n_phi
+                test_function(kr,kz,kphi) = r(kr) * z(kz) * sin(phi(kphi))
+            end do
+        end do
+    end do
+
+    open(newunit=outfile_unit, file="test_function.out")
+        write(outfile_unit, *) test_function
+    close(outfile_unit)
+
     spl_lam_chi(1,1,1,1,:,:,:) = lam_phi
     spl_lam_chi(2,1,1,1,:,:,:) = chi_gauge
+    spl_lam_chi(3,1,1,1,:,:,:) = test_function
+
     ! deallocate(lam_phi, chi_gauge)
 
     call construct_splines(spl_lam_chi)
@@ -46,19 +76,53 @@ contains
         use canonical, only : eval_splines
 
         real(8) :: x(3)
-        real(8) :: y, dy(3), d2y(6)
+        real(8) :: y
 
-        x(1) = rmin
-        x(2) = zmin
-        x(3) = 0.d0
+        integer :: kr, kz, kphi
 
-        call eval_splines(spl_lam_chi(1,:,:,:,:,:,:), x, y, dy, d2y)
+        kr=10
+        kz=20
+        kphi=30
 
-        print *, "y = ", y, lam_phi(1,1,1)
+        x(1) = r(kr)
+        x(2) = z(kz)
+        x(3) = phi(kphi)
+
+        call eval_splines(spl_lam_chi(1,:,:,:,:,:,:), x, y)
+
+        print *, "y = ", y, lam_phi(kr, kz, kphi)
 
 
-        call eval_splines(spl_lam_chi(2,:,:,:,:,:,:), x, y, dy, d2y)
+        call eval_splines(spl_lam_chi(2,:,:,:,:,:,:), x, y)
 
-        print *, "y = ", y, chi_gauge(1,1,1)
+        print *, "y = ", y, chi_gauge(kr, kz, kphi)
+
+        do kphi = 1, n_phi
+            x(3) = phi(kphi)
+            do kz = 1, n_z
+                x(2) = z(kz)
+                do kr = 1, n_r
+                    x(1) = r(kr)
+                    call eval_splines(spl_lam_chi(1,:,:,:,:,:,:), x, y)
+                    lam_phi(kr, kz, kphi) = y
+                    call eval_splines(spl_lam_chi(2,:,:,:,:,:,:), x, y)
+                    chi_gauge(kr, kz, kphi) = y
+                    call eval_splines(spl_lam_chi(3,:,:,:,:,:,:), x, y)
+                    test_function(kr, kz, kphi) = y
+                end do
+            end do
+        end do
+
+        open(newunit=outfile_unit, file="lam_phi_splined.out")
+            write(outfile_unit, *) lam_phi
+        close(outfile_unit)
+
+        open(newunit=outfile_unit, file="chi_gauge_splined.out")
+            write(outfile_unit, *) chi_gauge
+        close(outfile_unit)
+
+        open(newunit=outfile_unit, file="test_function_splined.out")
+            write(outfile_unit, *) test_function
+        close(outfile_unit)
     end subroutine test_splines
 end program main

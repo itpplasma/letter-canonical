@@ -2,9 +2,10 @@ include FindPython.mk
 
 # Compiler with debugging flags
 FC = gfortran
-FFLAGS = -g -fPIC -O3 -fopenmp -march=native -mtune=native
+# FFLAGS = -g -fPIC -O3 -fopenmp -march=native -mtune=native
+FFLAGS = -g -fPIC -Og -fopenmp
 
-FFLAGS += -Wall -Wuninitialized -Wno-unused-label -Wno-unused-dummy-argument -Werror -Wfatal-errors
+FFLAGS += -Wall -Wuninitialized -Wno-unused-label -Wno-unused-dummy-argument -Werror -Wfatal-errors -I../bspline-fortran/build/lib
 
 # Which field variant: local, libneo, GORILLA
 FIELD_VARIANT ?= libneo
@@ -46,7 +47,7 @@ all: libfield.so my_little_magfie.$(TARGET_SUFFIX) letter-canonical.x \
 	clean_objects
 
 letter-canonical.x: canonical.o my_little_magfie.o main.f90
-	$(FC) $(FFLAGS) -o $@ $^ -L. -lfield
+	$(FC) $(FFLAGS) -o $@ $^ -L. -lfield -L../bspline-fortran/build/lib -lbspline-fortran
 
 canonical.o: canonical.f90 my_little_magfie.o
 	$(FC) $(FFLAGS) -c $^
@@ -58,7 +59,7 @@ clean_objects:
 	rm -f *.o
 
 my_little_magfie.$(TARGET_SUFFIX): libfield.so my_little_magfie.f90
-	LDFLAGS=-Wl,-rpath,. f2py -c -m my_little_magfie my_little_magfie.f90 -L. -lfield
+	LDFLAGS=-Wl,-rpath,. f2py -c -m my_little_magfie my_little_magfie.f90 -L. -lfield  -I../bspline-fortran/build/lib -L../bspline-fortran/build/lib -lbspline-fortran
 
 
 # Target for shared library containing magnetic field routines

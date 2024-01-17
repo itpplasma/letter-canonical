@@ -259,6 +259,8 @@ contains
         rho_w(nrz+1) = rho_w(1)
 
         htht = TWOPI/(nrhotht-1)
+        Rw = 0.d0
+        Zw = 0.d0
         do i=2,nrhotht
             tht_wall(i) = htht*(i-1)
             do j=0,nrz

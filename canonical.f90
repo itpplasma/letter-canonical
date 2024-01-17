@@ -21,7 +21,7 @@ module canonical
 
 contains
 
-    subroutine init(n_r_, n_z_, n_phi_)
+    subroutine init_canonical(n_r_, n_z_, n_phi_)
         use my_little_magfie, only : init_magfie => init
 
         integer, intent(in) :: n_r_, n_z_, n_phi_  ! Number of grid points
@@ -44,15 +44,13 @@ contains
             derf2(k) = dble((k-1)*(k-2))
             derf3(k) = dble((k-1)*(k-2)*(k-3))
         enddo
-    end subroutine init
+    end subroutine init_canonical
 
 
     subroutine construct_splines(spl_data)
         real(8), intent(inout) :: spl_data(:,:,:,:,:,:,:)
 
-        real(8), dimension(0:spl_order,n_r)   :: splcoe_r
-        real(8), dimension(0:spl_order,n_z)   :: splcoe_z
-        real(8), dimension(0:spl_order,n_phi) :: splcoe_phi
+        real(8), dimension(:,:), allocatable  :: splcoe
 
         integer :: n_data
         integer :: i_r, i_z, i_phi            ! Loop counters for grid
@@ -61,54 +59,120 @@ contains
         n_data = size(spl_data, 1)
 
         ! Spline over $\varphi$
+        allocate(splcoe(0:spl_order,n_phi))
         do i_r=1,n_r
         do i_z=1,n_z
             do i_data=1,n_data
-                splcoe_phi(0,:)=spl_data(i_data,1,1,1,i_r,i_z,:)
-                call spl_per(spl_order,n_phi,h_phi,splcoe_phi)
+                splcoe(0,:)=spl_data(i_data,1,1,1,i_r,i_z,:)
+                call spl_per(spl_order,n_phi,h_phi,splcoe)
                 do k=1,spl_order
-                    spl_data(i_data,1,1,k+1,i_r,i_z,:)=splcoe_phi(k,:)
+                    spl_data(i_data,1,1,k+1,i_r,i_z,:)=splcoe(k,:)
                 enddo
             enddo
         enddo
         enddo
+        deallocate(splcoe)
 
         ! Spline over $Z$
+        allocate(splcoe(0:spl_order,n_z))
         do i_r=1,n_r
         do i_phi=1,n_phi
             do i_r_phi=1,spl_order+1
                 do i_data=1,n_data
-                    splcoe_z(0,:)=spl_data(i_data,1,1,i_r_phi,i_r,:,i_phi)
-                    call spl_reg(spl_order,n_z,h_z,splcoe_z)
+                    splcoe(0,:)=spl_data(i_data,1,1,i_r_phi,i_r,:,i_phi)
+                    call spl_reg(spl_order,n_z,h_z,splcoe)
                     do k=1,spl_order
-                        spl_data(i_data,1,k+1,i_r_phi,i_r,:,i_phi)=splcoe_z(k,:)
+                        spl_data(i_data,1,k+1,i_r_phi,i_r,:,i_phi)=splcoe(k,:)
                     enddo
                 enddo
             enddo
         enddo
         enddo
+        deallocate(splcoe)
 
         ! Spline over $R$
+        allocate(splcoe(0:spl_order,n_r))
         do i_z=1,n_z
         do i_phi=1,n_phi
             do i_r_z=1,spl_order+1
             do i_r_phi=1,spl_order+1
                 do i_data=1,n_data
-                    splcoe_r(0,:)=spl_data(i_data,1,i_r_z,i_r_phi,:,i_z,i_phi)
-                    call spl_reg(spl_order,n_r,h_r,splcoe_r)
+                    splcoe(0,:)=spl_data(i_data,1,i_r_z,i_r_phi,:,i_z,i_phi)
+                    call spl_reg(spl_order,n_r,h_r,splcoe)
                     do k=1,spl_order
-                        spl_data(i_data,k+1,i_r_z,i_r_phi,:,i_z,i_phi)=splcoe_r(k,:)
+                        spl_data(i_data,k+1,i_r_z,i_r_phi,:,i_z,i_phi)=splcoe(k,:)
                     enddo
                 enddo
             enddo
             enddo
         enddo
         enddo
+        deallocate(splcoe)
 
     end subroutine construct_splines
 
 
-    subroutine eval_splines(spl_data, x, y, dy, d2y)
+    subroutine eval_splines(spl_data, x, y)
+        real(8), intent(in) :: spl_data(:,:,:,:,:,:)
+        real(8), intent(in) :: x(3)
+        real(8), intent(out) :: y
+
+        real(8) :: dr, dz, dphi
+        integer :: nsp1                ! Spline order plus one
+        integer :: i_r, i_z, i_phi, k  ! Counters
+
+        real(8), dimension(spl_order+1) :: sp_y
+        real(8), dimension(spl_order+1, spl_order+1) :: stp_y
+
+        dr=x(1)/h_r
+        i_r=max(0,min(n_r-1,int(dr)))
+        dr=(dr-dble(i_r))*h_r
+        i_r=i_r+1
+
+        dz=x(2)/h_z
+        i_z=max(0,min(n_z-1,int(dz)))
+        dz=(dz-dble(i_z))*h_z
+        i_z=i_z+1
+
+        dphi=modulo(x(3),twopi/dble(nper))/h_phi
+        i_phi=max(0,min(n_phi-1,int(h_phi)))
+        dphi=(h_phi-dble(i_phi))*h_phi
+        i_phi=i_phi+1
+
+        nsp1 = spl_order+1
+
+        !Begin interpolation over r
+        stp_y(1:nsp1,1:nsp1)=spl_data(nsp1,:,:,i_r,i_z,i_phi)
+
+        do k=spl_order,1,-1
+            stp_y(1:nsp1,1:nsp1)=spl_data(k,:,:,i_r,i_z,i_phi)+dr*stp_y(1:nsp1,1:nsp1)
+        enddo
+
+        ! End interpolation over r
+        !----------------------------
+        ! Begin interpolation over z
+
+        sp_y(1:nsp1)=stp_y(nsp1,1:nsp1)
+
+        do k=spl_order,1,-1
+            sp_y(1:nsp1)=stp_y(k,1:nsp1)+dz*sp_y(1:nsp1)
+        enddo
+
+        ! End interpolation over z
+        !--------------------------------
+        ! Begin interpolation over phi
+
+        y=sp_y(nsp1)
+
+        do k=spl_order,1,-1
+            y=sp_y(k)+dphi*y
+        enddo
+
+        ! End interpolation over phi
+    end subroutine eval_splines
+
+
+    subroutine eval_splines_der2(spl_data, x, y, dy, d2y)
         real(8), intent(in) :: spl_data(:,:,:,:,:,:)
         real(8), intent(in) :: x(3)
         real(8), intent(inout) :: y, dy(3), d2y(6)
@@ -249,7 +313,7 @@ contains
         d2y(4)=d2qua_dt2
         d2y(5)=d2qua_dtdp
         d2y(6)=d2qua_dp2
-    end subroutine eval_splines
+    end subroutine eval_splines_der2
 
 
     subroutine get_transformation(delta_phi, chi_gauge)
