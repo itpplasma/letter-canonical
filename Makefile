@@ -5,7 +5,7 @@ FC = gfortran
 FFLAGS = -g -fPIC -O3 -fopenmp -march=native -mtune=native
 # FFLAGS = -g -fPIC -Og -fopenmp
 
-FFLAGS += -Wall -Wuninitialized -Wno-unused-label -Wno-unused-dummy-argument -Werror -Wfatal-errors -I../bspline-fortran/build/lib
+FFLAGS += -Wall -Wuninitialized -Wno-unused-label -Wno-unused-dummy-argument -Werror -Wfatal-errors -I../libs/bspline-fortran/build/lib
 
 # Which field variant: local, libneo, GORILLA
 FIELD_VARIANT ?= libneo
@@ -34,7 +34,7 @@ else ifeq ($(FIELD_VARIANT), libneo)
 
 	SOURCES += odeint_rkf45.f90 contrib/rkf45.f90
 
-    SOURCES := $(addprefix ../libneo/src/, $(SOURCES))
+    SOURCES := $(addprefix ../libs/libneo/src/, $(SOURCES))
 
 else ifeq ($(FIELD_VARIANT), GORILLA)
     SOURCES = spline5_RZ.f90 field_divB0.f90 bdivfree.f90
@@ -47,7 +47,7 @@ all: libfield.so my_little_magfie.$(TARGET_SUFFIX) letter-canonical.x \
 	clean_objects
 
 letter-canonical.x: canonical.o my_little_magfie.o main.f90
-	$(FC) $(FFLAGS) -o $@ $^ -L. -lfield -L../bspline-fortran/build/lib -lbspline-fortran
+	$(FC) $(FFLAGS) -o $@ $^ -L. -lfield -L../libs/bspline-fortran/build/lib -lbspline-fortran
 
 canonical.o: canonical.f90 my_little_magfie.o
 	$(FC) $(FFLAGS) -c $^
@@ -59,7 +59,7 @@ clean_objects:
 	rm -f *.o
 
 my_little_magfie.$(TARGET_SUFFIX): libfield.so my_little_magfie.f90
-	LDFLAGS=-Wl,-rpath,. f2py -c -m my_little_magfie my_little_magfie.f90 -L. -lfield  -I../bspline-fortran/build/lib -L../bspline-fortran/build/lib -lbspline-fortran
+	LDFLAGS=-Wl,-rpath,. f2py -c -m my_little_magfie my_little_magfie.f90 -L. -lfield  -I../libs/bspline-fortran/build/lib -L../libs/bspline-fortran/build/lib -lbspline-fortran
 
 
 # Target for shared library containing magnetic field routines
