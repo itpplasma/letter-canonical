@@ -5,7 +5,7 @@ FC = gfortran
 FFLAGS = -g -fPIC -O3 -fopenmp -march=native -mtune=native
 # FFLAGS = -g -fPIC -Og -fopenmp
 
-FFLAGS += -Wall -Wuninitialized -Wno-unused-label -Wno-unused-dummy-argument -Werror -Wfatal-errors -I../libs/bspline-fortran/build/lib
+FFLAGS += -Wall -Wuninitialized -Wno-maybe-uninitialized -Wno-unused-label -Wno-unused-dummy-argument -Werror -Wfatal-errors -I../libs/bspline-fortran/build/lib
 
 # Which field variant: local, libneo, GORILLA
 FIELD_VARIANT ?= libneo
@@ -32,7 +32,7 @@ else ifeq ($(FIELD_VARIANT), libneo)
 
     SOURCES += $(addprefix magfie/, $(MAGFIE_SOURCES))
 
-	SOURCES += odeint_rkf45.f90 contrib/rkf45.f90
+	SOURCES += odeint_rkf45.f90 contrib/rkf45.f90 interpolate.f90
 
     SOURCES := $(addprefix ../libs/libneo/src/, $(SOURCES))
 

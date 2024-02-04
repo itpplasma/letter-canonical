@@ -1,7 +1,9 @@
 program main
+    use interpolate, only : SplineData3D, construct_splines_3d, evaluate_splines_3d
     use canonical, only : init_canonical, get_transformation, construct_splines, spl_order, twopi
 
     implicit none
+    save
 
     integer, parameter :: n_r=50, n_z=75, n_phi=64
     real(8), parameter :: rmin = 75.d0, rmax = 264.42281879194627d0, &
@@ -14,6 +16,8 @@ program main
     real(8), dimension(:), allocatable :: r, z, phi
 
     integer :: kr, kz, kphi, outfile_unit
+
+    type(SplineData3D) :: spl
 
     allocate(lam_phi(n_r, n_z, n_phi), chi_gauge(n_r, n_z, n_phi), test_function(n_r, n_z, n_phi))
     allocate(spl_lam_chi(3,spl_order+1,spl_order+1,spl_order+1,n_r,n_z,n_phi))
@@ -65,6 +69,7 @@ program main
 
     call construct_splines(spl_lam_chi)
 
+
     call test_splines
     call test_spline_derivatives
 
@@ -103,6 +108,13 @@ contains
         call eval_splines_der2(spl_lam_chi(3,:,:,:,:,:,:), x, y, dy, d2y)
 
         print *, "test = ", r(kr)*z(kz)*cos(phi(kphi)), y
+
+        call construct_splines_3d([rmin, zmin, 0.0d0], [rmax, zmax, twopi], &
+        test_function, order=[3, 3, 3], periodic=[.False., .False., .True.], spl=spl)
+
+        call evaluate_splines_3d(x, spl, y)
+
+        print *, "test libneo = ", y
 
         do kphi = 1, n_phi
             x(3) = phi(kphi)
@@ -156,7 +168,6 @@ contains
         print *, "d/dphi test = ", -r(kr)*z(kz)*sin(phi(kphi)), dy(3)
 
         print *, "d2/dr2 test   = ", 0.0, d2y(1)
-
 
     end subroutine test_spline_derivatives
 end program main
