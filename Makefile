@@ -5,7 +5,7 @@ FC = gfortran
 FFLAGS = -g -fPIC -O3 -fopenmp -march=native -mtune=native
 # FFLAGS = -g -fPIC -Og -fopenmp
 
-FFLAGS += -Wall -Wuninitialized -Wno-maybe-uninitialized -Wno-unused-label -Wno-unused-dummy-argument -Werror -Wfatal-errors -I../libs/bspline-fortran/build/lib
+FFLAGS += -Wall -Wuninitialized -Wno-maybe-uninitialized -Wno-unused-label -Wno-unused-dummy-argument -Werror -Wfatal-errors
 
 SOURCES = libneo_kinds.f90 math_constants.f90 spl_three_to_five.f90
 
