@@ -66,9 +66,9 @@ contains
                          zmin + (zmax - zmin) * (i_z - 1) / (n_z_test - 1), &
                          twopi * (i_phi - 1) / (n_phi_test - 1)]
                     call evaluate_splines_3d( &
-                        x, spl_lam, lam_test(i_r, i_z, i_phi))
+                        spl_lam, x, lam_test(i_r, i_z, i_phi))
                     call evaluate_splines_3d( &
-                        x, spl_chi, chi_test(i_r, i_z, i_phi))
+                        spl_chi, x, chi_test(i_r, i_z, i_phi))
                 end do
             end do
         end do
