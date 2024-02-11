@@ -16,16 +16,12 @@ module canonical
     integer :: n_r, n_z, n_phi
     real(8) :: h_r, h_z, h_phi
 
-    ! Precomputed factors for spline derivatives
-    real(8), dimension(spl_order+1) :: derf1, derf2, derf3
-
 contains
 
     subroutine init_canonical(n_r_, n_z_, n_phi_)
         use my_little_magfie, only : init_magfie => init
 
         integer, intent(in) :: n_r_, n_z_, n_phi_  ! Number of grid points
-        integer :: k
 
         call init_magfie
 
@@ -38,12 +34,6 @@ contains
         h_z = (zmax-zmin)/dble(n_z-1)
         h_phi = twopi/dble(n_phi-1)
 
-        ! Spline derivative factors
-        do k=1,spl_order+1
-            derf1(k) = dble(k-1)
-            derf2(k) = dble((k-1)*(k-2))
-            derf3(k) = dble((k-1)*(k-2)*(k-3))
-        enddo
     end subroutine init_canonical
 
 
