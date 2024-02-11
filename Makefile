@@ -32,7 +32,7 @@ all: libfield.so my_little_magfie.$(TARGET_SUFFIX) letter-canonical.x \
 	clean_objects
 
 letter-canonical.x: canonical.o my_little_magfie.o main.f90
-	$(FC) $(FFLAGS) -o $@ $^ -L.
+	$(FC) $(FFLAGS) -o $@ $^ -L. -lfield
 
 canonical.o: canonical.f90 my_little_magfie.o
 	$(FC) $(FFLAGS) -c $^
