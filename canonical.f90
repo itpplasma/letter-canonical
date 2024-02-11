@@ -1,5 +1,6 @@
 module canonical
-    use my_little_magfie, only : rmin, rmax, zmin, zmax
+    use interpolate, only : SplineData3D, evaluate_splines_3d
+    use my_little_magfie, only : rmin, rmax, zmin, zmax, my_field
 
     implicit none
 
@@ -14,6 +15,13 @@ module canonical
     ! Number and spacing of grid points
     integer :: n_r, n_z, n_phi
     real(8) :: h_r, h_z, h_phi
+
+    ! For splining lambda (difference between canonical and cylindrical angle)
+    ! and chi (gauge transformation)
+    type(SplineData3D) :: spl_lam, spl_chi
+
+    ! TODO
+    ! type(SplineData3D) :: spl_A2, spl_A3, spl_h2, spl_h3, spl_Bmod
 
 contains
 
@@ -84,8 +92,8 @@ contains
 
     end subroutine get_transformation
 
+
     subroutine rh_ran(r_c, y, dy)
-        use my_little_magfie, only : my_field
 
         real(8), intent(in) :: r_c  ! plus threadprivate phi_c, z_c from module
         real(8), dimension(2), intent(in) :: y
@@ -103,5 +111,95 @@ contains
 
     end subroutine rh_ran
 
+
+    subroutine compute_canonical_field_components
+        real(8), dimension(:,:,:,:), allocatable :: xcan, xcyl, B, A
+
+        allocate(xcan(3,n_r,n_z,n_phi), xcyl(3,n_r,n_z,n_phi))
+        allocate(B(3,n_r,n_z,n_phi), A(3,n_r,n_z,n_phi))
+
+        call generate_regular_grid(xcan)
+        call can_to_cyl(xcan, xcyl)
+        call get_physical_field(xcyl, B, A)
+        ! TODO call compute_A2can()
+
+    end subroutine compute_canonical_field_components
+
+
+    subroutine get_physical_field(xcyl, B, A)
+        real(8), intent(in) :: xcyl(:,:,:,:)
+        real(8), intent(out) :: B(:,:,:,:), A(:,:,:,:)
+
+        integer :: i_r, i_z, i_phi
+        real(8) :: r, z, phi
+
+        real(8) :: dummy
+
+        do i_phi=1,n_phi
+            do i_z=1,n_z
+                do i_r=1,n_r
+                    r = xcyl(1,i_r,i_z,i_phi)
+                    z = xcyl(2,i_r,i_z,i_phi)
+                    phi = xcyl(3,i_r,i_z,i_phi)
+                    call my_field(r, phi, z, &
+                        B(1,i_r,i_z,i_phi), &
+                        B(2,i_r,i_z,i_phi), &
+                        B(3,i_r,i_z,i_phi), &
+                        dummy, dummy, dummy, dummy, &
+                        dummy, dummy, dummy, dummy, dummy, &
+                        A(1,i_r,i_z,i_phi), &
+                        A(2,i_r,i_z,i_phi), &
+                        A(3,i_r,i_z,i_phi))
+                end do
+            end do
+        end do
+
+    end subroutine get_physical_field
+
+
+    subroutine can_to_cyl(xcan, xcyl)
+        real(8), intent(in) :: xcan(:,:,:,:)
+        real(8), intent(out) :: xcyl(:,:,:,:)
+
+        integer :: i_r, i_z, i_phi
+        real(8) :: r, z, phi, lam
+
+        do i_phi=1,n_phi
+            do i_z=1,n_z
+                do i_r=1,n_r
+                    r = xcan(1,i_r,i_z,i_phi)
+                    z = xcan(2,i_r,i_z,i_phi)
+                    phi = xcan(3,i_r,i_z,i_phi)
+                    xcyl(1,i_r,i_z,i_phi) = r
+                    xcyl(2,i_r,i_z,i_phi) = z
+                    call evaluate_splines_3d(spl_lam, [r, z, phi], lam)
+                    xcyl(3,i_r,i_z,i_phi) = phi + lam
+                enddo
+            enddo
+        enddo
+
+    end subroutine can_to_cyl
+
+
+    subroutine generate_regular_grid(x)
+        real(8), intent(out) :: x(:,:,:,:)
+
+        integer :: i_r, i_z, i_phi
+        real(8) :: r, z, phi
+
+        do i_phi=1,n_phi
+            phi = h_phi*dble(i_phi-1)
+            do i_z=1,n_z
+                z = zmin + h_z*dble(i_z-1)
+                do i_r=1,n_r
+                    r = rmin + h_r*dble(i_r-1)
+                    x(1,i_r,i_z,i_phi) = r
+                    x(2,i_r,i_z,i_phi) = z
+                    x(3,i_r,i_z,i_phi) = phi
+                enddo
+            enddo
+        enddo
+
+    end subroutine generate_regular_grid
 
 end module canonical
