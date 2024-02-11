@@ -7,7 +7,6 @@ module canonical
     real(8), parameter :: twopi = atan(1.d0)*8.d0
 
     integer, parameter :: nper = 1  ! Number of periods (TODO: make thi_r a variable)
-    integer, parameter :: spl_order = 5
 
     real(8) :: phi_c, z_c  ! Temporary variables for the ODE integration
     !$omp threadprivate(phi_c, z_c)
