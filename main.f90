@@ -1,6 +1,6 @@
 program main
     use interpolate, only : SplineData3D, construct_splines_3d, evaluate_splines_3d, destroy_splines_3d, disp
-    use canonical, only : init_canonical, get_transformation, construct_splines, spl_order, twopi
+    use canonical, only : init_canonical, get_transformation, twopi
 
     implicit none
     save
