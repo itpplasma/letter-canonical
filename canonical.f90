@@ -17,12 +17,17 @@ module canonical
     integer :: n_r, n_z, n_phi
     real(8) :: h_r, h_z, h_phi
 
+    ! For splines
+    real(8) :: x_min(3), x_max(3)
+    integer, parameter :: order(3) = [3, 3, 3]
+    logical, parameter :: periodic(3) = [.False., .False., .True.]
+
     ! For splining lambda (difference between canonical and cylindrical angle)
     ! and chi (gauge transformation)
     type(SplineData3D) :: spl_lam, spl_chi
 
-    ! TODO
-    type(SplineData3D) :: spl_A2 !, spl_A3, spl_h2, spl_h3, spl_Bmod
+    ! TODO For splining covariant vector potential, h=B/Bmod and Bmod
+    type(SplineData3D) :: spl_A2 , spl_A3 !, spl_h2, spl_h3, spl_Bmod
 
 contains
 
@@ -41,6 +46,9 @@ contains
         h_r = (rmax-rmin)/dble(n_r-1)
         h_z = (zmax-zmin)/dble(n_z-1)
         h_phi = twopi/dble(n_phi-1)
+
+        x_min = [rmin, zmin, 0.d0]
+        x_max = [rmax, zmax, twopi]
 
     end subroutine init_canonical
 
@@ -115,29 +123,27 @@ contains
 
     subroutine compute_canonical_field_components
         real(8), dimension(:,:,:,:), allocatable :: xcan, xcyl, B, Acyl
-        real(8), dimension(:,:,:), allocatable :: A2can
-
-        real(8) :: x_min(3), x_max(3)
-        integer, parameter :: order(3) = [3, 3, 3]
-        logical, parameter :: periodic(3) = [.False., .False., .True.]
-
-        x_min = [rmin, zmin, 0.d0]
-        x_max = [rmax, zmax, twopi]
+        real(8), dimension(:,:,:,:), allocatable :: Acan
 
         allocate(xcan(3,n_r,n_z,n_phi), xcyl(3,n_r,n_z,n_phi))
         allocate(B(3,n_r,n_z,n_phi), Acyl(3,n_r,n_z,n_phi))
-        allocate(A2can(n_r,n_z,n_phi))
+        allocate(Acan(2,n_r,n_z,n_phi))
 
         call generate_regular_grid(xcan)
         call can_to_cyl(xcan, xcyl)
         call get_physical_field(xcyl, B, Acyl)
 
-        call compute_A2can(Acyl, A2can)
-        call construct_splines_3d(x_min, x_max, A2can, order, periodic, spl_A2)
-        deallocate(A2can)
+        call compute_Acan(Acyl, Acan)
+        call construct_splines_3d( &
+            x_min, x_max, Acan(1,:,:,:), order, periodic, spl_A2)
+        call construct_splines_3d( &
+            x_min, x_max, Acan(2,:,:,:), order, periodic, spl_A3)
+        deallocate(Acan)
+
         deallocate(Acyl, B, xcyl, xcan)
 
     end subroutine compute_canonical_field_components
+
 
 
     subroutine get_physical_field(xcyl, B, A)
@@ -195,9 +201,10 @@ contains
     end subroutine can_to_cyl
 
 
-    subroutine compute_A2can(Acyl, A2can)
-        real(8), dimension(:,:,:,:), intent(in) :: Acyl  ! physical components
-        real(8), dimension(:,:,:), intent(out) :: A2can  ! covariant component
+    subroutine compute_Acan(Acyl, Acan)
+        real(8), dimension(:,:,:,:), intent(in) :: Acyl   ! physical components
+        real(8), dimension(:,:,:,:), intent(out) :: Acan  ! covariant components
+        ! Acan stores only second and third component, as the first vanishes
 
         integer :: i_phi, i_z, i_r
         real(8) :: x(3)
@@ -212,15 +219,24 @@ contains
                     call evaluate_splines_3d_der2(spl_chi, x, chi, dchi, dummy)
                     AZ = Acyl(2, i_r, i_z, i_phi)
                     Aphicov = Acyl(3, i_r, i_z, i_phi)/x(1)
-                    A2can(i_r, i_z, i_phi) = AZ + Aphicov*dlam(2) - dchi(2)
+                    Acan(1, i_r, i_z, i_phi) = AZ + Aphicov*dlam(2) - dchi(2)
+                    Acan(2, i_r, i_z, i_phi) = Aphicov*(1d0 + dlam(3)) - dchi(3)
                 enddo
             enddo
         enddo
-    end subroutine compute_A2can
+    end subroutine compute_Acan
+
+
+    subroutine cyl_to_cov(xcyl, V)
+        real(8), intent(in) :: xcyl(:,:,:,:)
+        real(8), intent(inout) :: V(:,:,:,:)
+
+        V(3,:,:,:) = V(3,:,:,:)/xcyl(1,:,:,:)
+    end subroutine cyl_to_cov
 
 
     subroutine generate_regular_grid(x)
-        real(8), intent(out) :: x(:,:,:,:)
+        real(8), intent(inout) :: x(:,:,:,:)
 
         integer :: i_r, i_z, i_phi
 

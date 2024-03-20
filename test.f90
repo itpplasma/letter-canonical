@@ -8,7 +8,7 @@ program test
     call test_get_grid_point
     call test_generate_regular_grid
     call test_can_to_cyl
-    call test_compute_A2can
+    call test_compute_Acan
 
 contains
 
@@ -64,23 +64,27 @@ contains
     end subroutine test_generate_regular_grid
 
 
-    subroutine test_compute_A2can
-        use canonical, only: compute_A2can, spl_lam, spl_chi
+    subroutine test_compute_Acan
+        use canonical, only: compute_Acan, generate_regular_grid, cyl_to_cov, &
+            spl_lam, spl_chi
         use interpolate, only: destroy_splines_3d
 
-        real(8), dimension(3, n_r, n_z, n_phi) :: A
-        real(8), dimension(n_r, n_z, n_phi) :: A2can_computed
+        real(8), dimension(3, n_r, n_z, n_phi) :: A, Acov, x
+        real(8), dimension(2, n_r, n_z, n_phi) :: Acan_computed
 
-        call print_test("test_compute_A2can")
+        call print_test("test_compute_Acan")
 
         A(:,:,:,:) = 1.0d0
+        Acov = A
+        call generate_regular_grid(x)
+        call cyl_to_cov(x, Acov)
 
         call construct_zero_spline(spl_lam)
         call construct_zero_spline(spl_chi)
-        call compute_A2can(A, A2can_computed)
-        if (any(abs(A2can_computed - A(2,:,:,:)) > eps)) then
+        call compute_Acan(A, Acan_computed)
+        if (any(abs(Acan_computed - Acov(2:3,:,:,:)) > eps)) then
             call print_fail
-            print *, "A2 canonical should match A2 for identical transformation"
+            print *, "should match for identical transformation"
             error stop
         end if
         call destroy_splines_3d(spl_lam)
@@ -88,17 +92,17 @@ contains
 
         call construct_linear_spline(spl_lam)
         call construct_linear_spline(spl_chi)
-        call compute_A2can(A, A2can_computed)
-        if (all(abs(A2can_computed - A(2,:,:,:)) < eps)) then
+        call compute_Acan(A, Acan_computed)
+        if (all(abs(Acan_computed - Acov(2:3,:,:,:)) < eps)) then
             call print_fail
-            print *, "A2 canonical must not match A2 for linear transformation"
+            print *, "must not match for linear transformation"
             error stop
         end if
         call destroy_splines_3d(spl_lam)
         call destroy_splines_3d(spl_chi)
 
         call print_ok
-    end subroutine test_compute_A2can
+    end subroutine test_compute_Acan
 
 
     subroutine test_can_to_cyl
