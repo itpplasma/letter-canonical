@@ -8,6 +8,7 @@ program test
     call test_get_grid_point
     call test_generate_regular_grid
     call test_can_to_cyl
+    call test_compute_Bmod
     call test_compute_Acan
 
 contains
@@ -63,6 +64,21 @@ contains
         call print_ok
     end subroutine test_generate_regular_grid
 
+    subroutine test_compute_Bmod
+        use canonical, only: compute_Bmod
+
+        real(8), dimension(3, n_r, n_z, n_phi) :: B
+        real(8), dimension(n_r, n_z, n_phi) :: Bmod_computed
+
+        call print_test("test_compute_Bmod")
+
+        B(:,:,:,:) = sqrt(1.0d0/3.0d0)
+
+        call compute_Bmod(B, Bmod_computed)
+        if (any(abs(Bmod_computed - 1.0d0) > eps)) error stop
+
+        call print_ok
+    end subroutine test_compute_Bmod
 
     subroutine test_compute_Acan
         use canonical, only: compute_Acan, generate_regular_grid, cyl_to_cov, &

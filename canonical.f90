@@ -27,7 +27,7 @@ module canonical
     type(SplineData3D) :: spl_lam, spl_chi
 
     ! TODO For splining covariant vector potential, h=B/Bmod and Bmod
-    type(SplineData3D) :: spl_A2 , spl_A3 !, spl_h2, spl_h3, spl_Bmod
+    type(SplineData3D) :: spl_Bmod, spl_A2, spl_A3 !, spl_h2, spl_h3
 
 contains
 
@@ -138,22 +138,28 @@ contains
 
 
     subroutine init_canonical_field_components
-        real(8), dimension(:,:,:,:), allocatable :: xcan, xcyl, B, Acyl
-        real(8), dimension(:,:,:,:), allocatable :: Acan
+        real(8), dimension(:,:,:,:), allocatable :: xcan, xcyl, B, Acyl, Acan
+        real(8), dimension(:,:,:), allocatable :: Bmod
+
 
         allocate(xcan(3,n_r,n_z,n_phi), xcyl(3,n_r,n_z,n_phi))
         allocate(B(3,n_r,n_z,n_phi), Acyl(3,n_r,n_z,n_phi))
-        allocate(Acan(2,n_r,n_z,n_phi))
 
         call generate_regular_grid(xcan)
         call can_to_cyl(xcan, xcyl)
         call get_physical_field(xcyl, B, Acyl)
 
+        allocate(Bmod(n_r,n_z,n_phi))
+        call compute_Bmod(B, Bmod)
+        call construct_splines_3d(x_min, x_max, Bmod, order, periodic, spl_Bmod)
+        deallocate(Bmod)
+
+        allocate(Acan(2,n_r,n_z,n_phi))
         call compute_Acan(Acyl, Acan)
-        call construct_splines_3d( &
-            x_min, x_max, Acan(1,:,:,:), order, periodic, spl_A2)
-        call construct_splines_3d( &
-            x_min, x_max, Acan(2,:,:,:), order, periodic, spl_A3)
+        call construct_splines_3d(x_min, x_max, &
+            Acan(1,:,:,:), order, periodic, spl_A2)
+        call construct_splines_3d(x_min, x_max, &
+            Acan(2,:,:,:), order, periodic, spl_A3)
         deallocate(Acan)
 
         deallocate(Acyl, B, xcyl, xcan)
@@ -217,9 +223,29 @@ contains
     end subroutine can_to_cyl
 
 
+    subroutine compute_Bmod(B, Bmod)
+        real(8), dimension(:,:,:,:), intent(in) :: B   ! physical components
+        real(8), dimension(:,:,:), intent(inout) :: Bmod
+
+        integer :: i_r, i_z, i_phi
+
+        do i_phi=1,n_phi
+            do i_z=1,n_z
+                do i_r=1,n_r
+                    Bmod(i_r, i_z, i_phi) = sqrt( &
+                        B(1, i_r, i_z, i_phi)**2 + &
+                        B(2, i_r, i_z, i_phi)**2 + &
+                        B(3, i_r, i_z, i_phi)**2 &
+                    )
+                enddo
+            enddo
+        enddo
+    end subroutine
+
+
     subroutine compute_Acan(Acyl, Acan)
         real(8), dimension(:,:,:,:), intent(in) :: Acyl   ! physical components
-        real(8), dimension(:,:,:,:), intent(out) :: Acan  ! covariant components
+        real(8), dimension(:,:,:,:), intent(inout) :: Acan  ! covariant
         ! Acan stores only second and third component, as the first vanishes
 
         integer :: i_phi, i_z, i_r
