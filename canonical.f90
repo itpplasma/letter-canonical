@@ -26,7 +26,7 @@ module canonical
     ! and chi (gauge transformation)
     type(SplineData3D) :: spl_lam, spl_chi
 
-    ! TODO For splining covariant vector potential, h=B/Bmod and Bmod
+    ! For splining covariant vector potential, h=B/Bmod and Bmod
     type(SplineData3D) :: spl_Bmod, spl_A2, spl_A3, spl_h2, spl_h3
 
 contains

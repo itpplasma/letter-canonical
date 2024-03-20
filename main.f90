@@ -18,7 +18,6 @@ program main
     print *, "init_transformation ..."
     call init_transformation
 
-    ! TODO: Compute and spline h in canonical coordinates
     print *, "init_canonical_field_components ..."
     call init_canonical_field_components
 
