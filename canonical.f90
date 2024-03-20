@@ -268,8 +268,8 @@ contains
                     Bphicov = Bcyl(3, i_r, i_z, i_phi)*x(1)
                     B2can = BZcov + dlam(2)*Bphicov
                     B3can = Bphicov*(1.0d0 + dlam(3))
-                    hcan(1,:,:,:) = B2can/Bmod(i_r, i_z, i_phi)
-                    hcan(2,:,:,:) = B3can/Bmod(i_r, i_z, i_phi)
+                    hcan(1, i_r, i_z, i_phi) = B2can/Bmod(i_r, i_z, i_phi)
+                    hcan(2, i_r, i_z, i_phi) = B3can/Bmod(i_r, i_z, i_phi)
                 enddo
             enddo
         enddo

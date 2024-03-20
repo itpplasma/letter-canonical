@@ -84,12 +84,14 @@ contains
 
     subroutine test_compute_hcan
         use canonical, only: compute_hcan, compute_bmod, &
-            generate_regular_grid, cyl_to_cov, spl_lam, spl_chi
+            generate_regular_grid, cyl_to_cov, spl_lam
         use interpolate, only: destroy_splines_3d
 
         real(8), dimension(3, n_r, n_z, n_phi) :: B, Bcov, x
         real(8), dimension(n_r, n_z, n_phi) :: Bmod
         real(8), dimension(2, n_r, n_z, n_phi) :: hcan_expected, hcan_computed
+
+        call print_test("test_compute_hcan")
 
         call generate_regular_grid(x)
 
@@ -102,16 +104,15 @@ contains
         hcan_expected(2,:,:,:) = Bcov(3,:,:,:)/Bmod
 
         call construct_zero_spline(spl_lam)
-        call construct_zero_spline(spl_chi)
         call compute_hcan(B, Bmod, hcan_computed)
-        print *, hcan_computed(:,1,:,:)
         if (any(abs(hcan_computed - hcan_expected) > eps)) then
             call print_fail
             print *, "should match for identical transformation"
             error stop
         end if
         call destroy_splines_3d(spl_lam)
-        call destroy_splines_3d(spl_chi)
+
+        call print_ok
 
     end subroutine test_compute_hcan
 
