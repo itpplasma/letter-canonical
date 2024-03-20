@@ -7,6 +7,7 @@ program test
     call setup
     call test_get_grid_point
     call test_generate_regular_grid
+    call test_can_to_cyl
     call test_compute_A2can
 
 contains
@@ -68,7 +69,7 @@ contains
         use interpolate, only: destroy_splines_3d
 
         real(8), dimension(3, n_r, n_z, n_phi) :: A
-        real(8), dimension(n_r, n_z, n_phi) :: A2can_computed, A2can_expected
+        real(8), dimension(n_r, n_z, n_phi) :: A2can_computed
 
         call print_test("test_compute_A2can")
 
@@ -77,31 +78,58 @@ contains
         call construct_zero_spline(spl_lam)
         call construct_zero_spline(spl_chi)
         call compute_A2can(A, A2can_computed)
-        call destroy_splines_3d(spl_lam)
-        call destroy_splines_3d(spl_chi)
-
-        A2can_expected = A(2,:,:,:)
-        if (any(abs(A2can_computed - A2can_expected) > eps)) then
+        if (any(abs(A2can_computed - A(2,:,:,:)) > eps)) then
             call print_fail
             print *, "A2 canonical should match A2 for identical transformation"
             error stop
         end if
+        call destroy_splines_3d(spl_lam)
+        call destroy_splines_3d(spl_chi)
 
         call construct_linear_spline(spl_lam)
         call construct_linear_spline(spl_chi)
         call compute_A2can(A, A2can_computed)
-        call destroy_splines_3d(spl_lam)
-        call destroy_splines_3d(spl_chi)
-
-        A2can_expected = A(2,:,:,:)
-        if (all(abs(A2can_computed - A2can_expected) < eps)) then
+        if (all(abs(A2can_computed - A(2,:,:,:)) < eps)) then
             call print_fail
             print *, "A2 canonical must not match A2 for linear transformation"
             error stop
         end if
+        call destroy_splines_3d(spl_lam)
+        call destroy_splines_3d(spl_chi)
 
         call print_ok
     end subroutine test_compute_A2can
+
+
+    subroutine test_can_to_cyl
+        use canonical, only: can_to_cyl, spl_lam, generate_regular_grid
+        use interpolate, only: destroy_splines_3d
+
+        real(8), dimension(3, n_r, n_z, n_phi) :: xcan, xcyl_computed
+
+        call generate_regular_grid(xcan)
+
+        call print_test("test_can_to_cyl")
+        call construct_zero_spline(spl_lam)
+        call can_to_cyl(xcan, xcyl_computed)
+        if (any(abs(xcyl_computed - xcan) > eps)) then
+            call print_fail
+            print *, "should match for identical transformation"
+            error stop
+        end if
+        call destroy_splines_3d(spl_lam)
+
+        call construct_linear_spline(spl_lam)
+        call can_to_cyl(xcan, xcyl_computed)
+        if (all(abs(xcyl_computed - xcan) < eps)) then
+            call print_fail
+            print *, "must not match for linear transformation"
+            error stop
+        end if
+        call destroy_splines_3d(spl_lam)
+
+        call print_ok
+    end subroutine test_can_to_cyl
 
 
     subroutine construct_zero_spline(spl)
@@ -137,21 +165,29 @@ contains
         logical, parameter :: periodic(3) = [.False., .False., .True.]
 
         real(8), dimension(n_r, n_z, n_phi) :: linear
-        integer :: i_r, i_z, i_phi
 
         x_min = [rmin, zmin, 0.d0]
         x_max = [rmax, zmax, twopi]
 
-        do i_phi = 1, n_phi
-            do i_z = 1, n_z
-                do i_r = 1, n_r
-                    linear(i_r, i_z, i_phi) = i_r + i_z + i_phi + 1.0d0
-                end do
-            end do
-        end do
+        call fill_linear(linear)
 
         call construct_splines_3d(x_min, x_max, linear, order, periodic, spl)
     end subroutine construct_linear_spline
+
+
+    subroutine fill_linear(x)
+        real(8), intent(inout) :: x(n_r, n_z, n_phi)
+
+        integer :: i_r, i_z, i_phi
+
+        do i_phi = 1, n_phi
+            do i_z = 1, n_z
+                do i_r = 1, n_r
+                    x(i_r, i_z, i_phi) = i_r + i_z + i_phi + 1.0d0
+                end do
+            end do
+        end do
+    end subroutine fill_linear
 
 
     subroutine print_test(test_name)

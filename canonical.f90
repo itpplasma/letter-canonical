@@ -1,5 +1,6 @@
 module canonical
-    use interpolate, only : SplineData3D, evaluate_splines_3d
+    use interpolate, only : SplineData3D, construct_splines_3d, &
+        evaluate_splines_3d, evaluate_splines_3d_der2
     use my_little_magfie, only : rmin, rmax, zmin, zmax, my_field
 
     implicit none
@@ -21,7 +22,7 @@ module canonical
     type(SplineData3D) :: spl_lam, spl_chi
 
     ! TODO
-    ! type(SplineData3D) :: spl_A2, spl_A3, spl_h2, spl_h3, spl_Bmod
+    type(SplineData3D) :: spl_A2 !, spl_A3, spl_h2, spl_h3, spl_Bmod
 
 contains
 
@@ -113,14 +114,28 @@ contains
 
 
     subroutine compute_canonical_field_components
-        real(8), dimension(:,:,:,:), allocatable :: xcan, xcyl, B, A
+        real(8), dimension(:,:,:,:), allocatable :: xcan, xcyl, B, Acyl
+        real(8), dimension(:,:,:), allocatable :: A2can
+
+        real(8) :: x_min(3), x_max(3)
+        integer, parameter :: order(3) = [3, 3, 3]
+        logical, parameter :: periodic(3) = [.False., .False., .True.]
+
+        x_min = [rmin, zmin, 0.d0]
+        x_max = [rmax, zmax, twopi]
 
         allocate(xcan(3,n_r,n_z,n_phi), xcyl(3,n_r,n_z,n_phi))
-        allocate(B(3,n_r,n_z,n_phi), A(3,n_r,n_z,n_phi))
+        allocate(B(3,n_r,n_z,n_phi), Acyl(3,n_r,n_z,n_phi))
+        allocate(A2can(n_r,n_z,n_phi))
 
         call generate_regular_grid(xcan)
         call can_to_cyl(xcan, xcyl)
-        call get_physical_field(xcyl, B, A)
+        call get_physical_field(xcyl, B, Acyl)
+
+        call compute_A2can(Acyl, A2can)
+        call construct_splines_3d(x_min, x_max, A2can, order, periodic, spl_A2)
+        deallocate(A2can)
+        deallocate(Acyl, B, xcyl, xcan)
 
     end subroutine compute_canonical_field_components
 
@@ -180,16 +195,24 @@ contains
     end subroutine can_to_cyl
 
 
-    subroutine compute_A2can(A, A2can)
-        real(8), dimension(:,:,:,:), intent(in) :: A
-        real(8), dimension(:,:,:), intent(out) :: A2can
+    subroutine compute_A2can(Acyl, A2can)
+        real(8), dimension(:,:,:,:), intent(in) :: Acyl  ! physical components
+        real(8), dimension(:,:,:), intent(out) :: A2can  ! covariant component
 
         integer :: i_phi, i_z, i_r
+        real(8) :: x(3)
+        real(8) :: AZ, Aphicov
+        real(8) :: lam, chi, dlam(3), dchi(3), dummy(6)
 
         do i_phi=1,n_phi
             do i_z=1,n_z
                 do i_r=1,n_r
-                    A2can(i_r, i_z, i_phi) = A(2, i_r, i_z, i_phi)
+                    x = get_grid_point(i_r, i_z, i_phi)
+                    call evaluate_splines_3d_der2(spl_lam, x, lam, dlam, dummy)
+                    call evaluate_splines_3d_der2(spl_chi, x, chi, dchi, dummy)
+                    AZ = Acyl(2, i_r, i_z, i_phi)
+                    Aphicov = Acyl(3, i_r, i_z, i_phi)/x(1)
+                    A2can(i_r, i_z, i_phi) = AZ + Aphicov*dlam(2) - dchi(2)
                 enddo
             enddo
         enddo
