@@ -1,7 +1,7 @@
 program main
     use interpolate, only : SplineData3D, construct_splines_3d, evaluate_splines_3d, destroy_splines_3d, disp
-    use canonical, only : init_canonical, get_transformation, twopi, &
-        compute_canonical_field_components, spl_lam, spl_chi
+    use canonical, only : init_canonical, init_transformation, twopi, &
+        init_canonical_field_components, spl_lam, spl_chi
 
     implicit none
     save
@@ -10,38 +10,15 @@ program main
     real(8), parameter :: rmin = 75.d0, rmax = 264.42281879194627d0, &
                           zmin = -150.d0, zmax = 147.38193979933115d0
 
-    real(8), dimension(:,:,:), allocatable :: lam_phi, chi_gauge
-
     integer :: outfile_unit
 
-    allocate(lam_phi(n_r, n_z, n_phi), chi_gauge(n_r, n_z, n_phi))
-
     call init_canonical(n_r, n_z, n_phi)
-    call get_transformation(lam_phi, chi_gauge)
+    call init_transformation
 
-    open(newunit=outfile_unit, file="lam_phi.out")
-        write(outfile_unit, *) lam_phi
-    close(outfile_unit)
-
-    open(newunit=outfile_unit, file="chi_gauge.out")
-        write(outfile_unit, *) chi_gauge
-    close(outfile_unit)
-
-    call construct_splines_3d( &
-        x_min = [rmin, zmin, 0.d0], x_max = [rmax, zmax, twopi], y = lam_phi, &
-        order = [3, 3, 3], periodic = [.False., .False., .True.], spl = spl_lam)
-    deallocate(lam_phi)
-
-    call construct_splines_3d( &
-        x_min = [rmin, zmin, 0.d0], x_max = [rmax, zmax, twopi], y = chi_gauge,&
-        order = [3, 3, 3], periodic = [.False., .False., .True.], spl = spl_chi)
-    deallocate(chi_gauge)
+    ! TODO: Compute and spline h, Bmod from in canonical coordinates
+    call init_canonical_field_components
 
     call test_splines
-
-    ! TODO: Compute A, h, Bmod from splines on grid in canonical coordinates
-    call compute_canonical_field_components
-    ! TODO: Spline A, h, Bmod on grid in canonical coordinates
 
 contains
 

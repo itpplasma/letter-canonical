@@ -121,7 +121,23 @@ contains
     end subroutine rh_ran
 
 
-    subroutine compute_canonical_field_components
+    subroutine init_transformation
+        real(8), dimension(:,:,:), allocatable :: lam_phi, chi_gauge
+
+        allocate(lam_phi(n_r, n_z, n_phi), chi_gauge(n_r, n_z, n_phi))
+        call get_transformation(lam_phi, chi_gauge)
+
+        call construct_splines_3d( &
+            x_min, x_max, lam_phi, order, periodic, spl_lam)
+        deallocate(lam_phi)
+
+        call construct_splines_3d( &
+            x_min, x_max, chi_gauge, order, periodic, spl_chi)
+        deallocate(chi_gauge)
+    end subroutine init_transformation
+
+
+    subroutine init_canonical_field_components
         real(8), dimension(:,:,:,:), allocatable :: xcan, xcyl, B, Acyl
         real(8), dimension(:,:,:,:), allocatable :: Acan
 
@@ -142,7 +158,7 @@ contains
 
         deallocate(Acyl, B, xcyl, xcan)
 
-    end subroutine compute_canonical_field_components
+    end subroutine init_canonical_field_components
 
 
 
