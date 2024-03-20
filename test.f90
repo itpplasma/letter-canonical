@@ -9,6 +9,7 @@ program test
     call test_generate_regular_grid
     call test_can_to_cyl
     call test_compute_Bmod
+    call test_compute_hcan
     call test_compute_Acan
 
 contains
@@ -79,6 +80,40 @@ contains
 
         call print_ok
     end subroutine test_compute_Bmod
+
+
+    subroutine test_compute_hcan
+        use canonical, only: compute_hcan, compute_bmod, &
+            generate_regular_grid, cyl_to_cov, spl_lam, spl_chi
+        use interpolate, only: destroy_splines_3d
+
+        real(8), dimension(3, n_r, n_z, n_phi) :: B, Bcov, x
+        real(8), dimension(n_r, n_z, n_phi) :: Bmod
+        real(8), dimension(2, n_r, n_z, n_phi) :: hcan_expected, hcan_computed
+
+        call generate_regular_grid(x)
+
+        B(:,:,:,:) = sqrt(1.0d0/3.0d0)
+        Bcov = B
+        call cyl_to_cov(x, Bcov)
+
+        call compute_Bmod(B, Bmod)
+        hcan_expected(1,:,:,:) = Bcov(2,:,:,:)/Bmod
+        hcan_expected(2,:,:,:) = Bcov(3,:,:,:)/Bmod
+
+        call construct_zero_spline(spl_lam)
+        call construct_zero_spline(spl_chi)
+        call compute_hcan(B, Bmod, hcan_computed)
+        if (any(abs(hcan_computed - hcan_expected) > eps)) then
+            call print_fail
+            print *, "should match for identical transformation"
+            error stop
+        end if
+        call destroy_splines_3d(spl_lam)
+        call destroy_splines_3d(spl_chi)
+
+    end subroutine test_compute_hcan
+
 
     subroutine test_compute_Acan
         use canonical, only: compute_Acan, generate_regular_grid, cyl_to_cov, &

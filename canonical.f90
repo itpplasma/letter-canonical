@@ -27,7 +27,7 @@ module canonical
     type(SplineData3D) :: spl_lam, spl_chi
 
     ! TODO For splining covariant vector potential, h=B/Bmod and Bmod
-    type(SplineData3D) :: spl_Bmod, spl_A2, spl_A3 !, spl_h2, spl_h3
+    type(SplineData3D) :: spl_Bmod, spl_A2, spl_A3, spl_h2, spl_h3
 
 contains
 
@@ -138,7 +138,8 @@ contains
 
 
     subroutine init_canonical_field_components
-        real(8), dimension(:,:,:,:), allocatable :: xcan, xcyl, B, Acyl, Acan
+        real(8), dimension(:,:,:,:), allocatable :: xcan, xcyl, B, Acyl
+        real(8), dimension(:,:,:,:), allocatable :: hcan, Acan
         real(8), dimension(:,:,:), allocatable :: Bmod
 
 
@@ -149,10 +150,15 @@ contains
         call can_to_cyl(xcan, xcyl)
         call get_physical_field(xcyl, B, Acyl)
 
-        allocate(Bmod(n_r,n_z,n_phi))
+        allocate(Bmod(n_r,n_z,n_phi), hcan(2,n_r,n_z,n_phi))
         call compute_Bmod(B, Bmod)
+        call compute_hcan(B, Bmod, hcan)
         call construct_splines_3d(x_min, x_max, Bmod, order, periodic, spl_Bmod)
-        deallocate(Bmod)
+        call construct_splines_3d(x_min, x_max, &
+            hcan(1,:,:,:), order, periodic, spl_h2)
+        call construct_splines_3d(x_min, x_max, &
+            hcan(2,:,:,:), order, periodic, spl_h3)
+        deallocate(hcan, Bmod)
 
         allocate(Acan(2,n_r,n_z,n_phi))
         call compute_Acan(Acyl, Acan)
@@ -241,6 +247,13 @@ contains
             enddo
         enddo
     end subroutine
+
+
+    subroutine compute_hcan(B, Bmod, hcan)
+        real(8), dimension(:,:,:,:), intent(in) :: B   ! physical components
+        real(8), dimension(:,:,:), intent(in) :: Bmod
+        real(8), dimension(:,:,:,:), intent(in) :: hcan  ! covariant components
+    end subroutine compute_hcan
 
 
     subroutine compute_Acan(Acyl, Acan)
