@@ -121,7 +121,6 @@ contains
         call generate_regular_grid(xcan)
         call can_to_cyl(xcan, xcyl)
         call get_physical_field(xcyl, B, A)
-        ! TODO call compute_A2can()
 
     end subroutine compute_canonical_field_components
 
@@ -181,25 +180,47 @@ contains
     end subroutine can_to_cyl
 
 
+    subroutine compute_A2can(A, A2can)
+        real(8), dimension(:,:,:,:), intent(in) :: A
+        real(8), dimension(:,:,:), intent(out) :: A2can
+
+        integer :: i_phi, i_z, i_r
+
+        do i_phi=1,n_phi
+            do i_z=1,n_z
+                do i_r=1,n_r
+                    A2can(i_r, i_z, i_phi) = A(2, i_r, i_z, i_phi)
+                enddo
+            enddo
+        enddo
+    end subroutine compute_A2can
+
+
     subroutine generate_regular_grid(x)
         real(8), intent(out) :: x(:,:,:,:)
 
         integer :: i_r, i_z, i_phi
-        real(8) :: r, z, phi
 
         do i_phi=1,n_phi
-            phi = h_phi*dble(i_phi-1)
             do i_z=1,n_z
-                z = zmin + h_z*dble(i_z-1)
                 do i_r=1,n_r
-                    r = rmin + h_r*dble(i_r-1)
-                    x(1,i_r,i_z,i_phi) = r
-                    x(2,i_r,i_z,i_phi) = z
-                    x(3,i_r,i_z,i_phi) = phi
+                    x(:,i_r,i_z,i_phi) = get_grid_point(i_r, i_z, i_phi)
                 enddo
             enddo
         enddo
 
     end subroutine generate_regular_grid
+
+
+    function get_grid_point(i_r, i_z, i_phi)
+        integer, intent(in) :: i_r, i_z, i_phi
+        real(8) :: get_grid_point(3)
+
+        get_grid_point = [ &
+            rmin + h_r*dble(i_r-1), &
+            zmin + h_z*dble(i_z-1), &
+            h_phi*dble(i_phi-1) &
+        ]
+    end function get_grid_point
 
 end module canonical
