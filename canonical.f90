@@ -260,7 +260,7 @@ contains
                     call evaluate_splines_3d_der2(spl_lam, x, lam, dlam, dummy)
                     call evaluate_splines_3d_der2(spl_chi, x, chi, dchi, dummy)
                     AZ = Acyl(2, i_r, i_z, i_phi)
-                    Aphicov = Acyl(3, i_r, i_z, i_phi)/x(1)
+                    Aphicov = Acyl(3, i_r, i_z, i_phi)*x(1)
                     Acan(1, i_r, i_z, i_phi) = AZ + Aphicov*dlam(2) - dchi(2)
                     Acan(2, i_r, i_z, i_phi) = Aphicov*(1d0 + dlam(3)) - dchi(3)
                 enddo
@@ -273,7 +273,7 @@ contains
         real(8), intent(in) :: xcyl(:,:,:,:)
         real(8), intent(inout) :: V(:,:,:,:)
 
-        V(3,:,:,:) = V(3,:,:,:)/xcyl(1,:,:,:)
+        V(3,:,:,:) = V(3,:,:,:)*xcyl(1,:,:,:)
     end subroutine cyl_to_cov
 
 

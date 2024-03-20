@@ -12,12 +12,17 @@ program main
 
     integer :: outfile_unit
 
+    print *, "init_canonical ..."
     call init_canonical(n_r, n_z, n_phi)
+
+    print *, "init_transformation ..."
     call init_transformation
 
-    ! TODO: Compute and spline h, Bmod from in canonical coordinates
+    ! TODO: Compute and spline h in canonical coordinates
+    print *, "init_canonical_field_components ..."
     call init_canonical_field_components
 
+    print *, "test_splines ..."
     call test_splines
 
 contains
