@@ -104,6 +104,7 @@ contains
         call construct_zero_spline(spl_lam)
         call construct_zero_spline(spl_chi)
         call compute_hcan(B, Bmod, hcan_computed)
+        print *, hcan_computed(:,1,:,:)
         if (any(abs(hcan_computed - hcan_expected) > eps)) then
             call print_fail
             print *, "should match for identical transformation"

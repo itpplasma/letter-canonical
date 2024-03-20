@@ -249,10 +249,30 @@ contains
     end subroutine
 
 
-    subroutine compute_hcan(B, Bmod, hcan)
-        real(8), dimension(:,:,:,:), intent(in) :: B   ! physical components
+    subroutine compute_hcan(Bcyl, Bmod, hcan)
+        real(8), dimension(:,:,:,:), intent(in) :: Bcyl   ! physical components
         real(8), dimension(:,:,:), intent(in) :: Bmod
-        real(8), dimension(:,:,:,:), intent(in) :: hcan  ! covariant components
+        real(8), dimension(:,:,:,:), intent(inout) :: hcan  ! covariant
+
+        integer :: i_phi, i_z, i_r
+        real(8) :: x(3)
+        real(8) :: BZcov, Bphicov, B2can, B3can
+        real(8) :: lam, dlam(3), dummy(6)
+
+        do i_phi=1,n_phi
+            do i_z=1,n_z
+                do i_r=1,n_r
+                    x = get_grid_point(i_r, i_z, i_phi)
+                    call evaluate_splines_3d_der2(spl_lam, x, lam, dlam, dummy)
+                    BZcov = Bcyl(2, i_r, i_z, i_phi)
+                    Bphicov = Bcyl(3, i_r, i_z, i_phi)*x(1)
+                    B2can = BZcov + dlam(2)*Bphicov
+                    B3can = Bphicov*(1.0d0 + dlam(3))
+                    hcan(1,:,:,:) = B2can/Bmod(i_r, i_z, i_phi)
+                    hcan(2,:,:,:) = B3can/Bmod(i_r, i_z, i_phi)
+                enddo
+            enddo
+        enddo
     end subroutine compute_hcan
 
 
@@ -263,7 +283,7 @@ contains
 
         integer :: i_phi, i_z, i_r
         real(8) :: x(3)
-        real(8) :: AZ, Aphicov
+        real(8) :: AZcov, Aphicov
         real(8) :: lam, chi, dlam(3), dchi(3), dummy(6)
 
         do i_phi=1,n_phi
@@ -272,9 +292,9 @@ contains
                     x = get_grid_point(i_r, i_z, i_phi)
                     call evaluate_splines_3d_der2(spl_lam, x, lam, dlam, dummy)
                     call evaluate_splines_3d_der2(spl_chi, x, chi, dchi, dummy)
-                    AZ = Acyl(2, i_r, i_z, i_phi)
+                    AZcov = Acyl(2, i_r, i_z, i_phi)
                     Aphicov = Acyl(3, i_r, i_z, i_phi)*x(1)
-                    Acan(1, i_r, i_z, i_phi) = AZ + Aphicov*dlam(2) - dchi(2)
+                    Acan(1, i_r, i_z, i_phi) = AZcov + Aphicov*dlam(2) - dchi(2)
                     Acan(2, i_r, i_z, i_phi) = Aphicov*(1d0 + dlam(3)) - dchi(3)
                 enddo
             enddo
