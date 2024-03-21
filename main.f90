@@ -1,6 +1,6 @@
 program main
-    use interpolate, only : SplineData3D, construct_splines_3d, evaluate_splines_3d, destroy_splines_3d, disp
-    use canonical, only : init_canonical, init_transformation, twopi, &
+    use interpolate, only: SplineData3D, construct_splines_3d, evaluate_splines_3d, destroy_splines_3d, disp
+    use canonical, only: init_canonical, init_transformation, twopi, &
         init_canonical_field_components, spl_lam, spl_chi
 
     implicit none
@@ -24,7 +24,47 @@ program main
     print *, "test_splines ..."
     call test_splines
 
+    print *, "test_integration ..."
+    call test_integration
+
+
 contains
+
+    subroutine test_integration
+        real(8), parameter :: tmax = 1.0d3
+        integer, parameter :: nt = 10000
+
+        real(8) :: x(3)
+        integer :: i_t
+
+        x = [0.5*(rmin+rmax), 0.5*(zmin+zmax), 0.0d0]
+
+        do i_t = 0, nt
+            call odeint_allroutines(&
+                x, 3, i_t*tmax/nt, (i_t+1)*tmax/nt, 1.0d-8, Bnoncan)
+            write(100, *) x
+        end do
+    end subroutine test_integration
+
+
+    subroutine Bnoncan(t, x, dx)
+        use my_little_magfie, only: my_field
+
+        real(8), intent(in) :: t  ! plus threadprivate phi_c, z_c from module
+        real(8), dimension(3), intent(in) :: x
+        real(8), dimension(3), intent(inout) :: dx
+        real(8) :: Br, Bp, Bz, Ar, Ap, Az
+        real(8) :: dummy
+
+        call my_field(x(1), x(3), x(2), Br, Bp, Bz, &
+            dummy, dummy, dummy, dummy, dummy, dummy, dummy, dummy, dummy, &
+            Ar, Ap, Az)
+
+        dx(1) = Br/Bp
+        dx(2) = Bz/Bp
+        dx(3) = 1.0d0
+    end subroutine Bnoncan
+
 
     subroutine test_splines
 

@@ -89,7 +89,7 @@ contains
                     r1 = rmin + h_r*dble(i_r-2)
                     r2 = rmin + h_r*dble(i_r-1)
 
-                    call odeint_allroutines(y, ndim, r1, r2, relerr, rh_ran)
+                    call odeint_allroutines(y, ndim, r1, r2, relerr, rh_can)
 
                     delta_phi(i_r, i_z, i_phi) = y(1)
                     chi_gauge(i_r, i_z, i_phi) = y(2)
@@ -102,7 +102,7 @@ contains
     end subroutine get_transformation
 
 
-    subroutine rh_ran(r_c, y, dy)
+    subroutine rh_can(r_c, y, dy)
 
         real(8), intent(in) :: r_c  ! plus threadprivate phi_c, z_c from module
         real(8), dimension(2), intent(in) :: y
@@ -118,7 +118,7 @@ contains
         dy(2) = Ar + Ap*dy(1)  ! Here it i_r reused so that r_c cancels out
         dy(1) = dy(1) / r_c    ! Finally we divide by r_c
 
-    end subroutine rh_ran
+    end subroutine rh_can
 
 
     subroutine init_transformation
@@ -171,7 +171,6 @@ contains
         deallocate(Acyl, B, xcyl, xcan)
 
     end subroutine init_canonical_field_components
-
 
 
     subroutine get_physical_field(xcyl, B, A)
