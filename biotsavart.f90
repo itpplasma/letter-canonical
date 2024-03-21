@@ -1,6 +1,8 @@
 module biotsavart
     implicit none
 
+    real(8), parameter :: clight = 2.99792458d10
+
     type CoilsData
         real(8), dimension(:), allocatable :: x, y, z, current
     end type CoilsData
@@ -80,6 +82,35 @@ module biotsavart
 
         deallocate(coils%x, coils%y, coils%z, coils%current)
     end subroutine deallocate_coils_data
+
+
+    function compute_vector_potential(coils, x) result(A)
+        ! Formula of Hanson and Hirshman (2002)
+        type(CoilsData), intent(in) :: coils
+        real(8), intent(in) :: x(3)
+
+        real(8) :: A(3), dx_i(3), dx_f(3), dl(3), R_i, R_f, L, eps, log_term
+        integer :: i
+
+        A = 0.0d0
+        do i = 1, size(coils%x) - 1
+            dl(1) = coils%x(i+1) - coils%x(i)
+            dl(2) = coils%y(i+1) - coils%y(i)
+            dl(3) = coils%z(i+1) - coils%z(i)
+            dx_i(1) = x(1) - coils%x(i)
+            dx_i(2) = x(2) - coils%y(i)
+            dx_i(3) = x(3) - coils%z(i)
+            dx_f(1) = x(1) - coils%x(i+1)
+            dx_f(2) = x(2) - coils%y(i+1)
+            dx_f(3) = x(3) - coils%z(i+1)
+            R_i = sqrt(dx_i(1)**2 + dx_i(2)**2 + dx_i(3)**2)
+            R_f = sqrt(dx_f(1)**2 + dx_f(2)**2 + dx_f(3)**2)
+            L = sqrt(dl(1)**2 + dl(2)**2 + dl(3)**2)
+            eps = L / (R_i + R_f)
+            log_term = log((1.0d0 + eps) / (1.0d0 - eps))
+            A = A + (dl / (clight*L)) * log_term
+        end do
+    end function compute_vector_potential
 
 
 end module biotsavart
