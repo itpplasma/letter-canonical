@@ -1,65 +1,33 @@
-include FindPython.mk
-
-# Compiler with debugging flags
 FC = gfortran
 FFLAGS = -g -fPIC -O3 -fopenmp -march=native -mtune=native
-# FFLAGS = -g -fPIC -Og -fopenmp
 
-FFLAGS += -Wall -Wuninitialized -Wno-maybe-uninitialized -Wno-unused-label -Wno-unused-dummy-argument -Werror -Wfatal-errors
+FFLAGS += -Wall -Wuninitialized -Wno-maybe-uninitialized -Wno-unused-label -Wno-unused-dummy-argument -Werror -Wfatal-errors -I$(HOME)/bin/libstell_dir
 
-SOURCES = libneo_kinds.f90 math_constants.f90 spl_three_to_five.f90
+all: letter-canonical.x test.x test_large.x test_biotsavart.x
 
-MAGFIE_SOURCES = spline5_RZ.f90 \
-theta_rz_mod.f90 \
-extract_fluxcoord_mod.f90 \
-amn_mod.f90 \
-field_mod.f90 \
-field_eq_mod.f90 \
-field_c_mod.f90 \
-input_files.f90 \
-input_files.f90 \
-inthecore_mod.f90 \
-field_divB0.f90 \
-bdivfree_mod.f90 \
-bdivfree.f90
+letter-canonical.x: canonical.o magfie.o main.f90
+	$(FC) $(FFLAGS) -o $@ $^ -L. -lstell
 
-SOURCES += $(addprefix magfie/, $(MAGFIE_SOURCES))
+test.x: canonical.o magfie.o test_util.f90 test.f90
+	$(FC) $(FFLAGS) -o $@ $^ -L. -lstell
 
-SOURCES += odeint_rkf45.f90 contrib/rkf45.f90 interpolate.f90
-SOURCES := $(addprefix ../libneo/src/, $(SOURCES))
-
-all: libfield.so my_little_magfie.$(TARGET_SUFFIX) letter-canonical.x \
-	test.x test_large.x test_biotsavart.x clean_objects
-
-letter-canonical.x: canonical.o my_little_magfie.o main.f90
-	$(FC) $(FFLAGS) -o $@ $^ -L. -lfield
-
-test.x: canonical.o my_little_magfie.o test_util.f90 test.f90
-	$(FC) $(FFLAGS) -o $@ $^ -L. -lfield
-
-test_large.x: canonical.o my_little_magfie.o test_util.f90 test_large.f90
-	$(FC) $(FFLAGS) -o $@ $^ -L. -lfield
+test_large.x: canonical.o magfie.o test_util.f90 test_large.f90
+	$(FC) $(FFLAGS) -o $@ $^ -L. -lstell
 
 test_biotsavart.x: test_biotsavart.f90 test_util.f90 biotsavart.o
-	$(FC) $(FFLAGS) -o $@ $^ -L. -lfield
+	$(FC) $(FFLAGS) -o $@ $^ -L. -lstell
 
 biotsavart.o: biotsavart.f90
 	$(FC) $(FFLAGS) -c $^
 
-canonical.o: canonical.f90 my_little_magfie.o
+canonical.o: canonical.f90 magfie.o
 	$(FC) $(FFLAGS) -c $^
 
-my_little_magfie.o: my_little_magfie.f90 libfield.so
+magfie.o: magfie_stell.f90
 	$(FC) $(FFLAGS) -c $^
 
 clean_objects:
 	rm -f *.o
-
-my_little_magfie.$(TARGET_SUFFIX): libfield.so my_little_magfie.f90
-	LDFLAGS=-Wl,-rpath,. f2py -c -m my_little_magfie my_little_magfie.f90 -L. -lfield
-
-libfield.so: $(SOURCES)
-	$(FC) $(FFLAGS) -shared -o $@ $^
 
 clean:
 	rm -f *.x *.so *.o *.mod
