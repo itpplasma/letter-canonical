@@ -53,9 +53,9 @@ contains
     end subroutine init_canonical
 
 
-    subroutine get_transformation(delta_phi, chi_gauge)
+    subroutine get_transformation(lam_phi, chi_gauge)
 
-        real(8), intent(inout), dimension(:,:,:) :: delta_phi, chi_gauge
+        real(8), intent(inout), dimension(:,:,:) :: lam_phi, chi_gauge
 
         integer, parameter :: ndim=2
         real(8), parameter :: relerr=1d-10
@@ -80,7 +80,7 @@ contains
             do i_z=1,n_z
                 z_c = zmin + h_z*dble(i_z-1)
 
-                delta_phi(1, i_z, i_phi) = 0.d0
+                lam_phi(1, i_z, i_phi) = 0.d0
                 chi_gauge(1, i_z, i_phi) = 0.d0
 
                 y = 0.d0
@@ -91,7 +91,7 @@ contains
 
                     call odeint_allroutines(y, ndim, r1, r2, relerr, rh_can)
 
-                    delta_phi(i_r, i_z, i_phi) = y(1)
+                    lam_phi(i_r, i_z, i_phi) = y(1)
                     chi_gauge(i_r, i_z, i_phi) = y(2)
                 enddo
             enddo
@@ -256,7 +256,7 @@ contains
 
         integer :: i_phi, i_z, i_r
         real(8) :: x(3)
-        real(8) :: BZcov, Bphicov, B2can, B3can
+        real(8) :: BRcov, BZcov, Bphicov, B1can, B2can, B3can
         real(8) :: lam, dlam(3), dummy(6)
 
         do i_phi=1,n_phi
@@ -264,9 +264,15 @@ contains
                 do i_r=1,n_r
                     x = get_grid_point(i_r, i_z, i_phi)
                     call evaluate_splines_3d_der2(spl_lam, x, lam, dlam, dummy)
+                    BRcov = Bcyl(1, i_r, i_z, i_phi)
                     BZcov = Bcyl(2, i_r, i_z, i_phi)
                     Bphicov = Bcyl(3, i_r, i_z, i_phi)*x(1)
-                    B2can = BZcov + dlam(2)*Bphicov
+                    B1can = BRcov + Bphicov*dlam(1)
+                    if (B1can/Bmod(i_r, i_z, i_phi) > 0.1d0) then
+                            print *, x, B1can/Bmod(i_r, i_z, i_phi)
+                            !error stop
+                    end if
+                    B2can = BZcov + Bphicov*dlam(2)
                     B3can = Bphicov*(1.0d0 + dlam(3))
                     hcan(1, i_r, i_z, i_phi) = B2can/Bmod(i_r, i_z, i_phi)
                     hcan(2, i_r, i_z, i_phi) = B3can/Bmod(i_r, i_z, i_phi)
@@ -283,7 +289,7 @@ contains
 
         integer :: i_phi, i_z, i_r
         real(8) :: x(3)
-        real(8) :: AZcov, Aphicov
+        real(8) :: ARcov, AZcov, Aphicov
         real(8) :: lam, chi, dlam(3), dchi(3), dummy(6)
 
         do i_phi=1,n_phi
@@ -292,8 +298,10 @@ contains
                     x = get_grid_point(i_r, i_z, i_phi)
                     call evaluate_splines_3d_der2(spl_lam, x, lam, dlam, dummy)
                     call evaluate_splines_3d_der2(spl_chi, x, chi, dchi, dummy)
+                    ARcov = Acyl(1, i_r, i_z, i_phi)
                     AZcov = Acyl(2, i_r, i_z, i_phi)
                     Aphicov = Acyl(3, i_r, i_z, i_phi)*x(1)
+                    print *, (ARcov + Aphicov*dlam(1) - dchi(1))/Aphicov
                     Acan(1, i_r, i_z, i_phi) = AZcov + Aphicov*dlam(2) - dchi(2)
                     Acan(2, i_r, i_z, i_phi) = Aphicov*(1d0 + dlam(3)) - dchi(3)
                 enddo
