@@ -37,7 +37,7 @@ contains
     subroutine test_integration
         real(8), parameter :: tol = 1.0d-6
         real(8), parameter :: timefac = 1d0
-        real(8), parameter :: tmax = 0.75d0*twopi
+        real(8), parameter :: tmax = 10.75d0*twopi
         integer, parameter :: nt = 1000
 
         real(8) :: x(3)
@@ -72,6 +72,7 @@ contains
             dummy, dummy, dummy, dummy, dummy, dummy, dummy, dummy, dummy, &
             Ar, Ap, Az)
 
+        Bp = Bp/x(1)  ! contravariant component
         dx(1) = Br/Bp
         dx(2) = Bz/Bp
         dx(3) = 1.0d0

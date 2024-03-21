@@ -1,4 +1,6 @@
 program test
+    use test_util, only: print_test, print_ok, print_fail
+
     implicit none
 
     integer, parameter :: n_r=2, n_z=3, n_phi=4
@@ -246,22 +248,5 @@ contains
             end do
         end do
     end subroutine fill_linear
-
-
-    subroutine print_test(test_name)
-
-        character(*) :: test_name
-        print *, "==> ", test_name
-    end subroutine print_test
-
-
-    subroutine print_ok
-        print *, "    .................................................... OK"
-    end subroutine print_ok
-
-
-    subroutine print_fail
-        print *, "    .................................................... FAIL"
-    end subroutine print_fail
 
 end program test

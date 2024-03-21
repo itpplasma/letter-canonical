@@ -29,12 +29,15 @@ SOURCES += odeint_rkf45.f90 contrib/rkf45.f90 interpolate.f90
 SOURCES := $(addprefix ../libneo/src/, $(SOURCES))
 
 all: libfield.so my_little_magfie.$(TARGET_SUFFIX) letter-canonical.x \
-	test.x clean_objects
+	test.x test_large.x clean_objects
 
 letter-canonical.x: canonical.o my_little_magfie.o main.f90
 	$(FC) $(FFLAGS) -o $@ $^ -L. -lfield
 
-test.x: canonical.o my_little_magfie.o test.f90
+test.x: canonical.o my_little_magfie.o test_util.f90 test.f90
+	$(FC) $(FFLAGS) -o $@ $^ -L. -lfield
+
+test_large.x: canonical.o my_little_magfie.o test_util.f90 test_large.f90
 	$(FC) $(FFLAGS) -o $@ $^ -L. -lfield
 
 canonical.o: canonical.f90 my_little_magfie.o
