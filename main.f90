@@ -31,7 +31,7 @@ program main
 contains
 
     subroutine test_integration
-        real(8), parameter :: tmax = 1.0d1
+        real(8), parameter :: tmax = 1.0d0
         integer, parameter :: nt = 10000
 
         real(8) :: x(3)
