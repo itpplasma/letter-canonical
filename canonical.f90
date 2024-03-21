@@ -174,6 +174,7 @@ contains
 
 
     subroutine get_physical_field(xcyl, B, A)
+        ! Order of coordinates: R, Z, phi
         real(8), intent(in) :: xcyl(:,:,:,:)
         real(8), intent(out) :: B(:,:,:,:), A(:,:,:,:)
 
@@ -186,17 +187,17 @@ contains
             do i_z=1,n_z
                 do i_r=1,n_r
                     r = xcyl(1,i_r,i_z,i_phi)
+                    phi = xcyl(3,i_r,i_z,i_phi) ! swap to R, Z, phi
                     z = xcyl(2,i_r,i_z,i_phi)
-                    phi = xcyl(3,i_r,i_z,i_phi)
                     call my_field(r, phi, z, &
                         B(1,i_r,i_z,i_phi), &
+                        B(3,i_r,i_z,i_phi), &  ! swap to R, Z, phi
                         B(2,i_r,i_z,i_phi), &
-                        B(3,i_r,i_z,i_phi), &
                         dummy, dummy, dummy, dummy, &
                         dummy, dummy, dummy, dummy, dummy, &
                         A(1,i_r,i_z,i_phi), &
-                        A(2,i_r,i_z,i_phi), &
-                        A(3,i_r,i_z,i_phi))
+                        A(3,i_r,i_z,i_phi), &  ! swap to R, Z, phi
+                        A(2,i_r,i_z,i_phi))
                 end do
             end do
         end do

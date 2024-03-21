@@ -65,6 +65,7 @@ contains
         call print_ok
     end subroutine test_generate_regular_grid
 
+
     subroutine test_compute_Bmod
         use canonical, only: compute_Bmod
 
