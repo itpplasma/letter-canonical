@@ -1,14 +1,14 @@
 program main
     use interpolate, only: SplineData3D, construct_splines_3d, evaluate_splines_3d, destroy_splines_3d, disp
     use canonical, only: init_canonical, init_transformation, twopi, &
-        init_canonical_field_components, spl_lam, spl_chi, &
-        rmin, rmax, zmin, zmax
+        init_canonical_field_components, spl_lam, spl_chi
 
     implicit none
     save
 
     integer, parameter :: n_r=100, n_z=75, n_phi=64
     integer :: outfile_unit
+    real(8) :: rmin, rmax, zmin, zmax
 
     ! Workaround, otherwise not initialized without perturbation field
     rmin = 75.d0
@@ -17,7 +17,8 @@ program main
     zmax = 147.38193979933115d0
 
     print *, "init_canonical ..."
-    call init_canonical(n_r, n_z, n_phi)
+    call init_canonical(n_r, n_z, n_phi, [rmin, zmin, 0.0d0], &
+        [rmax, zmax, twopi])
 
     print *, "init_transformation ..."
     call init_transformation
@@ -60,21 +61,18 @@ contains
 
 
     subroutine Bnoncan(t, x, dx)
-        use my_little_magfie, only: my_field
+        use magfie, only: compute_bfield
 
         real(8), intent(in) :: t  ! plus threadprivate phi_c, z_c from module
         real(8), dimension(3), intent(in) :: x
         real(8), dimension(3), intent(inout) :: dx
-        real(8) :: Br, Bp, Bz, Ar, Ap, Az
-        real(8) :: dummy
+        real(8) :: BR, BZ, Bphi, Bphictr
 
-        call my_field(x(1), x(3), x(2), Br, Bp, Bz, &
-            dummy, dummy, dummy, dummy, dummy, dummy, dummy, dummy, dummy, &
-            Ar, Ap, Az)
+        call compute_bfield(x(1), x(3), x(2), BR, BZ, Bphi)
 
-        Bp = Bp/x(1)  ! contravariant component
-        dx(1) = Br/Bp
-        dx(2) = Bz/Bp
+        Bphictr = Bphi/x(1)  ! contravariant component
+        dx(1) = BR/Bphictr
+        dx(2) = BZ/Bphictr
         dx(3) = 1.0d0
     end subroutine Bnoncan
 

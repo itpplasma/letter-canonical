@@ -11,15 +11,17 @@ program test_large
 contains
 
     subroutine setup
-        use canonical, only: init_canonical, rmin, rmax, zmin, zmax
+        use canonical, only: init_canonical, twopi
+
+        real(8) :: rmin, rmax, zmin, zmax
 
         call print_test("Test Setup")
-        ! Workaround, otherwise not initialized without perturbation field
         rmin = 75.d0
         rmax = 264.42281879194627d0
         zmin = -150.d0
         zmax = 147.38193979933115d0
-        call init_canonical(n_r, n_z, n_phi)
+        call init_canonical(n_r, n_z, n_phi, [rmin, zmin, 0.0d0], &
+            [rmax, zmax, twopi])
         call print_ok
     end subroutine setup
 

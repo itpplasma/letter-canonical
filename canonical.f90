@@ -1,7 +1,6 @@
 module canonical
     use interpolate, only : SplineData3D, construct_splines_3d, &
         evaluate_splines_3d, evaluate_splines_3d_der2
-    use my_little_magfie, only : rmin, rmax, zmin, zmax, my_field
 
     implicit none
 
@@ -9,6 +8,8 @@ module canonical
     real(8), parameter :: twopi = atan(1.d0)*8.d0
 
     integer, parameter :: nper = 1  ! Number of periods (TODO: make thi_r a variable)
+
+    real(8) :: rmin, rmax, zmin, zmax
 
     real(8) :: phi_c, z_c  ! Temporary variables for the ODE integration
     !$omp threadprivate(phi_c, z_c)
@@ -31,16 +32,21 @@ module canonical
 
 contains
 
-    subroutine init_canonical(n_r_, n_z_, n_phi_)
-        use my_little_magfie, only : init_magfie => init
+    subroutine init_canonical(n_r_, n_z_, n_phi_, xmin, xmax)
+        use magfie, only: init_magfie
 
         integer, intent(in) :: n_r_, n_z_, n_phi_  ! Number of grid points
+        real(8), intent(in) :: xmin(3), xmax(3)
 
         call init_magfie
 
         n_r = n_r_
         n_z = n_z_
         n_phi = n_phi_
+        rmin = xmin(1)
+        rmax = xmax(1)
+        zmin = xmin(2)
+        zmax = xmax(2)
 
         ! Grid spacing
         h_r = (rmax-rmin)/dble(n_r-1)
@@ -103,16 +109,14 @@ contains
 
 
     subroutine rh_can(r_c, y, dy)
+        use magfie, only: compute_abfield
 
         real(8), intent(in) :: r_c  ! plus threadprivate phi_c, z_c from module
         real(8), dimension(2), intent(in) :: y
         real(8), dimension(2), intent(inout) :: dy
         real(8) :: Br, Bp, Bz, Ar, Ap, Az
-        real(8) :: dummy
 
-        call my_field(r_c, phi_c + y(1), z_c, Br, Bp, Bz, &
-            dummy, dummy, dummy, dummy, dummy, dummy, dummy, dummy, dummy, &
-            Ar, Ap, Az)
+        call compute_abfield(r_c, phi_c + y(1), z_c, Br, Bp, Bz, Ar, Ap, Az)
 
         dy(1) = -Br/Bp         ! Must still be divided by r_c for covariant Bp
         dy(2) = Ar + Ap*dy(1)  ! Here it i_r reused so that r_c cancels out
@@ -174,6 +178,8 @@ contains
 
 
     subroutine get_physical_field(xcyl, B, A)
+        use magfie, only: compute_abfield
+
         ! Order of coordinates: R, Z, phi
         real(8), intent(in) :: xcyl(:,:,:,:)
         real(8), intent(out) :: B(:,:,:,:), A(:,:,:,:)
@@ -181,20 +187,16 @@ contains
         integer :: i_r, i_z, i_phi
         real(8) :: r, z, phi
 
-        real(8) :: dummy
-
         do i_phi=1,n_phi
             do i_z=1,n_z
                 do i_r=1,n_r
                     r = xcyl(1,i_r,i_z,i_phi)
                     phi = xcyl(3,i_r,i_z,i_phi) ! swap to R, Z, phi
                     z = xcyl(2,i_r,i_z,i_phi)
-                    call my_field(r, phi, z, &
+                    call compute_abfield(r, phi, z, &
                         B(1,i_r,i_z,i_phi), &
                         B(3,i_r,i_z,i_phi), &  ! swap to R, Z, phi
                         B(2,i_r,i_z,i_phi), &
-                        dummy, dummy, dummy, dummy, &
-                        dummy, dummy, dummy, dummy, dummy, &
                         A(1,i_r,i_z,i_phi), &
                         A(3,i_r,i_z,i_phi), &  ! swap to R, Z, phi
                         A(2,i_r,i_z,i_phi))
@@ -257,7 +259,7 @@ contains
         real(8), parameter :: check_tol = 1d-2
         integer :: i_phi, i_z, i_r
         real(8) :: x(3)
-        real(8) :: BRcov, BZcov, Bphicov, B1can, B2can, B3can
+        real(8) :: BRcov, BZcov, Bphicov, B2can, B3can
         real(8) :: lam, dlam(3), dummy(6)
 
         do i_phi=1,n_phi
@@ -269,18 +271,9 @@ contains
                     BZcov = Bcyl(2, i_r, i_z, i_phi)
                     Bphicov = Bcyl(3, i_r, i_z, i_phi)*x(1)
 
-                    if (i_r < n_r) then
-                        B1can = BRcov + Bphicov*dlam(1)
-                        if(abs(B1can/Bmod(i_r, i_z, i_phi)) > check_tol) then
-                            print *, 'h1can too large'
-                            print *, "x = ", x
-                            print *, "h1can = ", B1can/Bmod(i_r, i_z, i_phi)
-                            error stop
-                        end if
-                    end if
-
                     B2can = BZcov + Bphicov*dlam(2)
                     B3can = Bphicov*(1.0d0 + dlam(3))
+
                     hcan(1, i_r, i_z, i_phi) = B2can/Bmod(i_r, i_z, i_phi)
                     hcan(2, i_r, i_z, i_phi) = B3can/Bmod(i_r, i_z, i_phi)
                 enddo
@@ -297,7 +290,7 @@ contains
         real(8), parameter :: check_tol = 1d-2
         integer :: i_phi, i_z, i_r
         real(8) :: x(3)
-        real(8) :: ARcov, AZcov, Aphicov, A1can
+        real(8) :: ARcov, AZcov, Aphicov
         real(8) :: lam, chi, dlam(3), dchi(3), dummy(6)
 
         do i_phi=1,n_phi
@@ -309,15 +302,6 @@ contains
                     ARcov = Acyl(1, i_r, i_z, i_phi)
                     AZcov = Acyl(2, i_r, i_z, i_phi)
                     Aphicov = Acyl(3, i_r, i_z, i_phi)*x(1)
-                    if (i_r < n_r) then
-                        A1can = ARcov + Aphicov*dlam(1) - dchi(1)
-                        if (abs(A1can/AZcov) > check_tol) then
-                            print *, 'A1can/AZcov too large'
-                            print *, "x = ", x
-                            print *, "A1can/AZcov = ", A1can/AZcov
-                            error stop
-                        end if
-                    end if
                     Acan(1, i_r, i_z, i_phi) = AZcov + Aphicov*dlam(2) - dchi(2)
                     Acan(2, i_r, i_z, i_phi) = Aphicov*(1d0 + dlam(3)) - dchi(3)
                 enddo

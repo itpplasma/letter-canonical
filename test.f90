@@ -17,17 +17,20 @@ program test
 contains
 
     subroutine setup
-        use canonical, only: init_canonical
+        use canonical, only: init_canonical, twopi
+
+        real(8) :: xmin(3), xmax(3)
+        xmin = [100.0d0, -150.0d0, 0.0d0]
+        xmax = [200.0d0, 150.0d0, twopi]
 
         call print_test("Test Setup")
-        call init_canonical(n_r, n_z, n_phi)
+        call init_canonical(n_r, n_z, n_phi, xmin, xmax)
         call print_ok
     end subroutine setup
 
 
     subroutine test_get_grid_point
-        use canonical, only: get_grid_point, pi
-        use my_little_magfie, only : rmin, rmax, zmin, zmax
+        use canonical, only: get_grid_point, pi, rmin, rmax, zmin, zmax
 
         real(8) :: x_expected(3), x_computed(3)
 
@@ -46,8 +49,7 @@ contains
 
 
     subroutine test_generate_regular_grid
-        use canonical, only: generate_regular_grid, pi
-        use my_little_magfie, only : rmin, rmax, zmin, zmax
+        use canonical, only: generate_regular_grid, pi, rmin, rmax, zmin, zmax
 
         real(8) :: grid_computed(3, n_r, n_z, n_phi)
         real(8) :: x_computed(3), x_expected(3)
@@ -193,9 +195,8 @@ contains
 
 
     subroutine construct_zero_spline(spl)
-        use canonical, only: twopi
-        use interpolate, only : SplineData3D, construct_splines_3d
-        use my_little_magfie, only : rmin, rmax, zmin, zmax
+        use canonical, only: twopi, rmin, rmax, zmin, zmax
+        use interpolate, only: SplineData3D, construct_splines_3d
 
         type(SplineData3D), intent(out) :: spl
 
@@ -214,9 +215,8 @@ contains
 
 
     subroutine construct_linear_spline(spl)
-        use canonical, only: twopi
-        use interpolate, only : SplineData3D, construct_splines_3d
-        use my_little_magfie, only : rmin, rmax, zmin, zmax
+        use canonical, only: twopi, rmin, rmax, zmin, zmax
+        use interpolate, only: SplineData3D, construct_splines_3d
 
         type(SplineData3D), intent(out) :: spl
 
