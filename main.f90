@@ -72,7 +72,6 @@ contains
             dummy, dummy, dummy, dummy, dummy, dummy, dummy, dummy, dummy, &
             Ar, Ap, Az)
 
-        print *, Br, Bz, Bp
         dx(1) = Br/Bp
         dx(2) = Bz/Bp
         dx(3) = 1.0d0
