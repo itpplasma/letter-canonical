@@ -31,18 +31,24 @@ program main
 contains
 
     subroutine test_integration
-        real(8), parameter :: tmax = 1.0d3
+        real(8), parameter :: tmax = 1.0d1
         integer, parameter :: nt = 10000
 
         real(8) :: x(3)
         integer :: i_t
 
         x = [0.5*(rmin+rmax), 0.5*(zmin+zmax), 0.0d0]
-
         do i_t = 0, nt
             call odeint_allroutines(&
                 x, 3, i_t*tmax/nt, (i_t+1)*tmax/nt, 1.0d-8, Bnoncan)
             write(100, *) x
+        end do
+
+        x = [0.5*(rmin+rmax), 0.5*(zmin+zmax), 0.0d0]
+        do i_t = 0, nt
+            call odeint_allroutines(&
+                x, 3, i_t*tmax/nt, (i_t+1)*tmax/nt, 1.0d-8, Bcan)
+            write(101, *) x
         end do
     end subroutine test_integration
 
@@ -64,6 +70,29 @@ contains
         dx(2) = Bz/Bp
         dx(3) = 1.0d0
     end subroutine Bnoncan
+
+
+    subroutine Bcan(t, x, dx)
+        use canonical, only: spl_A2, spl_A3
+        use interpolate, only: evaluate_splines_3d_der2
+
+        real(8), intent(in) :: t  ! plus threadprivate phi_c, z_c from module
+        real(8), dimension(3), intent(in) :: x
+        real(8), dimension(3), intent(inout) :: dx
+        real(8) :: A2, A3, dA2(3), dA3(3), d2A2(6), d2A3(6)
+        real(8) :: B(3)
+
+        call evaluate_splines_3d_der2(spl_A2, x, A2, dA2, d2A2)
+        call evaluate_splines_3d_der2(spl_A3, x, A3, dA3, d2A3)
+
+        B(1) = dA3(2) - dA2(3)
+        B(2) = -dA3(1)
+        B(3) = dA2(1)
+
+        dx(1) = B(1)/B(3)
+        dx(2) = B(2)/B(3)
+        dx(3) = 1.0d0
+    end subroutine Bcan
 
 
     subroutine test_splines
