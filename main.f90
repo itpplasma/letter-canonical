@@ -30,32 +30,6 @@ program main
 
 contains
 
-
-    subroutine test_physical_field
-        use interpolate, only: SplineData3D, construct_splines_3d, evaluate_splines_3d_der2, destroy_splines_3d
-        use canonical, only: generate_regular_grid, get_physical_field, &
-            x_min, x_max, order, periodic
-
-        real(8), dimension(3, n_r, n_z, n_phi) :: A, B, x
-        real(8) :: Aspl, Bspl, dAspl(3), dBspl(3), d2Aspl(6), d2Bspl(6)
-        type(SplineData3D) :: spl_AR, spl_AZ, spl_Aphi, spl_BR, spl_BZ, spl_Bphi
-
-
-        call print_test("test_physical_field")
-
-        call generate_regular_grid(x)
-
-        call get_physical_field(x, A, B)
-        call construct_splines_3d(x_min, x_max, &
-            A(1,:,:,:), order, periodic, spl_AR)
-        call construct_splines_3d(x_min, x_max, &
-            A(2,:,:,:), order, periodic, spl_AZ)
-        call construct_splines_3d(x_min, x_max, &
-            A(3,:,:,:), order, periodic, spl_Aphi)
-
-    end subroutine test_physical_field
-
-
     subroutine test_integration
         real(8), parameter :: tmax = 1.0d0
         integer, parameter :: nt = 10000
