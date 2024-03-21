@@ -58,7 +58,7 @@ contains
         real(8), intent(inout), dimension(:,:,:) :: lam_phi, chi_gauge
 
         integer, parameter :: ndim=2
-        real(8), parameter :: relerr=1d-10
+        real(8), parameter :: relerr=1d-9
 
         real(8), allocatable :: y(:), dy(:)
         real(8) :: r1, r2
@@ -254,6 +254,7 @@ contains
         real(8), dimension(:,:,:), intent(in) :: Bmod
         real(8), dimension(:,:,:,:), intent(inout) :: hcan  ! covariant
 
+        real(8), parameter :: check_tol = 1d-2
         integer :: i_phi, i_z, i_r
         real(8) :: x(3)
         real(8) :: BRcov, BZcov, Bphicov, B1can, B2can, B3can
@@ -267,11 +268,17 @@ contains
                     BRcov = Bcyl(1, i_r, i_z, i_phi)
                     BZcov = Bcyl(2, i_r, i_z, i_phi)
                     Bphicov = Bcyl(3, i_r, i_z, i_phi)*x(1)
-                    B1can = BRcov + Bphicov*dlam(1)
-                    if (B1can/Bmod(i_r, i_z, i_phi) > 0.1d0) then
-                            print *, x, B1can/Bmod(i_r, i_z, i_phi)
-                            !error stop
+
+                    if (i_r < n_r) then
+                        B1can = BRcov + Bphicov*dlam(1)
+                        if(abs(B1can/Bmod(i_r, i_z, i_phi)) > check_tol) then
+                            print *, 'h1can too large'
+                            print *, "x = ", x
+                            print *, "h1can = ", B1can/Bmod(i_r, i_z, i_phi)
+                            error stop
+                        end if
                     end if
+
                     B2can = BZcov + Bphicov*dlam(2)
                     B3can = Bphicov*(1.0d0 + dlam(3))
                     hcan(1, i_r, i_z, i_phi) = B2can/Bmod(i_r, i_z, i_phi)
@@ -287,9 +294,10 @@ contains
         real(8), dimension(:,:,:,:), intent(inout) :: Acan  ! covariant
         ! Acan stores only second and third component, as the first vanishes
 
+        real(8), parameter :: check_tol = 1d-2
         integer :: i_phi, i_z, i_r
         real(8) :: x(3)
-        real(8) :: ARcov, AZcov, Aphicov
+        real(8) :: ARcov, AZcov, Aphicov, A1can
         real(8) :: lam, chi, dlam(3), dchi(3), dummy(6)
 
         do i_phi=1,n_phi
@@ -301,7 +309,15 @@ contains
                     ARcov = Acyl(1, i_r, i_z, i_phi)
                     AZcov = Acyl(2, i_r, i_z, i_phi)
                     Aphicov = Acyl(3, i_r, i_z, i_phi)*x(1)
-                    print *, (ARcov + Aphicov*dlam(1) - dchi(1))/Aphicov
+                    if (i_r < n_r) then
+                        A1can = ARcov + Aphicov*dlam(1) - dchi(1)
+                        if (abs(A1can/AZcov) > check_tol) then
+                            print *, 'A1can/AZcov too large'
+                            print *, "x = ", x
+                            print *, "A1can/AZcov = ", A1can/AZcov
+                            error stop
+                        end if
+                    end if
                     Acan(1, i_r, i_z, i_phi) = AZcov + Aphicov*dlam(2) - dchi(2)
                     Acan(2, i_r, i_z, i_phi) = Aphicov*(1d0 + dlam(3)) - dchi(3)
                 enddo

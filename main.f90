@@ -1,16 +1,20 @@
 program main
     use interpolate, only: SplineData3D, construct_splines_3d, evaluate_splines_3d, destroy_splines_3d, disp
     use canonical, only: init_canonical, init_transformation, twopi, &
-        init_canonical_field_components, spl_lam, spl_chi
+        init_canonical_field_components, spl_lam, spl_chi, &
+        rmin, rmax, zmin, zmax
 
     implicit none
     save
 
-    integer, parameter :: n_r=50, n_z=75, n_phi=64
-    real(8), parameter :: rmin = 75.d0, rmax = 264.42281879194627d0, &
-                          zmin = -150.d0, zmax = 147.38193979933115d0
-
+    integer, parameter :: n_r=100, n_z=75, n_phi=64
     integer :: outfile_unit
+
+    ! Workaround, otherwise not initialized without perturbation field
+    rmin = 75.d0
+    rmax = 264.42281879194627d0
+    zmin = -150.d0
+    zmax = 147.38193979933115d0
 
     print *, "init_canonical ..."
     call init_canonical(n_r, n_z, n_phi)
@@ -31,23 +35,25 @@ program main
 contains
 
     subroutine test_integration
-        real(8), parameter :: tmax = 1.0d1
-        integer, parameter :: nt = 10000
+        real(8), parameter :: tol = 1.0d-6
+        real(8), parameter :: timefac = 1d0
+        real(8), parameter :: tmax = 0.75d0*twopi
+        integer, parameter :: nt = 1000
 
         real(8) :: x(3)
         integer :: i_t
 
-        x = [0.5*(rmin+rmax), 0.5*(zmin+zmax), 1.0d0]
+        x = [123.0d0, 0.0d0, 0.0d0]
         do i_t = 0, nt
             call odeint_allroutines(&
-                x, 3, i_t*tmax/nt, (i_t+1)*tmax/nt, 1.0d-8, Bnoncan)
+                x, 3, i_t*tmax/nt, (i_t+1)*tmax/nt, tol, Bnoncan)
             write(100, *) x
         end do
 
-        x = [0.5*(rmin+rmax), 0.5*(zmin+zmax), 1.0d0]
+        x = [123.0d0, 0.0d0, 0.0d0]
         do i_t = 0, nt
             call odeint_allroutines(&
-                x, 3, i_t*tmax/nt, (i_t+1)*tmax/nt, 1.0d-8, Bcan)
+                x, 3, timefac*i_t*tmax/nt, timefac*(i_t+1)*tmax/nt, tol, Bcan)
             write(101, *) x
         end do
     end subroutine test_integration
@@ -66,6 +72,7 @@ contains
             dummy, dummy, dummy, dummy, dummy, dummy, dummy, dummy, dummy, &
             Ar, Ap, Az)
 
+        print *, Br, Bz, Bp
         dx(1) = Br/Bp
         dx(2) = Bz/Bp
         dx(3) = 1.0d0
