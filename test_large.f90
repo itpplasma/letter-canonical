@@ -67,6 +67,7 @@ contains
         deallocate(Acyl)
 
         x = 0.5d0*(x_min + x_max)
+        x(3) = 0.2d0
         call evaluate_splines_3d(spl_BR, x, BR)
         call evaluate_splines_3d(spl_BZ, x, BZ)
         call evaluate_splines_3d(spl_Bphi, x, Bphi)

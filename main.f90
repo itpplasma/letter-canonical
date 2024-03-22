@@ -69,7 +69,7 @@ contains
         real(8), dimension(3), intent(inout) :: dx
         real(8) :: BR, BZ, Bphi, Bphictr
 
-        call magfie_type%compute_bfield(x(1), x(3), x(2), BR, BZ, Bphi)
+        call magfie_type%compute_bfield(x(1), x(3), x(2), BR, Bphi, BZ)
 
         Bphictr = Bphi/x(1)  ! contravariant component
         dx(1) = BR/Bphictr
