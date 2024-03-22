@@ -7,6 +7,7 @@ program test
     real(8) :: eps = 1d-10
 
     call setup
+    call test_magfie_factory
     call test_get_grid_point
     call test_generate_regular_grid
     call test_can_to_cyl
@@ -27,6 +28,28 @@ contains
         call init_canonical(n_r, n_z, n_phi, xmin, xmax)
         call print_ok
     end subroutine setup
+
+
+    subroutine test_magfie_factory
+        use magfie, only: FieldType
+        use magfie_test, only: TestFieldType
+        use magfie_factory, only: magfie_type_from_string
+
+        class(FieldType), allocatable :: field_type
+
+        call print_test("test_magfie_factory")
+
+        field_type = magfie_type_from_string("test")
+
+        select type (field_type)
+            type is (TestFieldType)
+                call print_ok
+            class default
+                call print_fail
+                print *, "unexpected field type"
+                error stop
+        end select
+    end subroutine test_magfie_factory
 
 
     subroutine test_get_grid_point

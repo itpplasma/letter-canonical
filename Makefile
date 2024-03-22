@@ -17,26 +17,23 @@ SOURCES := $(addprefix ../libneo/src/, $(SOURCES))
 
 all: letter-canonical.x test.x test_large.x test_biotsavart.x
 
-letter-canonical.x: libfield.so canonical.o magfie.o main.f90
-	$(FC) $(FFLAGS) -o $@ $^ -L. -lstell -lfield
+letter-canonical.x: libfield.so libcanonical.so main.f90
+	$(FC) $(FFLAGS) -o $@ $^ -L. -lstell -lfield -lcanonical
 
-test.x: libfield.so canonical.o magfie.o test_util.f90 test.f90
-	$(FC) $(FFLAGS) -o $@ $^ -L. -lstell -lfield
+test.x: libfield.so libcanonical.so test_util.f90 test.f90
+	$(FC) $(FFLAGS) -o $@ $^ -L. -lstell -lfield -lcanonical
 
-test_large.x: libfield.so canonical.o magfie.o test_util.f90 test_large.f90
-	$(FC) $(FFLAGS) -o $@ $^ -L. -lstell -lfield
+test_large.x: libfield.so libcanonical.so test_util.f90 test_large.f90
+	$(FC) $(FFLAGS) -o $@ $^ -L. -lstell -lfield -lcanonical
 
-test_biotsavart.x: libfield.so test_biotsavart.f90 test_util.f90 biotsavart.o
-	$(FC) $(FFLAGS) -o $@ $^ -L. -lstell -lfield
+test_biotsavart.x: libfield.so libcanonical.so test_biotsavart.f90 test_util.f90 biotsavart.o
+	$(FC) $(FFLAGS) -o $@ $^ -L. -lstell -lfield -lcanonical
 
 biotsavart.o: biotsavart.f90
 	$(FC) $(FFLAGS) -o $@ -c $^
 
-canonical.o: canonical.f90 magfie.o
-	$(FC) $(FFLAGS) -o $@ -c $^
-
-magfie.o: magfie_stell.f90
-	$(FC) $(FFLAGS) -o $@ -c $^
+libcanonical.so: magfie.f90 magfie_test.f90 magfie_factory.f90 canonical.f90
+	$(FC) $(FFLAGS) -shared -o $@ $^
 
 libfield.so: $(SOURCES)
 	$(FC) $(FFLAGS) -shared -o $@ $^

@@ -61,6 +61,7 @@ contains
 
 
     subroutine Bnoncan(t, x, dx)
+        use canonical, only: magfie_type
         use magfie, only: compute_bfield
 
         real(8), intent(in) :: t  ! plus threadprivate phi_c, z_c from module
@@ -68,7 +69,7 @@ contains
         real(8), dimension(3), intent(inout) :: dx
         real(8) :: BR, BZ, Bphi, Bphictr
 
-        call compute_bfield(x(1), x(3), x(2), BR, BZ, Bphi)
+        call magfie_type%compute_bfield(x(1), x(3), x(2), BR, BZ, Bphi)
 
         Bphictr = Bphi/x(1)  ! contravariant component
         dx(1) = BR/Bphictr

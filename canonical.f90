@@ -1,5 +1,6 @@
 module canonical
-    use interpolate, only : SplineData3D, construct_splines_3d, &
+    use magfie, only: FieldType
+    use interpolate, only: SplineData3D, construct_splines_3d, &
         evaluate_splines_3d, evaluate_splines_3d_der2
 
     implicit none
@@ -30,15 +31,19 @@ module canonical
     ! For splining covariant vector potential, h=B/Bmod and Bmod
     type(SplineData3D) :: spl_Bmod, spl_A2, spl_A3, spl_h2, spl_h3
 
+    class(FieldType), allocatable :: magfie_type
+
 contains
 
     subroutine init_canonical(n_r_, n_z_, n_phi_, xmin, xmax)
+        use magfie_factory, only: magfie_type_from_string
         use magfie, only: init_magfie
 
         integer, intent(in) :: n_r_, n_z_, n_phi_  ! Number of grid points
         real(8), intent(in) :: xmin(3), xmax(3)
 
-        call init_magfie
+        magfie_type = magfie_type_from_string("test")
+        call magfie_type%init_magfie()
 
         n_r = n_r_
         n_z = n_z_
@@ -116,7 +121,8 @@ contains
         real(8), dimension(2), intent(inout) :: dy
         real(8) :: Br, Bp, Bz, Ar, Ap, Az
 
-        call compute_abfield(r_c, phi_c + y(1), z_c, Br, Bp, Bz, Ar, Ap, Az)
+        call magfie_type%compute_abfield(&
+            r_c, phi_c + y(1), z_c, Br, Bp, Bz, Ar, Ap, Az)
 
         dy(1) = -Br/Bp         ! Must still be divided by r_c for covariant Bp
         dy(2) = Ar + Ap*dy(1)  ! Here it i_r reused so that r_c cancels out
@@ -182,7 +188,7 @@ contains
 
         ! Order of coordinates: R, Z, phi
         real(8), intent(in) :: xcyl(:,:,:,:)
-        real(8), intent(out) :: B(:,:,:,:), A(:,:,:,:)
+        real(8), intent(inout) :: B(:,:,:,:), A(:,:,:,:)
 
         integer :: i_r, i_z, i_phi
         real(8) :: r, z, phi
@@ -193,13 +199,13 @@ contains
                     r = xcyl(1,i_r,i_z,i_phi)
                     phi = xcyl(3,i_r,i_z,i_phi) ! swap to R, Z, phi
                     z = xcyl(2,i_r,i_z,i_phi)
-                    call compute_abfield(r, phi, z, &
-                        B(1,i_r,i_z,i_phi), &
-                        B(3,i_r,i_z,i_phi), &  ! swap to R, Z, phi
-                        B(2,i_r,i_z,i_phi), &
+                    call magfie_type%compute_abfield(r, phi, z, &
                         A(1,i_r,i_z,i_phi), &
                         A(3,i_r,i_z,i_phi), &  ! swap to R, Z, phi
-                        A(2,i_r,i_z,i_phi))
+                        A(2,i_r,i_z,i_phi), &
+                        B(1,i_r,i_z,i_phi), &
+                        B(3,i_r,i_z,i_phi), &  ! swap to R, Z, phi
+                        B(2,i_r,i_z,i_phi))
                 end do
             end do
         end do
