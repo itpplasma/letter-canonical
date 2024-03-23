@@ -35,14 +35,14 @@ module canonical
 
 contains
 
-    subroutine init_canonical(n_r_, n_z_, n_phi_, xmin, xmax)
-        use magfie_factory, only: magfie_type_from_string
+    subroutine init_canonical(n_r_, n_z_, n_phi_, xmin, xmax, magfie_type_)
         use magfie, only: init_magfie
 
         integer, intent(in) :: n_r_, n_z_, n_phi_  ! Number of grid points
         real(8), intent(in) :: xmin(3), xmax(3)
+        class(FieldType), intent(in) :: magfie_type_
 
-        magfie_type = magfie_type_from_string("test")
+        magfie_type = magfie_type_
         call magfie_type%init_magfie()
 
         n_r = n_r_

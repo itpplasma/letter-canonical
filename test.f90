@@ -18,6 +18,7 @@ program test
 contains
 
     subroutine setup
+        use magfie_test, only: TestFieldType
         use canonical, only: init_canonical, twopi
 
         real(8) :: xmin(3), xmax(3)
@@ -25,7 +26,7 @@ contains
         xmax = [200.0d0, 150.0d0, twopi]
 
         call print_test("Test Setup")
-        call init_canonical(n_r, n_z, n_phi, xmin, xmax)
+        call init_canonical(n_r, n_z, n_phi, xmin, xmax, TestFieldType())
         call print_ok
     end subroutine setup
 

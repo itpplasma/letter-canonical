@@ -1,6 +1,7 @@
 module magfie_factory
     use magfie
     use magfie_test
+    use magfie_tok
 
     implicit none
 
@@ -13,6 +14,8 @@ module magfie_factory
         select case(magfie_type)
         case("test")
             magfie_instance = TestFieldType()
+        case("tok")
+            magfie_instance = TokFieldType()
         case default
             print *, "magfie_factory: Unknown magfie type"
             error stop

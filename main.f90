@@ -1,4 +1,6 @@
 program main
+    use magfie, only: FieldType
+    use magfie_factory, only: magfie_type_from_string
     use interpolate, only: SplineData3D, construct_splines_3d, evaluate_splines_3d_der2, destroy_splines_3d, disp
     use canonical, only: init_canonical, init_transformation, twopi, &
         init_canonical_field_components, spl_lam, spl_chi
@@ -10,15 +12,19 @@ program main
     integer :: outfile_unit
     real(8) :: rmin, rmax, zmin, zmax
 
+    class(FieldType), allocatable :: field_type
+
     ! Workaround, otherwise not initialized without perturbation field
     rmin = 75.d0
     rmax = 264.42281879194627d0
     zmin = -150.d0
     zmax = 147.38193979933115d0
 
+    field_type = magfie_type_from_string("tok")
+
     print *, "init_canonical ..."
     call init_canonical(n_r, n_z, n_phi, [rmin, zmin, 0.0d0], &
-        [rmax, zmax, -twopi])
+        [rmax, zmax, -twopi], field_type)
 
     print *, "init_transformation ..."
     call init_transformation
