@@ -13,7 +13,6 @@ program test
     call test_can_to_cyl
     call test_compute_Bmod
     call test_compute_hcan
-    call test_compute_Acan
 
 contains
 
@@ -144,50 +143,6 @@ contains
         call print_ok
 
     end subroutine test_compute_hcan
-
-
-    subroutine test_compute_Acan
-        use canonical, only: compute_Acan, generate_regular_grid, cyl_to_cov, &
-            spl_lam, spl_chi
-        use interpolate, only: destroy_splines_3d
-
-        real(8), dimension(3, n_r, n_z, n_phi) :: A, Acov, x
-        real(8), dimension(2, n_r, n_z, n_phi) :: Acan_computed, Acan_expected
-
-        call print_test("test_compute_Acan")
-
-        A(:,:,:,:) = 1.0d0
-        Acov = A
-        call generate_regular_grid(x)
-        call cyl_to_cov(x, Acov)
-        Acan_expected(1,:,:,:) = Acov(3,:,:,:)
-        Acan_expected(2,:,:,:) = -Acov(2,:,:,:)
-
-        call construct_zero_spline(spl_lam)
-        call construct_zero_spline(spl_chi)
-        call compute_Acan(A, Acan_computed)
-        if (any(abs(Acan_computed - Acan_expected) > eps)) then
-            call print_fail
-            print *, "should match for identical transformation"
-            error stop
-        end if
-        call destroy_splines_3d(spl_lam)
-        call destroy_splines_3d(spl_chi)
-
-        call construct_linear_spline(spl_lam)
-        call construct_linear_spline(spl_chi)
-        call compute_Acan(A, Acan_computed)
-        if (any(abs(Acan_computed - Acan_expected) < eps)) then
-            print *, Acan_computed - Acan_expected
-            call print_fail
-            print *, "must not match for linear transformation"
-            error stop
-        end if
-        call destroy_splines_3d(spl_lam)
-        call destroy_splines_3d(spl_chi)
-
-        call print_ok
-    end subroutine test_compute_Acan
 
 
     subroutine test_can_to_cyl

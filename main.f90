@@ -97,17 +97,15 @@ contains
 
 
     subroutine Bcan(t, x, dx)
-        use canonical, only: spl_A2, spl_A3, spl_A1
+        use canonical, only: evaluate_afield_can
 
         real(8), intent(in) :: t  ! plus threadprivate phi_c, z_c from module
         real(8), dimension(3), intent(in) :: x
         real(8), dimension(3), intent(inout) :: dx
-        real(8) :: A1, A2, A3, dA1(3), dA2(3), dA3(3), dummy(6)
+        real(8) :: A1, A2, A3, dA1(3), dA2(3), dA3(3)
         real(8) :: B(3)
 
-        call evaluate_splines_3d_der2(spl_A1, x, A1, dA1, dummy)
-        call evaluate_splines_3d_der2(spl_A2, x, A2, dA2, dummy)
-        call evaluate_splines_3d_der2(spl_A3, x, A3, dA3, dummy)
+        call evaluate_afield_can(x, A1, dA1, A2, dA2, A3, dA3)
 
         B(1) = dA3(2) - dA2(3)
         B(2) = -dA3(1) + dA1(3)

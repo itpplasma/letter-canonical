@@ -147,18 +147,18 @@ contains
         close(outfile_unit)
 
         call construct_splines_3d( &
-            x_min, x_max, lam_phi, order, periodic, spl_lam)
+            x_min, x_max, lam_phi, [5, 5, 5], periodic, spl_lam)
         deallocate(lam_phi)
 
         call construct_splines_3d( &
-            x_min, x_max, chi_gauge, [4, 4, 4], periodic, spl_chi)
+            x_min, x_max, chi_gauge, [5, 5, 5], periodic, spl_chi)
         deallocate(chi_gauge)
     end subroutine init_transformation
 
 
     subroutine init_canonical_field_components
         real(8), dimension(:,:,:,:), allocatable :: xcan, xcyl, B, Acyl
-        real(8), dimension(:,:,:,:), allocatable :: hcan, Acan
+        real(8), dimension(:,:,:,:), allocatable :: hcan
         real(8), dimension(:,:,:), allocatable :: Bmod
 
 
@@ -179,19 +179,70 @@ contains
             hcan(2,:,:,:), order, periodic, spl_h3)
         deallocate(hcan, Bmod)
 
-        allocate(Acan(3,n_r,n_z,n_phi))
-        call compute_Acan(Acyl, Acan)
         call construct_splines_3d(x_min, x_max, &
-            Acan(1,:,:,:), [3, 4, 4], periodic, spl_A2)
+            Acyl(1,:,:,:), [3, 4, 4], periodic, spl_A1)
         call construct_splines_3d(x_min, x_max, &
-            Acan(2,:,:,:), [4, 3, 4], periodic, spl_A3)
+            Acyl(2,:,:,:), [4, 3, 4], periodic, spl_A2)
         call construct_splines_3d(x_min, x_max, &
-            Acan(3,:,:,:), [4, 4, 3], periodic, spl_A1)
-        deallocate(Acan)
+            Acyl(3,:,:,:), [4, 4, 3], periodic, spl_A3)
 
         deallocate(Acyl, B, xcyl, xcan)
 
     end subroutine init_canonical_field_components
+
+
+    subroutine evaluate_afield_can(x, A1, dA1, A2, dA2, A3, dA3)
+        real(8), intent(in) :: x(3)
+        real(8), intent(out) :: A1, A2, A3, dA1(3), dA2(3), dA3(3)
+        real(8) :: lam, chi, dlam(3), d2lam(6), dchi(3), d2chi(6)
+        real(8) :: Acyl1, Acyl2, Acyl3, dAcyl1(3), dAcyl2(3), dAcyl3(3)
+        real(8) :: ARcov, Aphicov, AZcov, dARcov(3), dAphicov(3), dAZcov(3)
+        real(8) :: dummy(6)
+
+        call evaluate_splines_3d_der2(spl_A1, x, Acyl1, dAcyl1, dummy)
+        call evaluate_splines_3d_der2(spl_A2, x, Acyl2, dAcyl2, dummy)
+        call evaluate_splines_3d_der2(spl_A3, x, Acyl3, dAcyl3, dummy)
+
+        call evaluate_splines_3d_der2(spl_lam, x, lam, dlam, d2lam)
+        call evaluate_splines_3d_der2(spl_chi, x, chi, dchi, d2chi)
+
+        ARcov = Acyl1
+        Aphicov = Acyl2*x(1)
+        AZcov = Acyl3
+
+        dARcov = dAcyl1
+        dAphicov = dAcyl2*x(1)
+        dAphicov(1) = dAphicov(1) + Acyl2
+        dAZcov = dAcyl3
+
+        A1 = ARcov + Aphicov*dlam(1) - dchi(1)
+        A2 = AZcov + Aphicov*dlam(2) - dchi(2)
+        A3 = Aphicov*(-1.0d0 + dlam(3)) - dchi(3)
+
+        ! dA1(1) = dARcov(1) - d2chi(1)  ! 11
+        ! dA1(2) = dARcov(2) - d2chi(2)  ! 21
+        ! dA1(3) = dARcov(3) - d2chi(3)  ! 31
+
+        ! dA2(1) = dAZcov(1) - d2chi(2)  ! 12
+        ! dA2(2) = dAZcov(2) - d2chi(4)  ! 22
+        ! dA2(3) = dAZcov(3) - d2chi(5)  ! 32
+
+        dA1 = dARcov
+        dA2 = dAZcov
+        dA3 = -dAphicov
+
+        ! dA1 = dARcov + Aphicov*d2lam(1:3) + dAphicov*dlam(1) - d2chi(1:3)
+
+        ! dA2(1) = dAZcov(1) + Aphicov*d2lam(2) - d2chi(2)  ! 12
+        ! dA2(2) = dAZcov(2) + Aphicov*d2lam(4) - d2chi(4)  ! 22
+        ! dA2(3) = dAZcov(3) + Aphicov*d2lam(5) - d2chi(5)  ! 32
+
+        ! dA3 = dAphicov*(-1.0d0 + dlam(3))
+        ! dA3(1) = dA3(1) + Aphicov*d2lam(3) - d2chi(3)  ! 13
+        ! dA3(2) = dA3(2) + Aphicov*d2lam(5) - d2chi(5)  ! 23
+        ! dA3(3) = dA3(3) + Aphicov*d2lam(6) - d2chi(6)  ! 33
+
+    end subroutine evaluate_afield_can
 
 
     subroutine get_physical_field(xcyl, B, A)
@@ -295,39 +346,6 @@ contains
             enddo
         enddo
     end subroutine compute_hcan
-
-
-    subroutine compute_Acan(Acyl, Acan)
-        real(8), dimension(:,:,:,:), intent(in) :: Acyl   ! physical components
-        real(8), dimension(:,:,:,:), intent(inout) :: Acan  ! covariant
-        ! Acan stores only second and third component, as the first vanishes
-
-        integer :: i_phi, i_z, i_r
-        real(8) :: x(3)
-        real(8) :: ARcov, AZcov, Aphicov, A1can, A2can, A3can
-        real(8) :: lam, chi, dlam(3), dchi(3), dummy(6)
-
-        do i_phi=1,n_phi
-            do i_z=1,n_z
-                do i_r=1,n_r
-                    x = get_grid_point(i_r, i_z, i_phi)
-                    call evaluate_splines_3d_der2(spl_lam, x, lam, dlam, dummy)
-                    call evaluate_splines_3d_der2(spl_chi, x, chi, dchi, dummy)
-                    ARcov = Acyl(1, i_r, i_z, i_phi)
-                    Aphicov = Acyl(2, i_r, i_z, i_phi)*x(1)
-                    AZcov = Acyl(3, i_r, i_z, i_phi)
-
-                    A1can = ARcov + Aphicov*dlam(1) - dchi(1)
-                    A2can = AZcov + Aphicov*dlam(2) - dchi(2)
-                    A3can = Aphicov*(-1.0d0 + dlam(3)) - dchi(3)
-
-                    Acan(1, i_r, i_z, i_phi) = A2can
-                    Acan(2, i_r, i_z, i_phi) = A3can
-                    Acan(3, i_r, i_z, i_phi) = A1can  ! TODO remove again
-                enddo
-            enddo
-        enddo
-    end subroutine compute_Acan
 
 
     subroutine cyl_to_cov(xcyl, V)
