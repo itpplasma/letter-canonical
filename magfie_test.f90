@@ -3,7 +3,7 @@ module magfie_test
 
     implicit none
 
-    real(8), parameter :: AMPL = 1.0d-8, AMPL2 = 2.0d-6
+    real(8), parameter :: AMPL = 1.0d-7, AMPL2 = 2.0d-6
 
     type, extends(FieldType) :: TestFieldType
         contains

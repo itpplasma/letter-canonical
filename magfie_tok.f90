@@ -54,7 +54,7 @@ module magfie_tok
 
         real(8) :: dummy
 
-        call my_field(R, phi, Z,BR, Bphi, BZ,dummy,dummy,dummy, &
+        call my_field(R, phi, Z, BR, Bphi, BZ,dummy,dummy,dummy, &
                    dummy,dummy,dummy,dummy,dummy,dummy,AR, Aphi, AZ)
 
         call perturb_afield(self, R, phi, Z, AR, Aphi, AZ)
@@ -69,7 +69,7 @@ module magfie_tok
 
         real(8) :: dummy
 
-        call my_field(R, phi, Z,BR, Bphi, BZ,dummy,dummy,dummy, &
+        call my_field(R, phi, Z, BR, Bphi, BZ,dummy,dummy,dummy, &
             dummy,dummy,dummy,dummy,dummy,dummy,dummy,dummy,dummy)
 
         call perturb_bfield(self, R, phi, Z, BR, Bphi, BZ)
@@ -93,7 +93,6 @@ module magfie_tok
 
         theta = atan2(Z, R)
 
-
         do i = 1, size(self%perturbations)
             associate(p => self%perturbations(i))
                 expfac = exp(dcmplx(0.d0, p%mpol*theta + p%ntor*phi))
@@ -103,9 +102,9 @@ module magfie_tok
             end associate
         end do
 
-        AR = real(ARmn, kind=8)
-        Aphi = real(Aphimn, kind=8)
-        AZ = real(AZmn, kind=8)
+        AR = AR + real(ARmn, kind=8)
+        Aphi = Aphi + real(Aphimn, kind=8)
+        AZ = AZ + real(AZmn, kind=8)
     end subroutine perturb_afield
 
 

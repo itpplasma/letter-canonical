@@ -21,8 +21,8 @@ module canonical
 
     ! For splines
     real(8) :: x_min(3), x_max(3)
-    integer, parameter :: order(3) = [3, 3, 3]
-    logical, parameter :: periodic(3) = [.False., .False., .True.]
+    integer, parameter :: order(3) = [4, 3, 3]
+    logical, parameter :: periodic(3) = [.False., .False., .False.]
 
     ! For splining lambda (difference between canonical and cylindrical angle)
     ! and chi (gauge transformation)
@@ -227,18 +227,16 @@ contains
         real(8), intent(out) :: xcyl(:,:,:,:)
 
         integer :: i_r, i_z, i_phi
-        real(8) :: r_c, z_c, phi_c, lam
+        real(8) :: lam
 
         do i_phi=1,n_phi
             do i_z=1,n_z
                 do i_r=1,n_r
-                    r_c = xcan(1,i_r,i_z,i_phi)
-                    z_c = xcan(2,i_r,i_z,i_phi)
-                    phi_c = xcan(3,i_r,i_z,i_phi)
-                    call evaluate_splines_3d(spl_lam, [r_c, z_c, phi_c], lam)
-                    xcyl(1,i_r,i_z,i_phi) = r_c
-                    xcyl(2,i_r,i_z,i_phi) = -phi_c + lam
-                    xcyl(3,i_r,i_z,i_phi) = z_c
+                    call evaluate_splines_3d( &
+                        spl_lam, xcan(:,i_r,i_z,i_phi), lam)
+                    xcyl(1,i_r,i_z,i_phi) = xcan(1,i_r,i_z,i_phi)
+                    xcyl(2,i_r,i_z,i_phi) = -xcan(3,i_r,i_z,i_phi) + lam
+                    xcyl(3,i_r,i_z,i_phi) = xcan(2,i_r,i_z,i_phi)
                 enddo
             enddo
         enddo
@@ -271,7 +269,6 @@ contains
         real(8), dimension(:,:,:), intent(in) :: Bmod
         real(8), dimension(:,:,:,:), intent(inout) :: hcan  ! covariant
 
-        real(8), parameter :: check_tol = 1d-2
         integer :: i_phi, i_z, i_r
         real(8) :: x(3)
         real(8) :: BRcov, BZcov, Bphicov, B1can, B2can, B3can
@@ -303,7 +300,6 @@ contains
         real(8), dimension(:,:,:,:), intent(inout) :: Acan  ! covariant
         ! Acan stores only second and third component, as the first vanishes
 
-        real(8), parameter :: check_tol = 1d-2
         integer :: i_phi, i_z, i_r
         real(8) :: x(3)
         real(8) :: ARcov, AZcov, Aphicov, A1can, A2can, A3can
