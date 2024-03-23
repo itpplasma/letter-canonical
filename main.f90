@@ -1,7 +1,7 @@
 program main
-    !use magfie, only: FieldType
-    !use magfie_factory, only: magfie_type_from_string
-    use magfie_tok, only: TokFieldType
+    use magfie, only: FieldType
+    use magfie_factory, only: magfie_type_from_string
+    !use magfie_tok, only: TokFieldType
     use interpolate, only: SplineData3D, construct_splines_3d, evaluate_splines_3d_der2, destroy_splines_3d, disp
     use canonical, only: init_canonical, init_transformation, twopi, &
         init_canonical_field_components, spl_lam, spl_chi
@@ -12,10 +12,10 @@ program main
     integer, parameter :: n_r=100, n_z=75, n_phi=64
     integer :: outfile_unit
     real(8) :: rmin, rmax, zmin, zmax
-    complex(8) :: pert
+    !complex(8) :: pert
 
-    class(TokFieldType), allocatable :: field_type
-    !class(FieldType), allocatable :: field_type
+    class(FieldType), allocatable :: field_type
+    !class(TokFieldType), allocatable :: field_type
 
     ! Workaround, otherwise not initialized without perturbation field
     rmin = 75.d0
@@ -23,11 +23,11 @@ program main
     zmin = -150.d0
     zmax = 147.38193979933115d0
 
-    !field_type = magfie_type_from_string("tok")
+    field_type = magfie_type_from_string("test")
 
-    field_type = TokFieldType()
-    pert = dcmplx(2.0d4, 0.0d0)
-    call field_type%add_perturbation(3, 2, [pert, pert, pert])
+    !field_type = TokFieldType()
+    !pert = dcmplx(2.0d4, 0.0d0)
+    !call field_type%add_perturbation(3, 2, [pert, pert, pert])
     !call field_type%add_perturbation(3, 2, [pert, pert, pert])
     !call field_type%add_perturbation(5, -2, [pert, pert, pert])
     !call field_type%add_perturbation(5, 2, [pert, pert, pert])
@@ -52,22 +52,24 @@ program main
 contains
 
     subroutine test_integration
-        real(8), parameter :: tol = 1.0d-9
+        real(8), parameter :: tol = 1.0d-8
         real(8), parameter :: timefac = 1d0
         real(8), parameter :: tmax = 5.75d0*twopi
         integer, parameter :: nt = 10000
 
-        real(8) :: x(3)
+        real(8) :: x0(3), x(3)
         integer :: i_t
 
-        x = [200.0d0, 30.0d0, 0.0d0]
+        x0 = [150.0d0, 30.0d0, 0.0d0]
+
+        x = x0
         do i_t = 0, nt
             call odeint_allroutines(&
                 x, 3, i_t*tmax/nt, (i_t+1)*tmax/nt, tol, Bnoncan)
             write(100, *) x
         end do
 
-        x = [200.0d0, 30.0d0, 0.0d0]
+        x = x0
         do i_t = 0, nt
             call odeint_allroutines(&
                 x, 3, timefac*i_t*tmax/nt, timefac*(i_t+1)*tmax/nt, tol, Bcan)
@@ -95,20 +97,21 @@ contains
 
 
     subroutine Bcan(t, x, dx)
-        use canonical, only: spl_A2, spl_A3
+        use canonical, only: spl_A2, spl_A3, spl_A1
 
         real(8), intent(in) :: t  ! plus threadprivate phi_c, z_c from module
         real(8), dimension(3), intent(in) :: x
         real(8), dimension(3), intent(inout) :: dx
-        real(8) :: A2, A3, dA2(3), dA3(3), d2A2(6), d2A3(6)
+        real(8) :: A1, A2, A3, dA1(3), dA2(3), dA3(3), dummy(6)
         real(8) :: B(3)
 
-        call evaluate_splines_3d_der2(spl_A2, x, A2, dA2, d2A2)
-        call evaluate_splines_3d_der2(spl_A3, x, A3, dA3, d2A3)
+        call evaluate_splines_3d_der2(spl_A1, x, A1, dA1, dummy)
+        call evaluate_splines_3d_der2(spl_A2, x, A2, dA2, dummy)
+        call evaluate_splines_3d_der2(spl_A3, x, A3, dA3, dummy)
 
         B(1) = dA3(2) - dA2(3)
-        B(2) = -dA3(1)
-        B(3) = dA2(1)
+        B(2) = -dA3(1) + dA1(3)
+        B(3) = dA2(1) - dA1(2)
 
         dx(1) = B(1)/B(3)
         dx(2) = B(2)/B(3)
@@ -137,7 +140,7 @@ contains
                 do i_r = 1, n_r_test
                     x = [rmin + (rmax - rmin) * (i_r - 1) / (n_r_test - 1), &
                          zmin + (zmax - zmin) * (i_z - 1) / (n_z_test - 1), &
-                         -twopi * (i_phi - 1) / (n_phi_test - 1)]
+                         twopi * (i_phi - 1) / (n_phi_test - 1)]
                     call evaluate_splines_3d_der2( &
                         spl_lam, x, lam_test(i_r, i_z, i_phi), dlam_test(:,i_r, i_z, i_phi), dummy)
                     call evaluate_splines_3d_der2( &

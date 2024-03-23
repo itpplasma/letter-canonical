@@ -21,15 +21,15 @@ module canonical
 
     ! For splines
     real(8) :: x_min(3), x_max(3)
-    integer, parameter :: order(3) = [4, 3, 3]
-    logical, parameter :: periodic(3) = [.False., .False., .False.]
+    integer, parameter :: order(3) = [3, 3, 3]
+    logical, parameter :: periodic(3) = [.False., .False., .True.]
 
     ! For splining lambda (difference between canonical and cylindrical angle)
     ! and chi (gauge transformation)
     type(SplineData3D) :: spl_lam, spl_chi
 
     ! For splining covariant vector potential, h=B/Bmod and Bmod
-    type(SplineData3D) :: spl_Bmod, spl_A2, spl_A3, spl_h2, spl_h3
+    type(SplineData3D) :: spl_Bmod, spl_A2, spl_A3, spl_A1, spl_h2, spl_h3
 
     class(FieldType), allocatable :: magfie_type
 
@@ -69,7 +69,7 @@ contains
         real(8), intent(inout), dimension(:,:,:) :: lam_phi, chi_gauge
 
         integer, parameter :: ndim=2
-        real(8), parameter :: relerr=1d-9
+        real(8), parameter :: relerr=1d-8
 
         real(8), allocatable :: y(:), dy(:)
         real(8) :: r1, r2
@@ -102,8 +102,8 @@ contains
 
                     call odeint_allroutines(y, ndim, r1, r2, relerr, rh_can)
 
-                    lam_phi(i_r, i_z, i_phi) = y(1)
-                    chi_gauge(i_r, i_z, i_phi) = y(2)
+                    lam_phi(i_r, i_z, i_phi) = 0d0 !TODO: y(1)
+                    chi_gauge(i_r, i_z, i_phi) = r1*sin(phi_c) !TODO: y(2)
                 enddo
             enddo
         enddo
@@ -117,7 +117,7 @@ contains
         use magfie, only: compute_abfield
 
         real(8), intent(in) :: r_c  ! plus threadprivate phi_c, z_c from module
-        real(8), dimension(2), intent(in) :: y
+        real(8), dimension(2), intent(in) :: y  ! lam_phi, chi_gauge
         real(8), dimension(2), intent(inout) :: dy
         real(8) :: Br, Bp, Bz, Ar, Ap, Az
 
@@ -151,7 +151,7 @@ contains
         deallocate(lam_phi)
 
         call construct_splines_3d( &
-            x_min, x_max, chi_gauge, order, periodic, spl_chi)
+            x_min, x_max, chi_gauge, [4, 4, 4], periodic, spl_chi)
         deallocate(chi_gauge)
     end subroutine init_transformation
 
@@ -179,12 +179,14 @@ contains
             hcan(2,:,:,:), order, periodic, spl_h3)
         deallocate(hcan, Bmod)
 
-        allocate(Acan(2,n_r,n_z,n_phi))
+        allocate(Acan(3,n_r,n_z,n_phi))
         call compute_Acan(Acyl, Acan)
         call construct_splines_3d(x_min, x_max, &
-            Acan(1,:,:,:), order, periodic, spl_A2)
+            Acan(1,:,:,:), [3, 4, 4], periodic, spl_A2)
         call construct_splines_3d(x_min, x_max, &
-            Acan(2,:,:,:), order, periodic, spl_A3)
+            Acan(2,:,:,:), [4, 3, 4], periodic, spl_A3)
+        call construct_splines_3d(x_min, x_max, &
+            Acan(3,:,:,:), [4, 4, 3], periodic, spl_A1)
         deallocate(Acan)
 
         deallocate(Acyl, B, xcyl, xcan)
@@ -321,6 +323,7 @@ contains
 
                     Acan(1, i_r, i_z, i_phi) = A2can
                     Acan(2, i_r, i_z, i_phi) = A3can
+                    Acan(3, i_r, i_z, i_phi) = A1can  ! TODO remove again
                 enddo
             enddo
         enddo
