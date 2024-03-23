@@ -3,12 +3,23 @@ module magfie_tok
 
     implicit none
 
+    complex(8), parameter :: imun = dcmplx(0.0d0, 1.0d0)
+
     type, extends(FieldType) :: TokFieldType
+        type(FourierPerturbation), allocatable :: perturbations(:)
         contains
             procedure :: init_magfie
             procedure :: compute_bfield
             procedure :: compute_abfield
+
+            procedure :: add_perturbation
     end type TokFieldType
+
+    type :: FourierPerturbation
+        integer :: mpol
+        integer :: ntor
+        complex(8) :: Amn(3)
+    end type FourierPerturbation
 
     contains
 
@@ -35,6 +46,7 @@ module magfie_tok
         end if
     end subroutine init_magfie
 
+
     subroutine compute_abfield(self, R, phi, Z, AR, Aphi, AZ, BR, Bphi, BZ)
         class(TokFieldType), intent(in) :: self
         real(8), intent(in) :: R, phi, Z
@@ -44,7 +56,11 @@ module magfie_tok
 
         call my_field(R, phi, Z,BR, Bphi, BZ,dummy,dummy,dummy, &
                    dummy,dummy,dummy,dummy,dummy,dummy,AR, Aphi, AZ)
+
+        call perturb_afield(self, R, phi, Z, AR, Aphi, AZ)
+        call perturb_bfield(self, R, phi, Z, BR, Bphi, BZ)
     end subroutine compute_abfield
+
 
     subroutine compute_bfield(self, R, phi, Z, BR, Bphi, BZ)
         class(TokFieldType), intent(in) :: self
@@ -55,7 +71,102 @@ module magfie_tok
 
         call my_field(R, phi, Z,BR, Bphi, BZ,dummy,dummy,dummy, &
             dummy,dummy,dummy,dummy,dummy,dummy,dummy,dummy,dummy)
+
+        call perturb_bfield(self, R, phi, Z, BR, Bphi, BZ)
     end subroutine compute_bfield
+
+
+    subroutine perturb_afield(self, R, phi, Z, AR, Aphi, AZ)
+        class(TokFieldType), intent(in) :: self
+        real(8), intent(in) :: R, phi, Z
+        real(8), intent(out) :: AR, Aphi, AZ
+
+        real(8) :: theta
+        complex(8) :: expfac, ARmn, Aphimn, AZmn
+        integer :: i
+
+        if (.not. allocated(self%perturbations)) return
+
+        ARmn = 0.d0
+        APhimn = 0.d0
+        AZmn = 0.d0
+
+        theta = atan2(Z, R)
+
+
+        do i = 1, size(self%perturbations)
+            associate(p => self%perturbations(i))
+                expfac = exp(dcmplx(0.d0, p%mpol*theta + p%ntor*phi))
+                ARmn = ARmn + p%Amn(1)*expfac
+                Aphimn = Aphimn + p%Amn(2)*expfac
+                AZmn = AZmn + p%Amn(3)*expfac
+            end associate
+        end do
+
+        AR = real(ARmn, kind=8)
+        Aphi = real(Aphimn, kind=8)
+        AZ = real(AZmn, kind=8)
+    end subroutine perturb_afield
+
+
+    subroutine perturb_bfield(self, R, phi, Z, BR, Bphi, BZ)
+        class(TokFieldType), intent(in) :: self
+        real(8), intent(in) :: R, phi, Z
+        real(8), intent(inout) :: BR, Bphi, BZ
+
+        real(8) :: theta
+        complex(8) :: expfac, BRmn, Bphimn, BZmn
+        integer :: i
+
+        if (.not. allocated(self%perturbations)) return
+
+        BRmn = 0.d0
+        BPhimn = 0.d0
+        BZmn = 0.d0
+
+        theta = atan2(Z, R)
+
+
+        do i = 1, size(self%perturbations)
+            associate(p => self%perturbations(i))
+                expfac = exp(dcmplx(0.d0, p%mpol*theta + p%ntor*phi))
+                BRmn = BRmn + imun *expfac * &
+                    (p%Amn(3)*p%ntor/R - p%mpol*R/(R**2 + Z**2))
+
+                Bphimn = Bphimn + imun/(R**2 + Z**2)*expfac * &
+                    p%mpol*(p%Amn(1)*R + p%Amn(3)*Z)
+
+                BZmn = BZmn + expfac/R * &
+                    (p%Amn(2) - imun*p%ntor*p%Amn(1)) &
+                    - imun*Z/(R**2 + Z**2)*expfac * p%mpol*p%Amn(2)
+            end associate
+        end do
+
+        BR = BR + real(BRmn, kind=8)
+        Bphi = Bphi + real(Bphimn, kind=8)
+        BZ = BZ + real(BZmn, kind=8)
+    end subroutine perturb_bfield
+
+
+    subroutine add_perturbation(self, mpol, ntor, Amn)
+        class(TokFieldType), intent(inout) :: self
+        integer, intent(in) :: mpol, ntor
+        complex(8), intent(in) :: Amn(3)
+
+        type(FourierPerturbation) :: new_perturbation
+
+        new_perturbation%mpol = mpol
+        new_perturbation%ntor = ntor
+        new_perturbation%Amn = Amn
+
+        if (.not. allocated(self%perturbations)) then
+            allocate(self%perturbations(1))
+            self%perturbations(1) = new_perturbation
+        else
+            self%perturbations = [self%perturbations, new_perturbation]
+        end if
+
+    end subroutine add_perturbation
 
 
     subroutine my_field(r,p,z,Br,Bp,Bz,dBrdR,dBrdp,dBrdZ   &

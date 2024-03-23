@@ -1,6 +1,5 @@
 program main
-    use magfie, only: FieldType
-    use magfie_factory, only: magfie_type_from_string
+    use magfie_tok, only: TokFieldType
     use interpolate, only: SplineData3D, construct_splines_3d, evaluate_splines_3d_der2, destroy_splines_3d, disp
     use canonical, only: init_canonical, init_transformation, twopi, &
         init_canonical_field_components, spl_lam, spl_chi
@@ -11,8 +10,9 @@ program main
     integer, parameter :: n_r=100, n_z=75, n_phi=64
     integer :: outfile_unit
     real(8) :: rmin, rmax, zmin, zmax
+    complex(8) :: pert
 
-    class(FieldType), allocatable :: field_type
+    class(TokFieldType), allocatable :: field_type
 
     ! Workaround, otherwise not initialized without perturbation field
     rmin = 75.d0
@@ -20,7 +20,10 @@ program main
     zmin = -150.d0
     zmax = 147.38193979933115d0
 
-    field_type = magfie_type_from_string("tok")
+    field_type = TokFieldType()
+
+    pert = dcmplx(0.1d0, 0.1d0)
+    call field_type%add_perturbation(1, 2, [pert, pert, pert])
 
     print *, "init_canonical ..."
     call init_canonical(n_r, n_z, n_phi, [rmin, zmin, 0.0d0], &
