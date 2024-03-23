@@ -53,7 +53,6 @@ contains
 
     subroutine test_integration
         real(8), parameter :: tol = 1.0d-8
-        real(8), parameter :: timefac = 1d0
         real(8), parameter :: tmax = 5.75d0*twopi
         integer, parameter :: nt = 10000
 
@@ -72,7 +71,7 @@ contains
         x = x0
         do i_t = 0, nt
             call odeint_allroutines(&
-                x, 3, timefac*i_t*tmax/nt, timefac*(i_t+1)*tmax/nt, tol, Bcan)
+                x, 3, i_t*tmax/nt, (i_t+1)*tmax/nt, tol, Bcan)
             write(101, *) x
         end do
     end subroutine test_integration

@@ -103,7 +103,7 @@ contains
                     call odeint_allroutines(y, ndim, r1, r2, relerr, rh_can)
 
                     lam_phi(i_r, i_z, i_phi) = 0d0 !TODO: y(1)
-                    chi_gauge(i_r, i_z, i_phi) = r1*sin(phi_c) !TODO: y(2)
+                    chi_gauge(i_r, i_z, i_phi) = 0d0 !r1*sin(phi_c) !TODO: y(2)
                 enddo
             enddo
         enddo
