@@ -57,14 +57,14 @@ contains
         real(8) :: x(3)
         integer :: i_t
 
-        x = [100.0d0, -100.0d0, 0.0d0]
+        x = [200.0d0, 30.0d0, 0.0d0]
         do i_t = 0, nt
             call odeint_allroutines(&
                 x, 3, i_t*tmax/nt, (i_t+1)*tmax/nt, tol, Bnoncan)
             write(100, *) x
         end do
 
-        x = [100.0d0, -100.0d0, 0.0d0]
+        x = [200.0d0, 30.0d0, 0.0d0]
         do i_t = 0, nt
             call odeint_allroutines(&
                 x, 3, timefac*i_t*tmax/nt, timefac*(i_t+1)*tmax/nt, tol, Bcan)
@@ -85,9 +85,9 @@ contains
         call magfie_type%compute_bfield(x(1), x(3), x(2), BR, Bphi, BZ)
 
         Bphictr = Bphi/x(1)  ! contravariant component
-        dx(1) = BR/Bphictr
-        dx(2) = BZ/Bphictr
-        dx(3) = 1.0d0
+        dx(1) = -BR/Bphictr
+        dx(2) = -BZ/Bphictr
+        dx(3) = -1.0d0
     end subroutine Bnoncan
 
 
@@ -107,9 +107,9 @@ contains
         B(2) = -dA3(1)
         B(3) = dA2(1)
 
-        dx(1) = -B(1)/B(3)
-        dx(2) = -B(2)/B(3)
-        dx(3) = -1.0d0
+        dx(1) = B(1)/B(3)
+        dx(2) = B(2)/B(3)
+        dx(3) = 1.0d0
     end subroutine Bcan
 
 
