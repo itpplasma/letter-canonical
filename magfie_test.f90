@@ -3,7 +3,7 @@ module magfie_test
 
     implicit none
 
-    real(8), parameter :: AMPL = 1.0d-3
+    real(8), parameter :: AMPL = 1.0d-11, AMPL2 = 1.0d-5
 
     type, extends(FieldType) :: TestFieldType
         contains
@@ -24,7 +24,7 @@ module magfie_test
         real(8), intent(out) :: AR, Aphi, AZ, BR, Bphi, BZ
 
         AR = AMPL*R*cos(phi)
-        Aphi = 0.5d0*R
+        Aphi = -0.5d0*AMPL2*Z*R
         AZ = -log(R)
 
         call self%compute_bfield(R, phi, Z, BR, Bphi, BZ)
@@ -35,9 +35,9 @@ module magfie_test
         real(8), intent(in) :: R, phi, Z
         real(8), intent(out) :: BR, Bphi, BZ
 
-        BR = 0.0d0
+        BR = 0.5d0*AMPL2*R
         Bphi = 1.0d0/R
-        BZ = 0.5d0 - (-0.5d0*R - AMPL*R*sin(phi))/R
+        BZ = -AMPL2*Z + AMPL*sin(phi)
     end subroutine compute_bfield
 
 end module magfie_test

@@ -56,10 +56,10 @@ contains
         ! Grid spacing
         h_r = (rmax-rmin)/dble(n_r-1)
         h_z = (zmax-zmin)/dble(n_z-1)
-        h_phi = twopi/dble(n_phi-1)
+        h_phi = -twopi/dble(n_phi-1)
 
         x_min = [rmin, zmin, 0.d0]
-        x_max = [rmax, zmax, twopi]
+        x_max = [rmax, zmax, -twopi]
 
     end subroutine init_canonical
 
@@ -122,7 +122,7 @@ contains
         real(8) :: Br, Bp, Bz, Ar, Ap, Az
 
         call magfie_type%compute_abfield(&
-            r_c, phi_c + y(1), z_c, Br, Bp, Bz, Ar, Ap, Az)
+            r_c, -phi_c + y(1), z_c, Br, Bp, Bz, Ar, Ap, Az)
 
         dy(1) = -Br/Bp         ! Must still be divided by r_c for covariant Bp
         dy(2) = Ar + Ap*dy(1)  ! Here it i_r reused so that r_c cancels out
@@ -133,9 +133,18 @@ contains
 
     subroutine init_transformation
         real(8), dimension(:,:,:), allocatable :: lam_phi, chi_gauge
+        integer :: outfile_unit
 
         allocate(lam_phi(n_r, n_z, n_phi), chi_gauge(n_r, n_z, n_phi))
         call get_transformation(lam_phi, chi_gauge)
+
+        open(newunit=outfile_unit, file="lam_phi.out")
+            write(outfile_unit, *) lam_phi
+        close(outfile_unit)
+
+        open(newunit=outfile_unit, file="chi_gauge.out")
+            write(outfile_unit, *) chi_gauge
+        close(outfile_unit)
 
         call construct_splines_3d( &
             x_min, x_max, lam_phi, order, periodic, spl_lam)
@@ -218,18 +227,18 @@ contains
         real(8), intent(out) :: xcyl(:,:,:,:)
 
         integer :: i_r, i_z, i_phi
-        real(8) :: r, z, phi, lam
+        real(8) :: r_c, z_c, phi_c, lam
 
         do i_phi=1,n_phi
             do i_z=1,n_z
                 do i_r=1,n_r
-                    r = xcan(1,i_r,i_z,i_phi)
-                    z = xcan(2,i_r,i_z,i_phi)
-                    phi = xcan(3,i_r,i_z,i_phi)
-                    xcyl(1,i_r,i_z,i_phi) = r
-                    xcyl(2,i_r,i_z,i_phi) = z
-                    call evaluate_splines_3d(spl_lam, [r, z, phi], lam)
-                    xcyl(3,i_r,i_z,i_phi) = phi + lam
+                    r_c = xcan(1,i_r,i_z,i_phi)
+                    z_c = xcan(2,i_r,i_z,i_phi)
+                    phi_c = xcan(3,i_r,i_z,i_phi)
+                    xcyl(1,i_r,i_z,i_phi) = r_c
+                    xcyl(2,i_r,i_z,i_phi) = z_c
+                    call evaluate_splines_3d(spl_lam, [r_c, z_c, phi_c], lam)
+                    xcyl(3,i_r,i_z,i_phi) = -phi_c + lam
                 enddo
             enddo
         enddo
@@ -265,7 +274,7 @@ contains
         real(8), parameter :: check_tol = 1d-2
         integer :: i_phi, i_z, i_r
         real(8) :: x(3)
-        real(8) :: BRcov, BZcov, Bphicov, B2can, B3can
+        real(8) :: BRcov, BZcov, Bphicov, B1can, B2can, B3can
         real(8) :: lam, dlam(3), dummy(6)
 
         do i_phi=1,n_phi
@@ -277,8 +286,9 @@ contains
                     BZcov = Bcyl(2, i_r, i_z, i_phi)
                     Bphicov = Bcyl(3, i_r, i_z, i_phi)*x(1)
 
+                    B1can = BRcov + Bphicov*dlam(1)
                     B2can = BZcov + Bphicov*dlam(2)
-                    B3can = Bphicov*(1.0d0 + dlam(3))
+                    B3can = Bphicov*(-1.0d0 + dlam(3))
 
                     hcan(1, i_r, i_z, i_phi) = B2can/Bmod(i_r, i_z, i_phi)
                     hcan(2, i_r, i_z, i_phi) = B3can/Bmod(i_r, i_z, i_phi)
@@ -296,7 +306,7 @@ contains
         real(8), parameter :: check_tol = 1d-2
         integer :: i_phi, i_z, i_r
         real(8) :: x(3)
-        real(8) :: ARcov, AZcov, Aphicov
+        real(8) :: ARcov, AZcov, Aphicov, A1can, A2can, A3can
         real(8) :: lam, chi, dlam(3), dchi(3), dummy(6)
 
         do i_phi=1,n_phi
@@ -308,8 +318,13 @@ contains
                     ARcov = Acyl(1, i_r, i_z, i_phi)
                     AZcov = Acyl(2, i_r, i_z, i_phi)
                     Aphicov = Acyl(3, i_r, i_z, i_phi)*x(1)
-                    Acan(1, i_r, i_z, i_phi) = AZcov + Aphicov*dlam(2) - dchi(2)
-                    Acan(2, i_r, i_z, i_phi) = Aphicov*(1d0 + dlam(3)) - dchi(3)
+
+                    A1can = ARcov + Aphicov*dlam(1) - dchi(1)
+                    A2can = AZcov + Aphicov*dlam(2) - dchi(2)
+                    A3can = Aphicov*(-1.0d0 + dlam(3)) - dchi(3)
+
+                    Acan(1, i_r, i_z, i_phi) = A2can
+                    Acan(2, i_r, i_z, i_phi) = A3can
                 enddo
             enddo
         enddo
