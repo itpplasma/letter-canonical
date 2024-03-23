@@ -206,15 +206,15 @@ contains
             do i_z=1,n_z
                 do i_r=1,n_r
                     r = xcyl(1,i_r,i_z,i_phi)
-                    phi = xcyl(3,i_r,i_z,i_phi) ! swap to R, Z, phi
-                    z = xcyl(2,i_r,i_z,i_phi)
+                    phi = xcyl(2,i_r,i_z,i_phi)
+                    z = xcyl(3,i_r,i_z,i_phi)
                     call magfie_type%compute_abfield(r, phi, z, &
                         A(1,i_r,i_z,i_phi), &
-                        A(3,i_r,i_z,i_phi), &  ! swap to R, Z, phi
                         A(2,i_r,i_z,i_phi), &
+                        A(3,i_r,i_z,i_phi), &
                         B(1,i_r,i_z,i_phi), &
-                        B(3,i_r,i_z,i_phi), &  ! swap to R, Z, phi
-                        B(2,i_r,i_z,i_phi))
+                        B(2,i_r,i_z,i_phi), &
+                        B(3,i_r,i_z,i_phi))
                 end do
             end do
         end do
@@ -235,10 +235,10 @@ contains
                     r_c = xcan(1,i_r,i_z,i_phi)
                     z_c = xcan(2,i_r,i_z,i_phi)
                     phi_c = xcan(3,i_r,i_z,i_phi)
-                    xcyl(1,i_r,i_z,i_phi) = r_c
-                    xcyl(2,i_r,i_z,i_phi) = z_c
                     call evaluate_splines_3d(spl_lam, [r_c, z_c, phi_c], lam)
-                    xcyl(3,i_r,i_z,i_phi) = -phi_c + lam
+                    xcyl(1,i_r,i_z,i_phi) = r_c
+                    xcyl(2,i_r,i_z,i_phi) = -phi_c + lam
+                    xcyl(3,i_r,i_z,i_phi) = z_c
                 enddo
             enddo
         enddo
@@ -283,8 +283,8 @@ contains
                     x = get_grid_point(i_r, i_z, i_phi)
                     call evaluate_splines_3d_der2(spl_lam, x, lam, dlam, dummy)
                     BRcov = Bcyl(1, i_r, i_z, i_phi)
-                    BZcov = Bcyl(2, i_r, i_z, i_phi)
-                    Bphicov = Bcyl(3, i_r, i_z, i_phi)*x(1)
+                    Bphicov = Bcyl(2, i_r, i_z, i_phi)*x(1)
+                    BZcov = Bcyl(3, i_r, i_z, i_phi)
 
                     B1can = BRcov + Bphicov*dlam(1)
                     B2can = BZcov + Bphicov*dlam(2)
@@ -316,8 +316,8 @@ contains
                     call evaluate_splines_3d_der2(spl_lam, x, lam, dlam, dummy)
                     call evaluate_splines_3d_der2(spl_chi, x, chi, dchi, dummy)
                     ARcov = Acyl(1, i_r, i_z, i_phi)
-                    AZcov = Acyl(2, i_r, i_z, i_phi)
-                    Aphicov = Acyl(3, i_r, i_z, i_phi)*x(1)
+                    Aphicov = Acyl(2, i_r, i_z, i_phi)*x(1)
+                    AZcov = Acyl(3, i_r, i_z, i_phi)
 
                     A1can = ARcov + Aphicov*dlam(1) - dchi(1)
                     A2can = AZcov + Aphicov*dlam(2) - dchi(2)
@@ -335,7 +335,7 @@ contains
         real(8), intent(in) :: xcyl(:,:,:,:)
         real(8), intent(inout) :: V(:,:,:,:)
 
-        V(3,:,:,:) = V(3,:,:,:)*xcyl(1,:,:,:)
+        V(2,:,:,:) = V(2,:,:,:)*xcyl(1,:,:,:)
     end subroutine cyl_to_cov
 
 

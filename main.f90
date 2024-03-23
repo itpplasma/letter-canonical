@@ -57,14 +57,14 @@ contains
         real(8) :: x(3)
         integer :: i_t
 
-        x = [200.0d0, -20.0d0, 0.0d0]
+        x = [100.0d0, -100.0d0, 0.0d0]
         do i_t = 0, nt
             call odeint_allroutines(&
                 x, 3, i_t*tmax/nt, (i_t+1)*tmax/nt, tol, Bnoncan)
             write(100, *) x
         end do
 
-        x = [200.0d0, -20.0d0, 0.0d0]
+        x = [100.0d0, -100.0d0, 0.0d0]
         do i_t = 0, nt
             call odeint_allroutines(&
                 x, 3, timefac*i_t*tmax/nt, timefac*(i_t+1)*tmax/nt, tol, Bcan)

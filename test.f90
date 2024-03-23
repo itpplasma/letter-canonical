@@ -129,8 +129,8 @@ contains
         call cyl_to_cov(x, Bcov)
 
         call compute_Bmod(B, Bmod)
-        hcan_expected(1,:,:,:) = Bcov(2,:,:,:)/Bmod
-        hcan_expected(2,:,:,:) = Bcov(3,:,:,:)/Bmod
+        hcan_expected(1,:,:,:) = Bcov(3,:,:,:)/Bmod
+        hcan_expected(2,:,:,:) = -Bcov(2,:,:,:)/Bmod
 
         call construct_zero_spline(spl_lam)
         call compute_hcan(B, Bmod, hcan_computed)
@@ -152,7 +152,7 @@ contains
         use interpolate, only: destroy_splines_3d
 
         real(8), dimension(3, n_r, n_z, n_phi) :: A, Acov, x
-        real(8), dimension(2, n_r, n_z, n_phi) :: Acan_computed
+        real(8), dimension(2, n_r, n_z, n_phi) :: Acan_computed, Acan_expected
 
         call print_test("test_compute_Acan")
 
@@ -160,11 +160,13 @@ contains
         Acov = A
         call generate_regular_grid(x)
         call cyl_to_cov(x, Acov)
+        Acan_expected(1,:,:,:) = Acov(3,:,:,:)
+        Acan_expected(2,:,:,:) = -Acov(2,:,:,:)
 
         call construct_zero_spline(spl_lam)
         call construct_zero_spline(spl_chi)
         call compute_Acan(A, Acan_computed)
-        if (any(abs(Acan_computed - Acov(2:3,:,:,:)) > eps)) then
+        if (any(abs(Acan_computed - Acan_expected) > eps)) then
             call print_fail
             print *, "should match for identical transformation"
             error stop
@@ -175,7 +177,8 @@ contains
         call construct_linear_spline(spl_lam)
         call construct_linear_spline(spl_chi)
         call compute_Acan(A, Acan_computed)
-        if (all(abs(Acan_computed - Acov(2:3,:,:,:)) < eps)) then
+        if (any(abs(Acan_computed - Acan_expected) < eps)) then
+            print *, Acan_computed - Acan_expected
             call print_fail
             print *, "must not match for linear transformation"
             error stop
@@ -191,15 +194,20 @@ contains
         use canonical, only: can_to_cyl, spl_lam, generate_regular_grid
         use interpolate, only: destroy_splines_3d
 
-        real(8), dimension(3, n_r, n_z, n_phi) :: xcan, xcyl_computed
+        real(8), dimension(3, n_r, n_z, n_phi) :: xcan, xcyl_computed, &
+            xcyl_reordered
 
         call generate_regular_grid(xcan)
 
         call print_test("test_can_to_cyl")
         call construct_zero_spline(spl_lam)
         call can_to_cyl(xcan, xcyl_computed)
-        if (any(abs(xcyl_computed - xcan) > eps)) then
+        xcyl_reordered(1,:,:,:) = xcyl_computed(1,:,:,:)
+        xcyl_reordered(2,:,:,:) = xcyl_computed(3,:,:,:)
+        xcyl_reordered(3,:,:,:) = -xcyl_computed(2,:,:,:)
+        if (any(abs(xcyl_reordered - xcan) > eps)) then
             call print_fail
+            print *, xcyl_reordered
             print *, "should match for identical transformation"
             error stop
         end if
@@ -207,7 +215,10 @@ contains
 
         call construct_linear_spline(spl_lam)
         call can_to_cyl(xcan, xcyl_computed)
-        if (all(abs(xcyl_computed - xcan) < eps)) then
+        xcyl_reordered(1,:,:,:) = xcyl_computed(1,:,:,:)
+        xcyl_reordered(2,:,:,:) = xcyl_computed(3,:,:,:)
+        xcyl_reordered(3,:,:,:) = -xcyl_computed(2,:,:,:)
+        if (all(abs(xcyl_reordered - xcan) < eps)) then
             call print_fail
             print *, "must not match for linear transformation"
             error stop
@@ -267,7 +278,8 @@ contains
         do i_phi = 1, n_phi
             do i_z = 1, n_z
                 do i_r = 1, n_r
-                    x(i_r, i_z, i_phi) = i_r + i_z + i_phi + 1.0d0
+                    x(i_r, i_z, i_phi) = &
+                        0.23d0*i_r + 0.12d0*i_z + 0.123d0*i_phi + 1.1234d0
                 end do
             end do
         end do
