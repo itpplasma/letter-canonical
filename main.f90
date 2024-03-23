@@ -2,7 +2,7 @@ program main
     use magfie, only: FieldType
     use magfie_factory, only: magfie_type_from_string
     !use magfie_tok, only: TokFieldType
-    use interpolate, only: SplineData3D, construct_splines_3d, evaluate_splines_3d_der2, destroy_splines_3d, disp
+    use interpolate, only: SplineData3D, construct_splines_3d, evaluate_splines_3d_der2, destroy_splines_3d
     use canonical, only: init_canonical, init_transformation, twopi, &
         init_canonical_field_components, spl_lam, spl_chi
 
