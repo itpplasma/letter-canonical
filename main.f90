@@ -1,5 +1,7 @@
 program main
-    use magfie_tok, only: TokFieldType
+    use magfie, only: FieldType
+    use magfie_factory, only: magfie_type_from_string
+    !use magfie_tok, only: TokFieldType
     use interpolate, only: SplineData3D, construct_splines_3d, evaluate_splines_3d_der2, destroy_splines_3d, disp
     use canonical, only: init_canonical, init_transformation, twopi, &
         init_canonical_field_components, spl_lam, spl_chi
@@ -10,9 +12,10 @@ program main
     integer, parameter :: n_r=100, n_z=75, n_phi=64
     integer :: outfile_unit
     real(8) :: rmin, rmax, zmin, zmax
-    complex(8) :: pert
+    !complex(8) :: pert
 
-    class(TokFieldType), allocatable :: field_type
+    !class(TokFieldType), allocatable :: field_type
+    class(FieldType), allocatable :: field_type
 
     ! Workaround, otherwise not initialized without perturbation field
     rmin = 75.d0
@@ -20,10 +23,11 @@ program main
     zmin = -150.d0
     zmax = 147.38193979933115d0
 
-    field_type = TokFieldType()
+    field_type = magfie_type_from_string("test")
 
-    pert = dcmplx(0.1d0, 0.1d0)
-    call field_type%add_perturbation(1, 2, [pert, pert, pert])
+    !field_type = TokFieldType()
+    !pert = dcmplx(0.1d0, 0.1d0)
+    !call field_type%add_perturbation(1, 2, [pert, pert, pert])
 
     print *, "init_canonical ..."
     call init_canonical(n_r, n_z, n_phi, [rmin, zmin, 0.0d0], &
@@ -81,9 +85,9 @@ contains
         call magfie_type%compute_bfield(x(1), x(3), x(2), BR, Bphi, BZ)
 
         Bphictr = Bphi/x(1)  ! contravariant component
-        dx(1) = -BR/Bphictr
-        dx(2) = -BZ/Bphictr
-        dx(3) = -1.0d0
+        dx(1) = BR/Bphictr
+        dx(2) = BZ/Bphictr
+        dx(3) = 1.0d0
     end subroutine Bnoncan
 
 
@@ -103,9 +107,9 @@ contains
         B(2) = -dA3(1)
         B(3) = dA2(1)
 
-        dx(1) = B(1)/B(3)
-        dx(2) = B(2)/B(3)
-        dx(3) = 1.0d0
+        dx(1) = -B(1)/B(3)
+        dx(2) = -B(2)/B(3)
+        dx(3) = -1.0d0
     end subroutine Bcan
 
 

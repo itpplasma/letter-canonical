@@ -56,10 +56,10 @@ contains
         ! Grid spacing
         h_r = (rmax-rmin)/dble(n_r-1)
         h_z = (zmax-zmin)/dble(n_z-1)
-        h_phi = -twopi/dble(n_phi-1)
+        h_phi = twopi/dble(n_phi-1)
 
         x_min = [rmin, zmin, 0.d0]
-        x_max = [rmax, zmax, -twopi]
+        x_max = [rmax, zmax, twopi]
 
     end subroutine init_canonical
 
