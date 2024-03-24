@@ -103,8 +103,8 @@ contains
 
                     call odeint_allroutines(y, ndim, r1, r2, relerr, rh_can)
 
-                    lam_phi(i_r, i_z, i_phi) = 0d0 !TODO: y(1)
-                    chi_gauge(i_r, i_z, i_phi) = 0d0 !r1*sin(phi_c) !TODO: y(2)
+                    lam_phi(i_r, i_z, i_phi) = y(1)
+                    chi_gauge(i_r, i_z, i_phi) = y(2)
                 enddo
             enddo
         enddo
@@ -205,15 +205,12 @@ contains
         real(8) :: ARcov, Aphicov, AZcov, dARcov(3), dAphicov(3), dAZcov(3)
         real(8) :: dummy(6)
 
-        call evaluate_splines_3d_der2(spl_A1, [x(1), x(2), dmod(x(3), twopi)], &
-             Acyl1, dAcyl1, dummy)
-
+        call evaluate_splines_3d_der2(spl_A1, x, Acyl1, dAcyl1, dummy)
         call evaluate_splines_3d_der2(spl_A2, x, Acyl2, dAcyl2, dummy)
         call evaluate_splines_3d_der2(spl_A3, x, Acyl3, dAcyl3, dummy)
 
         call evaluate_splines_3d_der2(spl_lam, x, lam, dlam, d2lam)
         call evaluate_splines_3d_der2(spl_chi, x, chi, dchi, d2chi)
-
 
         ARcov = Acyl1
         Aphicov = Acyl2*x(1)
