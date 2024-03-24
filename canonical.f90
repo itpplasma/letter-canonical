@@ -4,11 +4,12 @@ module canonical
         evaluate_splines_3d, evaluate_splines_3d_der2
 
     implicit none
+    save
 
     real(8), parameter :: pi = atan(1.d0)*4.d0
     real(8), parameter :: twopi = atan(1.d0)*8.d0
 
-    integer, parameter :: nper = 1  ! Number of periods (TODO: make thi_r a variable)
+    integer, parameter :: nper = 1  ! Number of periods (TODO: make this a variable)
 
     real(8) :: rmin, rmax, zmin, zmax
 
@@ -157,6 +158,8 @@ contains
 
 
     subroutine init_canonical_field_components
+        use magfie_test, only: AMPL
+
         real(8), dimension(:,:,:,:), allocatable :: xcan, xcyl, B, Acyl
         real(8), dimension(:,:,:,:), allocatable :: hcan
         real(8), dimension(:,:,:), allocatable :: Bmod
@@ -181,6 +184,7 @@ contains
 
         call construct_splines_3d(x_min, x_max, &
             Acyl(1,:,:,:), [3, 4, 4], periodic, spl_A1)
+
         call construct_splines_3d(x_min, x_max, &
             Acyl(2,:,:,:), [4, 3, 4], periodic, spl_A2)
         call construct_splines_3d(x_min, x_max, &
@@ -192,6 +196,8 @@ contains
 
 
     subroutine evaluate_afield_can(x, A1, dA1, A2, dA2, A3, dA3)
+        use magfie_test, only: AMPL
+
         real(8), intent(in) :: x(3)
         real(8), intent(out) :: A1, A2, A3, dA1(3), dA2(3), dA3(3)
         real(8) :: lam, chi, dlam(3), d2lam(6), dchi(3), d2chi(6)
@@ -199,12 +205,15 @@ contains
         real(8) :: ARcov, Aphicov, AZcov, dARcov(3), dAphicov(3), dAZcov(3)
         real(8) :: dummy(6)
 
-        call evaluate_splines_3d_der2(spl_A1, x, Acyl1, dAcyl1, dummy)
+        call evaluate_splines_3d_der2(spl_A1, [x(1), x(2), dmod(x(3), twopi)], &
+             Acyl1, dAcyl1, dummy)
+
         call evaluate_splines_3d_der2(spl_A2, x, Acyl2, dAcyl2, dummy)
         call evaluate_splines_3d_der2(spl_A3, x, Acyl3, dAcyl3, dummy)
 
         call evaluate_splines_3d_der2(spl_lam, x, lam, dlam, d2lam)
         call evaluate_splines_3d_der2(spl_chi, x, chi, dchi, d2chi)
+
 
         ARcov = Acyl1
         Aphicov = Acyl2*x(1)
@@ -215,46 +224,33 @@ contains
         dAphicov(1) = dAphicov(1) + Acyl2
         dAZcov = dAcyl3
 
-        ! A1 = ARcov + Aphicov*dlam(1) - dchi(1)
-        ! A2 = AZcov + Aphicov*dlam(2) - dchi(2)
-        ! A3 = Aphicov*(-1.0d0 + dlam(3)) - dchi(3)
+        A1 = ARcov + Aphicov*dlam(1) - dchi(1)
+        A2 = AZcov + Aphicov*dlam(2) - dchi(2)
+        A3 = Aphicov*(-1.0d0 + dlam(3)) - dchi(3)
 
-        ! dA1(1) = dARcov(1) - d2chi(1)  ! 11
-        ! dA1(2) = dARcov(2) - d2chi(2)  ! 21
-        ! dA1(3) = dARcov(3) - d2chi(3)  ! 31
+        dA1 = dARcov + Aphicov*d2lam(1:3) + dAphicov*dlam(1) - d2chi(1:3)
 
-        ! dA2(1) = dAZcov(1) - d2chi(2)  ! 12
-        ! dA2(2) = dAZcov(2) - d2chi(4)  ! 22
-        ! dA2(3) = dAZcov(3) - d2chi(5)  ! 32
+        dA2(1) = dAZcov(1) + Aphicov*d2lam(2) - d2chi(2)  ! 12
+        dA2(2) = dAZcov(2) + Aphicov*d2lam(4) - d2chi(4)  ! 22
+        dA2(3) = dAZcov(3) + Aphicov*d2lam(5) - d2chi(5)  ! 32
 
-        A1 = ARcov
-        A2 = AZcov
-        A3 = -Aphicov
-
-        dA1 = dARcov
-        dA2 = dAZcov
-        dA3 = -dAphicov
-
-        ! dA1 = dARcov + Aphicov*d2lam(1:3) + dAphicov*dlam(1) - d2chi(1:3)
-
-        ! dA2(1) = dAZcov(1) + Aphicov*d2lam(2) - d2chi(2)  ! 12
-        ! dA2(2) = dAZcov(2) + Aphicov*d2lam(4) - d2chi(4)  ! 22
-        ! dA2(3) = dAZcov(3) + Aphicov*d2lam(5) - d2chi(5)  ! 32
-
-        ! dA3 = dAphicov*(-1.0d0 + dlam(3))
-        ! dA3(1) = dA3(1) + Aphicov*d2lam(3) - d2chi(3)  ! 13
-        ! dA3(2) = dA3(2) + Aphicov*d2lam(5) - d2chi(5)  ! 23
-        ! dA3(3) = dA3(3) + Aphicov*d2lam(6) - d2chi(6)  ! 33
+        dA3 = dAphicov*(-1.0d0 + dlam(3))
+        dA3(1) = dA3(1) + Aphicov*d2lam(3) - d2chi(3)  ! 13
+        dA3(2) = dA3(2) + Aphicov*d2lam(5) - d2chi(5)  ! 23
+        dA3(3) = dA3(3) + Aphicov*d2lam(6) - d2chi(6)  ! 33
 
     end subroutine evaluate_afield_can
 
 
     subroutine get_physical_field(xcyl, B, A)
+        use magfie_test, only: AMPL
         use magfie, only: compute_abfield
 
         ! Order of coordinates: R, Z, phi
         real(8), intent(in) :: xcyl(:,:,:,:)
         real(8), intent(inout) :: B(:,:,:,:), A(:,:,:,:)
+
+        real(8) :: A1, A2, A3, B1, B2, B3
 
         integer :: i_r, i_z, i_phi
         real(8) :: r, z, phi
@@ -265,13 +261,14 @@ contains
                     r = xcyl(1,i_r,i_z,i_phi)
                     phi = xcyl(2,i_r,i_z,i_phi)
                     z = xcyl(3,i_r,i_z,i_phi)
-                    call magfie_type%compute_abfield(r, phi, z, &
-                        A(1,i_r,i_z,i_phi), &
-                        A(2,i_r,i_z,i_phi), &
-                        A(3,i_r,i_z,i_phi), &
-                        B(1,i_r,i_z,i_phi), &
-                        B(2,i_r,i_z,i_phi), &
-                        B(3,i_r,i_z,i_phi))
+                    call magfie_type%compute_abfield(r, phi, z, A1, A2, A3, &
+                        B1, B2, B3)
+                    A(1,i_r,i_z,i_phi) = A1
+                    A(2,i_r,i_z,i_phi) = A2
+                    A(3,i_r,i_z,i_phi) = A3
+                    B(1,i_r,i_z,i_phi) = B1
+                    B(2,i_r,i_z,i_phi) = B2
+                    B(3,i_r,i_z,i_phi) = B3
                 end do
             end do
         end do

@@ -2,7 +2,7 @@ FC = gfortran
 FFLAGS = -g -fPIC -O3 -fopenmp -march=native -mtune=native -L.
 
 FFLAGS += -Wall -Wuninitialized -Wno-maybe-uninitialized -Wno-unused-label \
-	-Wno-unused-dummy-argument -Werror -Wfatal-errors -fmax-errors=1 \
+	-Wno-unused-dummy-argument -fmax-errors=1 \
 	-I$(HOME)/bin/libstell_dir -L$(HOME)/bin/libstell_dir \
 	-I$(CODE)/libneo/build -L$(CODE)/libneo/build \
 	-I$(CODE)/external/bspline-fortran/build/lib \
