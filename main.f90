@@ -118,22 +118,6 @@ contains
 
         call evaluate_afield_can(x, A1s, dA1s, A2s, dA2s, A3s, dA3s)
 
-        A1 = AMPL*x(1)*cos(-x(3))
-        A2 = -log(x(1))
-        A3 = 0.5d0*AMPL2*x(2)*x(1)**2
-
-        dA1(1) = AMPL*cos(-x(3))
-        dA1(2) = 0d0
-        dA1(3) = AMPL*x(1)*sin(-x(3))
-
-        dA2(1) = -1d0/x(1)
-        dA2(2) = 0d0
-        dA2(3) = 0d0
-
-        dA3(1) = AMPL2*x(1)*x(2)
-        dA3(2) = 0.5d0*AMPL2*x(1)**2
-        dA3(3) = 0.0d0
-
         B(1) = dA3s(2) - dA2s(3)
         B(2) = dA1s(3) - dA3s(1)
         B(3) = dA2s(1) - dA1s(2)
