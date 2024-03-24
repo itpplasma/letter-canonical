@@ -1,11 +1,12 @@
 program main
-    !use magfie, only: FieldType
-    !use magfie_factory, only: magfie_type_from_string
-    use magfie_tok, only: TokFieldType
+    use magfie, only: FieldType
+    use magfie_factory, only: magfie_type_from_string
+    !use magfie_tok, only: TokFieldType
     use interpolate, only: SplineData3D, construct_splines_3d, &
     evaluate_splines_3d, evaluate_splines_3d_der2, destroy_splines_3d
     use canonical, only: init_canonical, init_transformation, twopi, &
-        init_canonical_field_components, spl_lam, spl_chi
+        init_canonical_field_components, spl_lam, spl_chi, spl_A1, &
+        spl_A2, spl_A3
 
     implicit none
     save
@@ -13,10 +14,10 @@ program main
     integer, parameter :: n_r=100, n_z=75, n_phi=64
     integer :: outfile_unit
     real(8) :: rmin, rmax, zmin, zmax
-    complex(8) :: pert
+    !complex(8) :: pert
 
-    !class(FieldType), allocatable :: field_type
-    class(TokFieldType), allocatable :: field_type
+    class(FieldType), allocatable :: field_type
+    !class(TokFieldType), allocatable :: field_type
 
     ! Workaround, otherwise not initialized without perturbation field
     rmin = 75.d0
@@ -24,11 +25,11 @@ program main
     zmin = -150.d0
     zmax = 147.38193979933115d0
 
-    !field_type = magfie_type_from_string("test")
+    field_type = magfie_type_from_string("test")
 
-    field_type = TokFieldType()
-    pert = dcmplx(2.0d4, 0.0d0)
-    call field_type%add_perturbation(3, 2, [pert, pert, pert])
+    !field_type = TokFieldType()
+    !pert = dcmplx(2.0d3, 0.0d0)
+    !call field_type%add_perturbation(3, 2, [pert, pert, pert])
     !call field_type%add_perturbation(3, 2, [pert, pert, pert])
     !call field_type%add_perturbation(5, -2, [pert, pert, pert])
     !call field_type%add_perturbation(5, 2, [pert, pert, pert])
@@ -53,8 +54,6 @@ program main
 contains
 
     subroutine test_integration
-        use canonical, only: spl_A1
-
         real(8), parameter :: tol = 1.0d-8
         real(8), parameter :: tmax = 5.75d0*twopi*2.5
         integer, parameter :: nt = 1000
@@ -120,7 +119,7 @@ contains
 
         dx(1) = B(1)/B(3)
         dx(2) = B(2)/B(3)
-        dx(3) = 1.0d0
+        dx(3) = 1d0
     end subroutine Bcan
 
 
@@ -154,12 +153,12 @@ contains
                         spl_lam, x, lam_test(i_r, i_z, i_phi), dlam_test(:,i_r, i_z, i_phi), dummy)
                     call evaluate_splines_3d_der2( &
                         spl_chi, x, chi_test(i_r, i_z, i_phi), dchi_test(:, i_r, i_z, i_phi), dummy)
-                    ! call evaluate_splines_3d( &
-                    !     spl_A1, x, A1_test(i_r, i_z, i_phi))
-                    ! call evaluate_splines_3d( &
-                    !     spl_A2, x, A2_test(i_r, i_z, i_phi))
-                    ! call evaluate_splines_3d( &
-                    !     spl_A3, x, A3_test(i_r, i_z, i_phi))
+                    call evaluate_splines_3d( &
+                        spl_A1, x, A1_test(i_r, i_z, i_phi))
+                    call evaluate_splines_3d( &
+                        spl_A2, x, A2_test(i_r, i_z, i_phi))
+                    call evaluate_splines_3d( &
+                        spl_A3, x, A3_test(i_r, i_z, i_phi))
                 end do
             end do
         end do
