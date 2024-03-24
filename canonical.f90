@@ -123,7 +123,7 @@ contains
         real(8) :: Br, Bp, Bz, Ar, Ap, Az
 
         call magfie_type%compute_abfield(&
-            r_c, -phi_c + y(1), z_c, Br, Bp, Bz, Ar, Ap, Az)
+            r_c, modulo(-phi_c + y(1), twopi), z_c, Br, Bp, Bz, Ar, Ap, Az)
 
         dy(1) = -Br/Bp         ! Must still be divided by r_c for covariant Bp
         dy(2) = Ar + Ap*dy(1)  ! Here it i_r reused so that r_c cancels out
