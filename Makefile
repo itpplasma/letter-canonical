@@ -26,7 +26,7 @@ bdivfree.f90
 
 SOURCES += $(addprefix magfie/, $(MAGFIE_SOURCES))
 
-SOURCES += odeint_rkf45.f90 contrib/rkf45.f90
+SOURCES += odeint_rkf45.f90 contrib/rkf45.f90 interpolate.f90
 SOURCES := $(addprefix ../libneo/src/, $(SOURCES))
 
 all: letter-canonical.x test.x test_large.x test_biotsavart.x
@@ -46,7 +46,7 @@ test_biotsavart.x: libfield.so libcanonical.so test_biotsavart.f90 test_util.f90
 biotsavart.o: biotsavart.f90
 	$(FC) $(FFLAGS) -o $@ -c $^
 
-libcanonical.so: interpolate_adapter.f90 magfie.f90 magfie_test.f90 magfie_tok.f90 magfie_factory.f90 canonical.f90 libfield.so
+libcanonical.so: magfie.f90 magfie_test.f90 magfie_tok.f90 magfie_factory.f90 canonical.f90 libfield.so
 	$(FC) $(FFLAGS) -shared -o $@ $^ -lfield -lbspline-fortran
 
 libfield.so: $(SOURCES)

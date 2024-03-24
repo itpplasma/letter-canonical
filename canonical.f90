@@ -29,7 +29,7 @@ module canonical
     type(SplineData3D) :: spl_lam, spl_chi
 
     ! For splining covariant vector potential, h=B/Bmod and Bmod
-    type(SplineData3D) :: spl_Bmod, spl_A2, spl_A3, spl_A1, spl_h2, spl_h3
+    type(SplineData3D) :: spl_Bmod, spl_A1, spl_A2, spl_A3, spl_h2, spl_h3
 
     class(FieldType), allocatable :: magfie_type
 
@@ -215,9 +215,9 @@ contains
         dAphicov(1) = dAphicov(1) + Acyl2
         dAZcov = dAcyl3
 
-        A1 = ARcov + Aphicov*dlam(1) - dchi(1)
-        A2 = AZcov + Aphicov*dlam(2) - dchi(2)
-        A3 = Aphicov*(-1.0d0 + dlam(3)) - dchi(3)
+        ! A1 = ARcov + Aphicov*dlam(1) - dchi(1)
+        ! A2 = AZcov + Aphicov*dlam(2) - dchi(2)
+        ! A3 = Aphicov*(-1.0d0 + dlam(3)) - dchi(3)
 
         ! dA1(1) = dARcov(1) - d2chi(1)  ! 11
         ! dA1(2) = dARcov(2) - d2chi(2)  ! 21
@@ -226,6 +226,10 @@ contains
         ! dA2(1) = dAZcov(1) - d2chi(2)  ! 12
         ! dA2(2) = dAZcov(2) - d2chi(4)  ! 22
         ! dA2(3) = dAZcov(3) - d2chi(5)  ! 32
+
+        A1 = ARcov
+        A2 = AZcov
+        A3 = -Aphicov
 
         dA1 = dARcov
         dA2 = dAZcov
