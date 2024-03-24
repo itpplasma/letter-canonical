@@ -13,14 +13,14 @@ def doplot(data, title):
     # Plot 2D slice as contour
     plt.figure()
     plt.contour(data[:, 1, :])
-    #plt.colorbar()
+    plt.colorbar()
     plt.xlabel("r")
     plt.ylabel("phi")
     plt.title(title)
 
     plt.figure()
     plt.contour(data[:, :, 1])
-    #plt.colorbar()
+    plt.colorbar()
     plt.xlabel("z")
     plt.ylabel("phi")
     plt.title(title)
