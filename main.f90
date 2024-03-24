@@ -1,7 +1,7 @@
 program main
     use magfie, only: FieldType
     use magfie_factory, only: magfie_type_from_string
-    !use magfie_tok, only: TokFieldType
+    use magfie_tok, only: TokFieldType
     use interpolate, only: SplineData3D, construct_splines_3d, &
     evaluate_splines_3d, evaluate_splines_3d_der2, destroy_splines_3d
     use canonical, only: init_canonical, init_transformation, twopi, &
@@ -88,7 +88,8 @@ contains
         real(8), dimension(3), intent(inout) :: dx
         real(8) :: BR, BZ, Bphi, Bphictr
 
-        call magfie_type%compute_bfield(x(1), x(3), x(2), BR, Bphi, BZ)
+        call magfie_type%compute_bfield(x(1), modulo(x(3), twopi), x(2), &
+            BR, Bphi, BZ)
 
         Bphictr = Bphi/x(1)  ! contravariant component
         dx(1) = -BR/Bphictr
