@@ -1,0 +1,51 @@
+// For format details, see https://aka.ms/devcontainer.json. For config options, see the
+// README at: https://github.com/devcontainers/templates/tree/main/src/docker-existing-dockerfile
+{
+	"name": "Default dev environment",
+	"image": "ghcr.io/itpplasma/devel-tex:latest",
+
+	"mounts": [
+		"source=/proj/plasma,target=/proj/plasma,type=bind,consistency=cached"
+	],
+
+	// Features to add to the dev container. More info: https://containers.dev/features.
+	// "features": {},
+
+	// Use 'forwardPorts' to make a list of ports inside the container available locally.
+	// "forwardPorts": [],
+
+	// Uncomment the next line to run commands after the container is created.
+	// "postCreateCommand": "cat /etc/os-release",
+
+	// Configure tool-specific properties.
+	"customizations": {
+		"vscode": {
+			"extensions": [
+				"ms-python.python",
+				"ms-python.black-formatter",
+				"ms-toolsai.jupyter",
+				"twxs.cmake",
+				"julialang.language-julia",
+				"ms-vscode.cpptools",
+				"github.copilot",
+				"james-yu.latex-workshop",
+				"trond-snekvik.simple-rst",
+				"fortran-lang.linter-gfortran"
+			],
+			"settings": {
+				"terminal.integrated.shell.linux": "/bin/bash",
+    			"terminal.integrated.shellArgs.linux": [
+					"-c", ". /opt/venv/plasma/bin/activate"],
+				"python.terminal.activateEnvInCurrentTerminal": true,
+				"python.defaultInterpreterPath": "/opt/venv/plasma/bin/python"
+			}
+		}
+	},
+
+	"capAdd": [
+		"SYS_ADMIN"
+	]
+
+	// Uncomment to connect as an existing user other than the container default. More info: https://aka.ms/dev-containers-non-root.
+	// "remoteUser": "devcontainer"
+}
