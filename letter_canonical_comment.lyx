@@ -1,0 +1,640 @@
+#LyX 2.3 created this file. For more info see http://www.lyx.org/
+\lyxformat 544
+\begin_document
+\begin_header
+\save_transient_properties true
+\origin unavailable
+\textclass revtex4-2
+\use_default_options true
+\maintain_unincluded_children false
+\language english
+\language_package default
+\inputencoding auto
+\fontencoding global
+\font_roman "default" "default"
+\font_sans "default" "default"
+\font_typewriter "default" "default"
+\font_math "auto" "auto"
+\font_default_family default
+\use_non_tex_fonts false
+\font_sc false
+\font_osf false
+\font_sf_scale 100 100
+\font_tt_scale 100 100
+\use_microtype false
+\use_dash_ligatures true
+\graphics default
+\default_output_format default
+\output_sync 0
+\bibtex_command default
+\index_command default
+\paperfontsize default
+\spacing single
+\use_hyperref false
+\papersize default
+\use_geometry false
+\use_package amsmath 1
+\use_package amssymb 1
+\use_package cancel 1
+\use_package esint 1
+\use_package mathdots 1
+\use_package mathtools 1
+\use_package mhchem 1
+\use_package stackrel 1
+\use_package stmaryrd 1
+\use_package undertilde 1
+\cite_engine natbib
+\cite_engine_type default
+\biblio_style plain
+\use_bibtopic false
+\use_indices false
+\paperorientation portrait
+\suppress_date false
+\justification true
+\use_refstyle 1
+\use_minted 0
+\index Index
+\shortcut idx
+\color #008000
+\end_index
+\secnumdepth 3
+\tocdepth 3
+\paragraph_separation indent
+\paragraph_indentation default
+\is_math_indent 0
+\math_numbering_side default
+\quotes_style english
+\dynamic_quotes 0
+\papercolumns 1
+\papersides 1
+\paperpagestyle default
+\tracking_changes false
+\output_changes false
+\html_math_output 0
+\html_css_as_file 0
+\html_be_strict false
+\end_header
+
+\begin_body
+
+\begin_layout Standard
+\begin_inset FormulaMacro
+\newcommand{\tht}{\vartheta}
+\end_inset
+
+
+\begin_inset FormulaMacro
+\newcommand{\ph}{\varphi}
+\end_inset
+
+
+\begin_inset FormulaMacro
+\newcommand{\balpha}{\boldsymbol{\alpha}}
+\end_inset
+
+
+\begin_inset FormulaMacro
+\newcommand{\btheta}{\boldsymbol{\theta}}
+\end_inset
+
+
+\begin_inset FormulaMacro
+\newcommand{\bJ}{\boldsymbol{J}}
+\end_inset
+
+
+\begin_inset FormulaMacro
+\newcommand{\bGamma}{\boldsymbol{\Gamma}}
+\end_inset
+
+
+\begin_inset FormulaMacro
+\newcommand{\bOmega}{\boldsymbol{\Omega}}
+\end_inset
+
+
+\begin_inset FormulaMacro
+\newcommand{\d}{\text{d}}
+\end_inset
+
+
+\begin_inset FormulaMacro
+\newcommand{\t}[1]{\text{#1}}
+\end_inset
+
+
+\begin_inset FormulaMacro
+\newcommand{\m}{\text{m}}
+\end_inset
+
+
+\begin_inset FormulaMacro
+\newcommand{\v}[1]{\boldsymbol{#1}}
+\end_inset
+
+
+\begin_inset FormulaMacro
+\newcommand{\u}[1]{\underline{#1}}
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\begin_inset FormulaMacro
+\renewcommand{\t}[1]{\mathbf{#1}}
+\end_inset
+
+
+\begin_inset FormulaMacro
+\newcommand{\bA}{\boldsymbol{A}}
+\end_inset
+
+
+\begin_inset FormulaMacro
+\newcommand{\bB}{\boldsymbol{B}}
+\end_inset
+
+
+\begin_inset FormulaMacro
+\newcommand{\c}{\mathrm{c}}
+\end_inset
+
+
+\begin_inset FormulaMacro
+\newcommand{\difp}[2]{\frac{\partial#1}{\partial#2}}
+\end_inset
+
+
+\begin_inset FormulaMacro
+\newcommand{\xset}{{\bf x}}
+\end_inset
+
+
+\begin_inset FormulaMacro
+\newcommand{\zset}{{\bf z}}
+\end_inset
+
+
+\begin_inset FormulaMacro
+\newcommand{\qset}{{\bf q}}
+\end_inset
+
+
+\begin_inset FormulaMacro
+\newcommand{\pset}{{\bf p}}
+\end_inset
+
+
+\begin_inset FormulaMacro
+\newcommand{\wset}{{\bf w}}
+\end_inset
+
+
+\begin_inset FormulaMacro
+\newcommand{\ei}{{\bf \mathrm{ei}}}
+\end_inset
+
+
+\begin_inset FormulaMacro
+\newcommand{\ie}{{\bf \mathrm{ie}}}
+\end_inset
+
+
+\begin_inset FormulaMacro
+\newcommand{\vrho}{\boldsymbol{\rho}}
+\end_inset
+
+
+\end_layout
+
+\begin_layout Title
+Comments: Global canonical coordinates for the guiding-center system
+\end_layout
+
+\begin_layout Standard
+Cylindrical coordinates:
+\end_layout
+
+\begin_layout Standard
+Old coordinates in terms of new coordinates
+\begin_inset Formula 
+\begin{align*}
+x^{1}=R & =R_{c}=x_{c}^{1}\\
+x^{2}=\varphi & =-\varphi_{c}+\lambda(R_{c},Z_{c},\varphi_{c})\\
+x^{3}=Z & =Z_{c}=x_{c}^{2}
+\end{align*}
+
+\end_inset
+
+
+\begin_inset Formula 
+\begin{align}
+0\overset{!}{=}B_{1}^{(c)}(\v x_{\c}) & =B_{i}\difp{x^{i}}{R_{c}}=B_{R}(\v x(\v x_{\c}))+\frac{\partial\lambda(\v x_{\c})}{\partial R_{c}}B_{\varphi}(\v x(\v x_{\c})).
+\end{align}
+
+\end_inset
+
+So we require
+\end_layout
+
+\begin_layout Standard
+\begin_inset Formula 
+\begin{equation}
+\frac{\partial\lambda(\v x_{\c})}{\partial R_{c}}=-\frac{B_{R}(\v x(\v x_{\c}))}{B_{\varphi}(\v x(\v x_{\c}))},\label{eq:dx3}
+\end{equation}
+
+\end_inset
+
+or written differently,
+\end_layout
+
+\begin_layout Standard
+\begin_inset Formula 
+\begin{equation}
+\frac{\partial\lambda(R_{c},Z_{c},\varphi_{c})}{\partial R_{c}}=-\frac{B_{R}(R_{c},-\varphi_{c}+\lambda(R_{c},Z_{c},\varphi_{c}),Z_{c})}{B_{\varphi}(R_{c},-\varphi_{c}+\lambda(R_{c},Z_{c},\varphi_{c}),Z_{c})}.\label{eq:dx3-1}
+\end{equation}
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+Then the other two components transform as
+\begin_inset Formula 
+\begin{align}
+B_{Z}^{(c)}(\v x_{\c}) & =B_{Z}(\v x(\v x_{\c}))+\frac{\partial\lambda(\v x_{\c})}{\partial Z_{c}}B_{\varphi}(\v x(\v x_{\c})),\\
+B_{\varphi}^{(c)}(\v x_{\c}) & =B_{\ph}(\v x(\v x_{\c}))\left(-1+\frac{\partial\lambda(\v x_{\c})}{\partial\varphi_{c}}\right).
+\end{align}
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+Coordinate and gauge transform of vector potential:
+\end_layout
+
+\begin_layout Standard
+\begin_inset Formula 
+\begin{equation}
+A_{R}^{(c)}=A_{R}+A_{\varphi}\difp{\varphi}{R_{c}}-\difp{\chi}{R_{c}}=A_{R}+A_{\varphi}\difp{\lambda}{R_{c}}-\difp{\chi}{R_{c}}=A_{R}-\frac{A_{\varphi}B_{R}}{B_{\varphi}}-\difp{\chi}{R_{c}}=0.
+\end{equation}
+
+\end_inset
+
+
+\begin_inset Formula 
+\begin{equation}
+\difp{\chi(R_{c},Z_{c},\varphi_{c})}{R_{c}}=A_{R}-\frac{A_{\varphi}B_{R}}{B_{\varphi}}.
+\end{equation}
+
+\end_inset
+
+Then the other two components transform as
+\end_layout
+
+\begin_layout Standard
+\begin_inset Formula 
+\[
+A_{Z}^{(c)}=A_{Z}+A_{\varphi}\difp{\lambda}{Z_{c}}-\difp{\chi}{Z_{c}}
+\]
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+ans
+\end_layout
+
+\begin_layout Standard
+\begin_inset Formula 
+\[
+A_{\varphi}^{(c)}=A_{\varphi}\left(-1+\difp{\lambda}{\varphi_{c}}\right)-\difp{\chi}{\varphi_{c}}
+\]
+
+\end_inset
+
+Now we get 
+\begin_inset Formula $A_{Z}^{(c)}(R_{c},Z_{c},\varphi_{c})$
+\end_inset
+
+ on regular grid in 
+\begin_inset Formula $R_{c},Z_{c},\varphi_{c}$
+\end_inset
+
+.
+ 
+\end_layout
+
+\begin_layout Standard
+Metric 
+\begin_inset Formula 
+\[
+g_{ij}^{(c)}=g_{kl}\frac{\partial x^{k}}{\partial x_{c}^{i}}\frac{\partial x^{l}}{\partial x_{c}^{j}}
+\]
+
+\end_inset
+
+Metric determinant
+\begin_inset Formula 
+\begin{align}
+\sqrt{g^{(c)}} & =\sqrt{g}\det\frac{\partial(x^{1},x^{2},x^{3})}{\partial(x_{c}^{1},x_{c}^{2},x_{c}^{3})}=\sqrt{g}\det\left(\begin{array}{ccc}
+1 & 0 & \partial_{1}\lambda\\
+0 & \partial_{2}\lambda & 1\\
+0 & -1+\partial_{3}\lambda & 0
+\end{array}\right)\nonumber \\
+ & =-\sqrt{g}(-1+\partial_{3}\lambda)=\sqrt{g}(1-\partial_{3}\lambda).
+\end{align}
+
+\end_inset
+
+From cylindrical coordinates
+\begin_inset Formula 
+\begin{equation}
+\sqrt{g^{(c)}}=R_{c}\left(1-\difp{\lambda(R_{c},Z_{c},\varphi_{c})}{\varphi_{c}}\right)
+\end{equation}
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Subsection*
+Field lines
+\end_layout
+
+\begin_layout Standard
+Non-Canonical
+\begin_inset Formula 
+\begin{align*}
+RB^{R} & =\difp{A_{Z}}{\varphi}-\difp{A_{\varphi}}Z\\
+RB^{\varphi} & =\difp{A_{R}}Z-\difp{A_{Z}}R\\
+RB^{Z} & =\difp{A_{\varphi}}R-\difp{A_{R}}{\varphi}
+\end{align*}
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+Canonical
+\begin_inset Formula 
+\begin{align*}
+R_{c}\left(1-\difp{\lambda(R_{c},Z_{c},\varphi_{c})}{\varphi_{c}}\right)B_{(c)}^{R} & =\difp{A_{\varphi}^{(c)}}{Z_{c}}-\difp{A_{Z}^{(c)}}{\varphi_{c}}\\
+R_{c}\left(1-\difp{\lambda(R_{c},Z_{c},\varphi_{c})}{\varphi_{c}}\right)B_{(c)}^{Z} & =-\difp{A_{\varphi}^{(c)}}{R_{c}}\\
+R_{c}\left(1-\difp{\lambda(R_{c},Z_{c},\varphi_{c})}{\varphi_{c}}\right)B_{(c)}^{\varphi} & =\difp{A_{Z}^{(c)}}{R_{c}}
+\end{align*}
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Subsection*
+Efficient interpolation of fields
+\end_layout
+
+\begin_layout Standard
+We spline the following quantities independently:
+\begin_inset Formula 
+\begin{align}
+A_{2} & =A_{Z}^{(c)},\quad A_{3}=A_{\ph}^{(c)}\\
+h_{2} & =\sqrt{B_{(R)}^{\,2}+B_{(Z)}^{\,2}+B_{(\ph)}^{\,2}}=h_{Z}^{(c)},\quad h_{3}=h_{\ph}^{(c)}\\
+ & =h_{Z}^{(c)}B^{Z}+h_{\varphi}^{(c)}B^{\varphi},\\
+B & =h_{R}B^{R}+h_{Z}B^{Z}+h_{\varphi}B^{\varphi}
+\end{align}
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Subsection*
+Using vector potential as one coordinate
+\end_layout
+
+\begin_layout Standard
+Let's also set as a radial variable the vector potential component 
+\begin_inset Formula $A_{Z}$
+\end_inset
+
+.
+ TODO: Check Sadrilla Abdullaev, canonical variables in tokamaks.
+ Now invert and interpolate 
+\begin_inset Formula $R_{c}=R_{c}(A_{Z}^{(c)},Z_{c},\varphi_{c})$
+\end_inset
+
+.
+ Could be a problem at the edges but not big.
+ Reinterpolate all other dependencies on this grid.
+ With 
+\begin_inset Formula $\psi\equiv A_{Z}^{(c)}$
+\end_inset
+
+ instead of 
+\begin_inset Formula $R_{c}$
+\end_inset
+
+ we have
+\begin_inset Formula 
+\begin{align*}
+\sqrt{g}\difp{R_{c}}{\psi}\bar{B}_{(c)}^{\psi} & =\difp{A_{\varphi}^{(c)}}{Z_{c}}\\
+\sqrt{g}\difp{R_{c}}{\psi}\bar{B}_{(c)}^{\varphi} & =1\\
+\sqrt{g}\difp{R_{c}}{\psi}\bar{B}_{(c)}^{Z} & =-\difp{A_{\varphi}^{(c)}}{\psi}
+\end{align*}
+
+\end_inset
+
+Field line equations are
+\begin_inset Formula 
+\begin{align}
+\frac{\d\psi}{\d\varphi} & =\frac{\bar{B}_{(c)}^{\psi}}{\bar{B}_{(c)}^{\varphi}}=\difp{A_{\varphi}^{(c)}}{Z_{c}},\\
+\frac{\d Z}{\d\varphi} & =\frac{\bar{B}_{(c)}^{Z}}{\bar{B}_{(c)}^{\varphi}}=-\difp{A_{\varphi}^{(c)}}{\psi}.
+\end{align}
+
+\end_inset
+
+Covariant components are
+\begin_inset Formula 
+\begin{align}
+\bar{B}_{\psi}^{(c)} & =B_{R}^{(c)}\difp{R_{c}}{\psi}+B_{\varphi}^{(c)}\difp{\varphi_{c}}{\psi}+B_{Z}\difp{Z_{c}}{\psi}=B_{R}^{(c)}\difp{R_{c}}{\psi}=0.\\
+\bar{B}_{\varphi}^{(c)} & =B_{R}^{(c)}\difp{R_{c}}{\varphi_{c}}+B_{\varphi}^{(c)}\difp{\varphi_{c}}{\varphi_{c}}+B_{Z}\difp{Z_{c}}{\varphi_{c}}=B_{\varphi}^{(c)}\\
+\bar{B}_{Z}^{(c)} & =B_{R}^{(c)}\difp{R_{c}}{Z_{c}}+B_{\varphi}^{(c)}\difp{\varphi_{c}}{Z_{c}}+B_{Z}\difp{Z_{c}}{Z_{c}}=B_{Z}^{(c)}
+\end{align}
+
+\end_inset
+
+In terms of original cylinder variables
+\begin_inset Formula 
+\begin{align}
+\difp{(R,\varphi,Z)}{(R_{c},\varphi_{c},Z_{c})} & =\left(\begin{array}{ccc}
+1 & 0 & 0\\
+\partial\lambda/\partial R_{c} & 1+\partial\lambda/\partial\varphi_{c} & \partial\lambda/\partial Z_{c}\\
+0 & 0 & 1
+\end{array}\right)
+\end{align}
+
+\end_inset
+
+
+\begin_inset Formula 
+\begin{align}
+B_{R}^{(c)} & =0,\\
+B_{\varphi}^{(c)} & =\difp R{\varphi_{c}}B_{R}+\difp{\varphi}{\varphi_{c}}B_{\varphi}+\difp Z{\varphi_{c}}B_{Z}=\left(1+\difp{\lambda}{\varphi_{c}}\right)B_{\varphi}.\\
+B_{Z}^{(c)} & =\difp R{Z_{c}}B_{R}+\difp{\varphi}{Z_{c}}B_{\varphi}+\difp Z{Z_{c}}B_{Z}=\difp f{Z_{c}}B_{\varphi}+B_{Z}.
+\end{align}
+
+\end_inset
+
+Re-use in the SIMPLE orbit algorithm
+\begin_inset Formula 
+\[
+A_{\vartheta}\rightarrow Z
+\]
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Section*
+Unified Variant (TODO)
+\end_layout
+
+\begin_layout Standard
+\begin_inset Formula 
+\begin{align}
+x^{1}= & R(\v x_{c})\\
+x^{2}= & Z(\v x_{c})=x_{c}^{2}\\
+x^{3}= & \varphi(\v x_{c})=x_{c}^{3}+\lambda
+\end{align}
+
+\end_inset
+
+where we get 
+\begin_inset Formula $R(\v x_{c})$
+\end_inset
+
+ from the inverse relation with 
+\begin_inset Formula $x_{c}^{1}=A_{2}^{(c)}(R,x_{c}^{2},x_{c}^{3})$
+\end_inset
+
+.
+ 
+\end_layout
+
+\begin_layout Standard
+The vector potential is defined via a coordinate and gauge transform such
+ that
+\begin_inset Formula 
+\begin{equation}
+0\overset{!}{=}A_{1}^{(c)}=\difp R{x_{c}^{1}}A_{R}+\underbrace{\difp Z{x_{c}^{1}}}_{0}A_{Z}+\difp{\lambda}{x_{c}^{1}}A_{\varphi}-\difp{\chi}{x_{c}^{1}}.\label{eq:A1c}
+\end{equation}
+
+\end_inset
+
+The second component matches the first coordinate with
+\begin_inset Formula 
+\begin{equation}
+x_{c}^{1}\overset{!}{=}A_{2}^{(c)}=\difp R{x_{c}^{2}}A_{R}+A_{Z}+\difp{\lambda}{x_{c}^{2}}A_{\varphi}-\difp{\chi}{x_{c}^{2}}.
+\end{equation}
+
+\end_inset
+
+The second condition is
+\begin_inset Formula 
+\begin{align}
+0\overset{!}{=}B_{1\mathrm{c}} & =\frac{\partial R}{\partial x_{c}^{1}}B_{R}+\frac{\partial\lambda}{\partial x_{c}^{1}}.
+\end{align}
+
+\end_inset
+
+We require thus
+\end_layout
+
+\begin_layout Standard
+\begin_inset Formula 
+\begin{equation}
+\frac{\partial f}{\partial x_{c}^{1}}=-\frac{\partial R}{\partial x_{c}^{1}}\frac{B_{R}}{B_{\varphi}},\label{eq:dx3-2}
+\end{equation}
+
+\end_inset
+
+and
+\begin_inset Formula 
+\begin{align}
+\difp{\chi}{x_{c}^{1}} & =\difp R{x_{c}^{1}}A_{R}+\difp{\lambda}{x_{c}^{1}}A_{\varphi}\nonumber \\
+ & =\difp R{x_{c}^{1}}\left(A_{R}-\frac{B_{R}}{B_{\varphi}}A_{\varphi}\right).
+\end{align}
+
+\end_inset
+
+We have
+\begin_inset Formula 
+\[
+x_{c}^{1}=A_{2}^{(c)}(R,x_{c}^{2},x_{c}^{3})
+\]
+
+\end_inset
+
+so
+\begin_inset Formula 
+\begin{align*}
+\left(\difp{(x_{c}^{1},x_{c}^{2},x_{c}^{3})}{(R,x_{c}^{2},x_{c}^{3})}\right)^{-1} & =\left(\begin{array}{ccc}
+\difp{A_{2}^{(c)}(R,x_{c}^{2},x_{c}^{3})}R & \difp{A_{2}^{(c)}(R,x_{c}^{2},x_{c}^{3})}{x_{c}^{2}} & \difp{A_{2}^{(c)}(R,x_{c}^{2},x_{c}^{3})}{x_{c}^{3}}\\
+0 & 1 & 0\\
+0 & 0 & 1
+\end{array}\right)^{-1}\\
+ & =\left(\begin{array}{ccc}
+\frac{1}{\difp{A_{2}^{(c)}(R,x_{c}^{2},x_{c}^{3})}R} & -\frac{\difp{A_{2}^{(c)}(R,x_{c}^{2},x_{c}^{3})}{x_{c}^{2}}}{\difp{A_{2}^{(c)}(R,x_{c}^{2},x_{c}^{3})}R} & -\frac{\difp{A_{2}^{(c)}(R,x_{c}^{2},x_{c}^{3})}{x_{c}^{3}}}{\difp{A_{2}^{(c)}(R,x_{c}^{2},x_{c}^{3})}R}\\
+0 & 1 & 0\\
+0 & 0 & 1
+\end{array}\right)^{-1}
+\end{align*}
+
+\end_inset
+
+So we can set
+\begin_inset Formula 
+\begin{equation}
+x_{c}^{1}\overset{!}{=}A_{2}^{(c)}=-\frac{\difp{A_{2}^{(c)}(R,x_{c}^{2},x_{c}^{3})}{x_{c}^{2}}}{\difp{A_{2}^{(c)}(R,x_{c}^{2},x_{c}^{3})}R}A_{R}+A_{Z}+\difp{\lambda}{x_{c}^{2}}A_{\varphi}-\difp{\chi}{x_{c}^{2}}.
+\end{equation}
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Subsection*
+Tensor-product splines for FEEC
+\end_layout
+
+\begin_layout Standard
+\begin_inset Formula 
+\begin{align*}
+\chi & =\sum\varphi_{i}(x^{1})\varphi_{j}(x^{2})\varphi_{k}(x^{3})\\
+ & \downarrow\mathrm{grad}\\
+A_{1} & =\sum\varphi_{i}^{\prime}(x^{1})\varphi_{j}(x^{2})\varphi_{k}(x^{3})\\
+A_{2} & =\sum\varphi_{i}(x^{1})\varphi_{j}^{\prime}(x^{2})\varphi_{k}(x^{3})\\
+A_{3} & =\sum\varphi_{i}(x^{1})\varphi_{j}(x^{2})\varphi_{k}^{\prime}(x^{3})\\
+ & \downarrow\mathrm{curl}\\
+\sqrt{g}B^{1} & =\sum\varphi_{i}(x^{1})\varphi_{j}^{\prime}(x^{2})\varphi_{k}^{\prime}(x^{3})\\
+\sqrt{g}B^{2} & =\sum\varphi_{i}^{\prime}(x^{1})\varphi_{j}(x^{2})\varphi_{k}^{\prime}(x^{3})\\
+\sqrt{g}B^{3} & =\sum\varphi_{i}^{\prime}(x^{1})\varphi_{j}^{\prime}(x^{2})\varphi_{k}(x^{3})\\
+ & \downarrow\mathrm{div}\\
+\rho & =\sum\varphi_{i}^{\prime}(x^{1})\varphi_{j}^{\prime}(x^{2})\varphi_{k}^{\prime}(x^{3})
+\end{align*}
+
+\end_inset
+
+
+\end_layout
+
+\end_body
+\end_document
