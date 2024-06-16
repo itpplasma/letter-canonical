@@ -1,4 +1,4 @@
-1                                 ipert        ! 0=eq only, 1=vac, 2,3=vac+plas
+0                                 ipert        ! 0=eq only, 1=vac, 2,3=vac+plas
 1                                 iequil       ! 0=pert. alone, 1=with equil.
 1.0d0                             ampl         ! amplitude of perturbation, a.u.
 16                                ntor         ! number of toroidal harmonics
@@ -6,7 +6,7 @@
 4                                 icftype      ! type of coil file
 '../GORILLA/MHD_EQUILIBRIA/g_file_for_test'    gfile        ! equilibrium file
 '/proj/plasma/DATA/AUG/COILS/MESH3D_31135odd/field_small.dat'   pfile        ! coil        file
- 'convexwall_aug_test.dat' ! 'convexwall_aug_rmp.dat'  convexfile   ! convex file for stretchcoords
+'convexwall_aug_inside_bcoils.dat' !  convexfile   ! convex file for stretchcoords
 'DATA/ASDEX/FLUXDATA'                  fluxdatapath ! directory with data in flux coord.
 0                                 window size for filtering of psi array over R
 0                                 window size for filtering of psi array over Z
