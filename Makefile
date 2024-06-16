@@ -32,16 +32,16 @@ SOURCES := $(addprefix ../libneo/src/, $(SOURCES))
 all: letter-canonical.x test.x test_large.x test_biotsavart.x
 
 letter-canonical.x: libfield.so libcanonical.so main.f90
-	$(FC) $(FFLAGS) -o $@ $^ -lstell -lfield -lcanonical -lbspline-fortran
+	$(FC) $(FFLAGS) -o $@ $^ -lfield -lcanonical -lbspline-fortran
 
 test.x: libfield.so libcanonical.so test_util.f90 test.f90
-	$(FC) $(FFLAGS) -o $@ $^ -lstell -lfield -lcanonical -lbspline-fortran
+	$(FC) $(FFLAGS) -o $@ $^ -lfield -lcanonical -lbspline-fortran
 
 test_large.x: libfield.so libcanonical.so test_util.f90 test_large.f90
-	$(FC) $(FFLAGS) -o $@ $^ -lstell -lfield -lcanonical -lbspline-fortran
+	$(FC) $(FFLAGS) -o $@ $^ -lfield -lcanonical -lbspline-fortran
 
 test_biotsavart.x: libfield.so libcanonical.so test_biotsavart.f90 test_util.f90 biotsavart.o
-	$(FC) $(FFLAGS) -o $@ $^ -lstell -lfield -lcanonical -lbspline-fortran
+	$(FC) $(FFLAGS) -o $@ $^ -lfield -lcanonical -lbspline-fortran
 
 biotsavart.o: biotsavart.f90
 	$(FC) $(FFLAGS) -o $@ -c $^
