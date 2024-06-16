@@ -22,7 +22,7 @@ module canonical
 
     ! For splines
     real(8) :: x_min(3), x_max(3)
-    integer, parameter :: order(3) = [3, 3, 3]
+    integer, parameter :: order(3) = [5, 5, 5]
     logical, parameter :: periodic(3) = [.False., .False., .True.]
 
     ! For splining lambda (difference between canonical and cylindrical angle)
@@ -185,11 +185,11 @@ contains
         allocate(Acan(3,n_r,n_z,n_phi))
         call compute_Acan(Acyl, Acan)
         call construct_splines_3d(x_min, x_max, &
-            Acan(1,:,:,:), [3, 4, 4], periodic, spl_A1)
+            Acan(1,:,:,:), [5, 5, 5], periodic, spl_A1)
         call construct_splines_3d(x_min, x_max, &
-            Acan(2,:,:,:), [4, 3, 4], periodic, spl_A2)
+            Acan(2,:,:,:), [5, 5, 5], periodic, spl_A2)
         call construct_splines_3d(x_min, x_max, &
-            Acan(3,:,:,:), [4, 4, 3], periodic, spl_A3)
+            Acan(3,:,:,:), [5, 5, 5], periodic, spl_A3)
         deallocate(Acan)
 
         deallocate(Acyl, B, xcyl, xcan)

@@ -1,5 +1,4 @@
 program main
-    use magfie, only: FieldType
     use magfie_factory, only: magfie_type_from_string
     use magfie_tok, only: TokFieldType
     use interpolate, only: SplineData3D, construct_splines_3d, &
@@ -16,8 +15,7 @@ program main
     real(8) :: rmin, rmax, zmin, zmax
     !complex(8) :: pert
 
-    class(FieldType), allocatable :: field_type
-    !class(TokFieldType), allocatable :: field_type
+    class(TokFieldType), allocatable :: field_type
 
     ! Workaround, otherwise not initialized without perturbation field
     rmin = 75.d0
@@ -25,9 +23,7 @@ program main
     zmin = -150.d0
     zmax = 147.38193979933115d0
 
-    field_type = magfie_type_from_string("test")
-
-    !field_type = TokFieldType()
+    field_type = TokFieldType()
     !pert = dcmplx(2.0d3, 0.0d0)
     !call field_type%add_perturbation(3, 2, [pert, pert, pert])
     !call field_type%add_perturbation(3, 2, [pert, pert, pert])
