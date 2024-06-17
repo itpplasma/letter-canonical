@@ -2,7 +2,7 @@ image: ghcr.io/itpplasma/devel-tex
 build-job:
   stage: build
   script:
-    - lyx --export pdf4 letter_canonical_comment.lyx
+    - lyx --export pdf2 letter_canonical_comment.lyx
   artifacts:
     paths:
       - letter_canonical_comment.pdf
