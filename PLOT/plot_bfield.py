@@ -7,8 +7,23 @@ zmin = -150
 zmax = 147.38193979933115
 
 plt.figure()
-data = np.loadtxt("fort.100"); plt.plot(data[:,0], data[:,1])
-data = np.loadtxt("fort.101"); plt.plot(data[:,0], data[:,1], '--')
+data = np.loadtxt("fort.100")
+for i in range(data.shape[0] - 1):
+    if(np.sign(np.mod(data[i, 2], 2*np.pi) - np.pi) !=
+       np.sign(np.mod(data[i+1, 2], 2*np.pi) - np.pi)):
+        r = 0.5*(data[i, 0] + data[i+1, 0])
+        z = 0.5*(data[i, 1] + data[i+1, 1])
+        plt.plot(r, z, 'b,')
+
+
+data = np.loadtxt("fort.101")
+for i in range(data.shape[0] - 1):
+    if(np.sign(np.mod(data[i, 2], 2*np.pi) - np.pi) !=
+       np.sign(np.mod(data[i+1, 2], 2*np.pi) - np.pi)):
+        r = 0.5*(data[i, 0] + data[i+1, 0])
+        z = 0.5*(data[i, 1] + data[i+1, 1])
+        plt.plot(r, z, 'r,')
+
 plt.xlabel('R [cm]')
 plt.ylabel('Z [cm]')
 plt.xlim([rmin, rmax])
@@ -24,8 +39,8 @@ Y = data[:,0]*np.sin(data[:,2])
 Z = data[:,1]
 ax.plot(X, Y, Z)
 data = np.loadtxt("fort.101")
-X = data[:,0]*np.cos(-data[:,2])
-Y = data[:,0]*np.sin(-data[:,2])
+X = data[:,0]*np.cos(data[:,2])
+Y = data[:,0]*np.sin(data[:,2])
 Z = data[:,1]
 ax.plot(X, Y, Z, '--')
 ax.set_xlim([-rmax, rmax])

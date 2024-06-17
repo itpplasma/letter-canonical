@@ -51,10 +51,10 @@ contains
 
     subroutine test_integration
         real(8), parameter :: tol = 1.0d-8
-        real(8), parameter :: tmax = 5.75d0*twopi*2.5
-        integer, parameter :: nt = 1000
+        real(8), parameter :: dt = 5.75d-3*twopi
+        integer, parameter :: nt = 100000
 
-        real(8) :: x0(3), x(3)
+        real(8) :: x0(3), x(3), xcyl(3), lam
         integer :: i_t
 
         x0 = [200.0d0, 20.0d0, 0.0d0]
@@ -62,15 +62,20 @@ contains
         x = x0
         do i_t = 0, nt
             call odeint_allroutines(&
-                x, 3, i_t*tmax/nt, (i_t+1)*tmax/nt, tol, Bnoncan)
+                x, 3, i_t*dt, (i_t+1)*dt, tol, Bnoncan)
             write(100, *) x
         end do
 
         x = x0
         do i_t = 0, nt
             call odeint_allroutines(&
-                x, 3, i_t*tmax/nt, (i_t+1)*tmax/nt, tol, Bcan)
-            write(101, *) x
+                x, 3, i_t*dt, (i_t+1)*dt, tol, Bcan)
+            call evaluate_splines_3d(spl_lam, x, lam)
+            xcyl(1) = x(1)
+            xcyl(2) = x(2)
+            xcyl(3) = modulo(-x(3) + lam, twopi)
+            write(101, *) xcyl
+            write(102, *) x
         end do
     end subroutine test_integration
 
@@ -104,9 +109,6 @@ contains
         real(8), dimension(3), intent(inout) :: dx
         real(8) :: A1s, A2s, A3s, dA1s(3), dA2s(3), dA3s(3)
         real(8) :: B(3)
-        real(8) :: sqrtg
-
-        sqrtg = x(1)
 
         call evaluate_afield_can(x, A1s, dA1s, A2s, dA2s, A3s, dA3s)
 

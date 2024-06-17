@@ -286,16 +286,14 @@ contains
         real(8) :: lam
 
         do i_phi=1,n_phi
-            do i_z=1,n_z
-                do i_r=1,n_r
-                    call evaluate_splines_3d( &
-                        spl_lam, xcan(:,i_r,i_z,i_phi), lam)
-                    xcyl(1,i_r,i_z,i_phi) = xcan(1,i_r,i_z,i_phi)
-                    xcyl(2,i_r,i_z,i_phi) = &
-                        modulo(-xcan(3,i_r,i_z,i_phi) + lam, twopi)
-                    xcyl(3,i_r,i_z,i_phi) = xcan(2,i_r,i_z,i_phi)
-                enddo
-            enddo
+        do i_z=1,n_z
+        do i_r=1,n_r
+            call evaluate_splines_3d(spl_lam, xcan(:,i_r,i_z,i_phi), lam)
+            xcyl(1,i_r,i_z,i_phi) = xcan(1,i_r,i_z,i_phi)
+            xcyl(2,i_r,i_z,i_phi) = modulo(-xcan(3,i_r,i_z,i_phi) + lam, twopi)
+            xcyl(3,i_r,i_z,i_phi) = xcan(2,i_r,i_z,i_phi)
+        enddo
+        enddo
         enddo
 
     end subroutine can_to_cyl
