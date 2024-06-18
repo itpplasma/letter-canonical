@@ -123,7 +123,7 @@ contains
         real(8) :: Br, Bp, Bz, Ar, Ap, Az
 
         call magfie_type%compute_abfield(&
-            r_c, modulo(-phi_c + y(1), twopi), z_c, Br, Bp, Bz, Ar, Ap, Az)
+            r_c, modulo(-phi_c + y(1), twopi), z_c, Ar, Ap, Az, Br, Bp, Bz)
 
         dy(1) = -Br/Bp         ! Must still be divided by r_c for covariant Bp
         dy(2) = Ar + Ap*dy(1)  ! Here it i_r reused so that r_c cancels out
@@ -138,6 +138,7 @@ contains
 
         allocate(lam_phi(n_r, n_z, n_phi), chi_gauge(n_r, n_z, n_phi))
         call get_transformation(lam_phi, chi_gauge)
+        lam_phi = 0d0
 
         open(newunit=outfile_unit, file="lam_phi.out")
             write(outfile_unit, *) lam_phi
