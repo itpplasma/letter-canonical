@@ -13,7 +13,7 @@ program main
     integer, parameter :: n_r=100, n_z=75, n_phi=64
     integer :: outfile_unit
     real(8) :: rmin, rmax, zmin, zmax
-    complex(8) :: pert
+    !complex(8) :: pert
 
     class(TokFieldType), allocatable :: field_type
 
@@ -50,18 +50,18 @@ program main
 contains
 
     subroutine test_integration
-        real(8), parameter :: tol = 1.0d-8
+        real(8), parameter :: tol = 1.0d-10
         real(8), parameter :: dt = 5.75d-3*twopi
-        integer, parameter :: nt = 100000
+        integer, parameter :: nt = 30000
 
         real(8) :: x0(3), x(3), xcyl(3), lam
         integer :: i_t, i_fs, n_flux
 
-        n_flux = 10
+        n_flux = 15
 
         do i_fs = 1, n_flux
-            x0 = [200.0d0, 20.0d0, 0.0d0]
-            x0(3) = twopi * (i_fs - 1) / n_flux
+            x0 = [170.0d0, 20.0d0, 0.0d0]
+            x0(2) = (i_fs*1.0d0/n_flux - 0.5d0)*130d0
             x = x0
             do i_t = 0, nt
                 call odeint_allroutines(&
@@ -71,8 +71,8 @@ contains
         end do
 
         do i_fs = 1, n_flux
-            x0 = [200.0d0, 20.0d0, 0.0d0]
-            x0(3) = twopi * (i_fs - 1) / n_flux
+            x0 = [170.0d0, 20.0d0, 0.0d0]
+            x0(2) = (i_fs*1.0d0/n_flux - 0.5d0)*130d0
             x = x0
             do i_t = 0, nt
                 call odeint_allroutines(&
