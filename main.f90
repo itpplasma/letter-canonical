@@ -24,11 +24,11 @@ program main
     zmax = 147.38193979933115d0
 
     field_type = TokFieldType()
-    pert = dcmplx(2.0d3, 2.0d3)
-    call field_type%add_perturbation(3, -2, [pert, pert, pert])
-    call field_type%add_perturbation(3, 2, [pert, pert, pert])
-    call field_type%add_perturbation(5, -2, [pert, pert, pert])
-    call field_type%add_perturbation(5, 2, [pert, pert, pert])
+    ! pert = dcmplx(2.0d3, 2.0d3)
+    ! call field_type%add_perturbation(3, -2, [pert, pert, pert])
+    ! call field_type%add_perturbation(3, 2, [pert, pert, pert])
+    ! call field_type%add_perturbation(5, -2, [pert, pert, pert])
+    ! call field_type%add_perturbation(5, 2, [pert, pert, pert])
 
     print *, "init_canonical ..."
     call init_canonical(n_r, n_z, n_phi, [rmin, zmin, 0.0d0], &

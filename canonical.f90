@@ -138,7 +138,6 @@ contains
 
         allocate(lam_phi(n_r, n_z, n_phi), chi_gauge(n_r, n_z, n_phi))
         call get_transformation(lam_phi, chi_gauge)
-        lam_phi = 0d0
 
         open(newunit=outfile_unit, file="lam_phi.out")
             write(outfile_unit, *) lam_phi
