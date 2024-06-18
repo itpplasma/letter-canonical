@@ -55,27 +55,35 @@ contains
         integer, parameter :: nt = 100000
 
         real(8) :: x0(3), x(3), xcyl(3), lam
-        integer :: i_t
+        integer :: i_t, i_fs, n_flux
 
-        x0 = [200.0d0, 20.0d0, 0.0d0]
+        n_flux = 10
 
-        x = x0
-        do i_t = 0, nt
-            call odeint_allroutines(&
-                x, 3, i_t*dt, (i_t+1)*dt, tol, Bnoncan)
-            write(100, *) x
+        do i_fs = 1, n_flux
+            x0 = [200.0d0, 20.0d0, 0.0d0]
+            x0(3) = twopi * (i_fs - 1) / n_flux
+            x = x0
+            do i_t = 0, nt
+                call odeint_allroutines(&
+                    x, 3, i_t*dt, (i_t+1)*dt, tol, Bnoncan)
+                write(100, *) x
+            end do
         end do
 
-        x = x0
-        do i_t = 0, nt
-            call odeint_allroutines(&
-                x, 3, i_t*dt, (i_t+1)*dt, tol, Bcan)
-            call evaluate_splines_3d(spl_lam, x, lam)
-            xcyl(1) = x(1)
-            xcyl(2) = x(2)
-            xcyl(3) = modulo(-x(3) + lam, twopi)
-            write(101, *) xcyl
-            write(102, *) x
+        do i_fs = 1, n_flux
+            x0 = [200.0d0, 20.0d0, 0.0d0]
+            x0(3) = twopi * (i_fs - 1) / n_flux
+            x = x0
+            do i_t = 0, nt
+                call odeint_allroutines(&
+                    x, 3, i_t*dt, (i_t+1)*dt, tol, Bcan)
+                call evaluate_splines_3d(spl_lam, x, lam)
+                xcyl(1) = x(1)
+                xcyl(2) = x(2)
+                xcyl(3) = modulo(-x(3) + lam, twopi)
+                write(101, *) xcyl
+                write(102, *) x
+            end do
         end do
     end subroutine test_integration
 
