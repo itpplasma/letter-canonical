@@ -31,14 +31,17 @@ plt.ylim([zmin, zmax])
 
 # 3D plot
 from mpl_toolkits.mplot3d import Axes3D
+
+tmax = 1000
+
 fig = plt.figure()
 ax = fig.add_subplot(111, projection='3d')
-data = np.loadtxt("fort.100")
+data = np.loadtxt("fort.100")[:tmax,:]
 X = data[:,0]*np.cos(data[:,2])
 Y = data[:,0]*np.sin(data[:,2])
 Z = data[:,1]
 ax.plot(X, Y, Z)
-data = np.loadtxt("fort.101")
+data = np.loadtxt("fort.101")[:tmax,:]
 X = data[:,0]*np.cos(data[:,2])
 Y = data[:,0]*np.sin(data[:,2])
 Z = data[:,1]
