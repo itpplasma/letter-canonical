@@ -510,9 +510,9 @@ Unified Variant (TODO)
 \begin_layout Standard
 \begin_inset Formula 
 \begin{align}
-x^{1}= & R(\v x_{c})\\
-x^{2}= & Z(\v x_{c})=x_{c}^{2}\\
-x^{3}= & \varphi(\v x_{c})=x_{c}^{3}+\lambda
+x^{1} & =R(\v x_{c})\\
+x^{2} & =\varphi(\v x_{c})=x_{c}^{2}+\lambda\\
+x^{3} & =Z(\v x_{c})=x_{c}^{3}
 \end{align}
 
 \end_inset
@@ -522,7 +522,7 @@ where we get
 \end_inset
 
  from the inverse relation with 
-\begin_inset Formula $x_{c}^{1}=A_{2}^{(c)}(R,x_{c}^{2},x_{c}^{3})$
+\begin_inset Formula $x_{c}^{1}=A_{3}^{(c)}(R,x_{c}^{2},x_{c}^{3})$
 \end_inset
 
 .
@@ -595,7 +595,7 @@ so
 \frac{1}{\difp{A_{2}^{(c)}(R,x_{c}^{2},x_{c}^{3})}R} & -\frac{\difp{A_{2}^{(c)}(R,x_{c}^{2},x_{c}^{3})}{x_{c}^{2}}}{\difp{A_{2}^{(c)}(R,x_{c}^{2},x_{c}^{3})}R} & -\frac{\difp{A_{2}^{(c)}(R,x_{c}^{2},x_{c}^{3})}{x_{c}^{3}}}{\difp{A_{2}^{(c)}(R,x_{c}^{2},x_{c}^{3})}R}\\
 0 & 1 & 0\\
 0 & 0 & 1
-\end{array}\right)^{-1}
+\end{array}\right)
 \end{align*}
 
 \end_inset
