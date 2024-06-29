@@ -28,6 +28,7 @@ module magfie_tok
         use field_eq_mod, only : icall_eq
         use field_c_mod, only : icall_c
         use libneo_kinds, only : real_kind
+        use field_sub, only : read_field_input
 
         class(TokFieldType), intent(in) :: self
 
@@ -175,6 +176,7 @@ module magfie_tok
     use field_eq_mod, only : rtf,btf,psif
     use inthecore_mod, only : incore
     use libneo_kinds, only : real_kind
+    use field_sub
 
     real(kind=real_kind), intent(in) :: r, z, p
     real(kind=real_kind), intent(inout) :: Br,Bp,Bz,dBrdR,dBrdp,dBrdZ         &
@@ -412,6 +414,7 @@ module magfie_tok
           nwindow_z,psib,btf,rtf,hrad,hzet,psi_axis,psi_sep,&
           psi,psi0,splfpol,splpsi,rad,zet,imi,ima,jmi,jma,ipoint
         use libneo_kinds, only : real_kind
+        use field_sub
 
         integer :: i
 
@@ -495,6 +498,7 @@ module magfie_tok
     subroutine read_field_input_c
         use libneo_kinds, only : real_kind
         use field_c_mod, only : ntor,nr,np,nz,icftype,rmin,pmin,zmin,rmax,pmax,zmax
+        use field_sub
 
         real(kind=real_kind), dimension(:,:,:), allocatable :: Br,Bp,Bz
 
