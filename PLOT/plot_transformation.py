@@ -15,8 +15,8 @@ def doplot(data, title):
         plt.figure()
         plt.contour(data[:, :, 1])
         plt.colorbar()
-        plt.xlabel("r")
-        plt.ylabel("phi")
+        plt.xlabel("phi")
+        plt.ylabel("z")
         plt.title(title)
     except:
         pass
@@ -25,17 +25,17 @@ def doplot(data, title):
         plt.figure()
         plt.contour(data[:, 1, :])
         plt.colorbar()
-        plt.xlabel("z")
-        plt.ylabel("phi")
+        plt.xlabel("r")
+        plt.ylabel("z")
         plt.title(title)
     except:
         pass
 
     try:
         plt.figure()
-        plt.plot(data[1, :, 1], 'o-')
-        plt.plot(data[2, :, 2], 'o-')
-        plt.xlabel("phi")
+        plt.contour(data[1, :, :])
+        plt.xlabel("r")
+        plt.ylabel("phi")
         plt.title(title)
     except:
         pass
@@ -87,3 +87,5 @@ doplot(data, "A3_spl")
 # %%
 
 plt.show()
+
+# %%
