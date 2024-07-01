@@ -147,12 +147,10 @@ contains
             write(outfile_unit, *) chi_gauge
         close(outfile_unit)
 
-        call construct_splines_3d( &
-            x_min, x_max, lam_phi, order, periodic, spl_lam)
+        call construct_splines_3d(x_min, x_max, lam_phi, order, periodic, spl_lam)
         deallocate(lam_phi)
 
-        call construct_splines_3d( &
-            x_min, x_max, chi_gauge, order, periodic, spl_chi)
+        call construct_splines_3d(x_min, x_max, chi_gauge, order, periodic, spl_chi)
         deallocate(chi_gauge)
     end subroutine init_transformation
 
@@ -176,10 +174,8 @@ contains
         call compute_Bmod(B, Bmod)
         call compute_hcan(B, Bmod, hcan)
         call construct_splines_3d(x_min, x_max, Bmod, order, periodic, spl_Bmod)
-        call construct_splines_3d(x_min, x_max, &
-            hcan(1,:,:,:), order, periodic, spl_h2)
-        call construct_splines_3d(x_min, x_max, &
-            hcan(2,:,:,:), order, periodic, spl_h3)
+        call construct_splines_3d(x_min, x_max, hcan(1,:,:,:), order, periodic, spl_h2)
+        call construct_splines_3d(x_min, x_max, hcan(2,:,:,:), order, periodic, spl_h3)
         deallocate(hcan, Bmod)
 
         allocate(Acan(3,n_r,n_z,n_phi))
@@ -263,8 +259,7 @@ contains
                     r = xcyl(1,i_r,i_z,i_phi)
                     phi = modulo(xcyl(2,i_r,i_z,i_phi), twopi)
                     z = xcyl(3,i_r,i_z,i_phi)
-                    call magfie_type%compute_abfield(r, phi, z, A1, A2, A3, &
-                        B1, B2, B3)
+                    call magfie_type%compute_abfield(r, phi, z, A1, A2, A3, B1, B2, B3)
                     A(1,i_r,i_z,i_phi) = A1
                     A(2,i_r,i_z,i_phi) = A2
                     A(3,i_r,i_z,i_phi) = A3
