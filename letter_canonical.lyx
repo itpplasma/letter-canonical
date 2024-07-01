@@ -211,10 +211,17 @@
 \end_inset
 
 
+\lang english
+
+\begin_inset FormulaMacro
+\newcommand{\difp}[2]{\frac{\partial#1}{\partial#2}}
+\end_inset
+
+
 \end_layout
 
 \begin_layout Title
-Global canonical coordinates for the guiding-center system
+New canonical coordinates for the guiding-center system
 \end_layout
 
 \begin_layout Author
@@ -238,7 +245,8 @@ Kasilov
 \end_layout
 
 \begin_layout Abstract
-TODO Abstract
+TODO Abstract: Mention periodic canonical coordinates for toroidal fields
+ with general topology
 \end_layout
 
 \begin_layout Standard
@@ -649,7 +657,11 @@ A_{Z\c}=A_{Z}+\frac{\partial\lambda}{\partial Z_{c}}A_{\varphi}-\frac{\partial\c
 
 \end_inset
 
-as the first coordinate.
+as the coordinate 
+\begin_inset Formula $x_{\text{c}}^{1}$
+\end_inset
+
+.
  Similar to a magnetic flux label, this has the advantage that 
 \begin_inset Formula $A_{Z\c}$
 \end_inset
@@ -659,7 +671,15 @@ as the first coordinate.
 \end_inset
 
  only.
- Combined with the choice 
+ The metric determinant of our final spatial coordinates is given as
+\begin_inset Formula 
+\begin{equation}
+\sqrt{g_{\c}}=R\left(\difp R{\psi_{\c}}\left(1+\difp{\lambda}{\varphi_{\c}}\right)-\difp R{\varphi_{\c}}\difp{\lambda}{\psi_{\c}}\right).
+\end{equation}
+
+\end_inset
+
+Combined with the choice 
 \begin_inset Formula $z^{4}\equiv A_{\varphi\c}^{\star}(\v x_{\c},z^{4})=p_{\varphi}$
 \end_inset
 

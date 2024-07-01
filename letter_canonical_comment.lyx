@@ -221,8 +221,8 @@ Old coordinates in terms of new coordinates
 \begin_inset Formula 
 \begin{align*}
 x^{1}=R & =R_{c}=x_{c}^{1}\\
-x^{2}=\varphi & =-\varphi_{c}+\lambda(R_{c},Z_{c},\varphi_{c})\\
-x^{3}=Z & =Z_{c}=x_{c}^{2}
+x^{2}=\varphi & =\varphi_{c}+\lambda(R_{c},Z_{c},\varphi_{c})\\
+x^{3}=Z & =Z_{c}=x_{c}^{3}
 \end{align*}
 
 \end_inset
@@ -252,7 +252,7 @@ or written differently,
 \begin_layout Standard
 \begin_inset Formula 
 \begin{equation}
-\frac{\partial\lambda(R_{c},Z_{c},\varphi_{c})}{\partial R_{c}}=-\frac{B_{R}(R_{c},-\varphi_{c}+\lambda(R_{c},Z_{c},\varphi_{c}),Z_{c})}{B_{\varphi}(R_{c},-\varphi_{c}+\lambda(R_{c},Z_{c},\varphi_{c}),Z_{c})}.\label{eq:dx3-1}
+\frac{\partial\lambda(R_{c},Z_{c},\varphi_{c})}{\partial R_{c}}=-\frac{B_{R}(R_{c},\varphi_{c}+\lambda(R_{c},Z_{c},\varphi_{c}),Z_{c})}{B_{\varphi}(R_{c},\varphi_{c}+\lambda(R_{c},Z_{c},\varphi_{c}),Z_{c})}.\label{eq:dx3-1}
 \end{equation}
 
 \end_inset
@@ -265,7 +265,7 @@ Then the other two components transform as
 \begin_inset Formula 
 \begin{align}
 B_{Z}^{(c)}(\v x_{\c}) & =B_{Z}(\v x(\v x_{\c}))+\frac{\partial\lambda(\v x_{\c})}{\partial Z_{c}}B_{\varphi}(\v x(\v x_{\c})),\\
-B_{\varphi}^{(c)}(\v x_{\c}) & =B_{\ph}(\v x(\v x_{\c}))\left(-1+\frac{\partial\lambda(\v x_{\c})}{\partial\varphi_{c}}\right).
+B_{\varphi}^{(c)}(\v x_{\c}) & =B_{\ph}(\v x(\v x_{\c}))\left(1+\frac{\partial\lambda(\v x_{\c})}{\partial\varphi_{c}}\right).
 \end{align}
 
 \end_inset
@@ -298,65 +298,8 @@ Then the other two components transform as
 
 \begin_layout Standard
 \begin_inset Formula 
-\[
-A_{Z}^{(c)}=A_{Z}+A_{\varphi}\difp{\lambda}{Z_{c}}-\difp{\chi}{Z_{c}}
-\]
-
-\end_inset
-
-
-\end_layout
-
-\begin_layout Standard
-ans
-\end_layout
-
-\begin_layout Standard
-\begin_inset Formula 
-\[
-A_{\varphi}^{(c)}=A_{\varphi}\left(-1+\difp{\lambda}{\varphi_{c}}\right)-\difp{\chi}{\varphi_{c}}
-\]
-
-\end_inset
-
-Now we get 
-\begin_inset Formula $A_{Z}^{(c)}(R_{c},Z_{c},\varphi_{c})$
-\end_inset
-
- on regular grid in 
-\begin_inset Formula $R_{c},Z_{c},\varphi_{c}$
-\end_inset
-
-.
- 
-\end_layout
-
-\begin_layout Standard
-Metric 
-\begin_inset Formula 
-\[
-g_{ij}^{(c)}=g_{kl}\frac{\partial x^{k}}{\partial x_{c}^{i}}\frac{\partial x^{l}}{\partial x_{c}^{j}}
-\]
-
-\end_inset
-
-Metric determinant
-\begin_inset Formula 
-\begin{align}
-\sqrt{g^{(c)}} & =\sqrt{g}\det\frac{\partial(x^{1},x^{2},x^{3})}{\partial(x_{c}^{1},x_{c}^{2},x_{c}^{3})}=\sqrt{g}\det\left(\begin{array}{ccc}
-1 & 0 & \partial_{1}\lambda\\
-0 & \partial_{2}\lambda & 1\\
-0 & -1+\partial_{3}\lambda & 0
-\end{array}\right)\nonumber \\
- & =-\sqrt{g}(-1+\partial_{3}\lambda)=\sqrt{g}(1-\partial_{3}\lambda).
-\end{align}
-
-\end_inset
-
-From cylindrical coordinates
-\begin_inset Formula 
 \begin{equation}
-\sqrt{g^{(c)}}=R_{c}\left(1-\difp{\lambda(R_{c},Z_{c},\varphi_{c})}{\varphi_{c}}\right)
+A_{Z}^{(c)}=A_{Z}+A_{\varphi}\difp{\lambda}{Z_{c}}-\difp{\chi}{Z_{c}}
 \end{equation}
 
 \end_inset
@@ -364,51 +307,15 @@ From cylindrical coordinates
 
 \end_layout
 
-\begin_layout Subsection*
-Field lines
+\begin_layout Standard
+and
 \end_layout
 
 \begin_layout Standard
-Non-Canonical
 \begin_inset Formula 
-\begin{align*}
-RB^{R} & =\difp{A_{Z}}{\varphi}-\difp{A_{\varphi}}Z\\
-RB^{\varphi} & =\difp{A_{R}}Z-\difp{A_{Z}}R\\
-RB^{Z} & =\difp{A_{\varphi}}R-\difp{A_{R}}{\varphi}
-\end{align*}
-
-\end_inset
-
-
-\end_layout
-
-\begin_layout Standard
-Canonical
-\begin_inset Formula 
-\begin{align*}
-R_{c}\left(1-\difp{\lambda(R_{c},Z_{c},\varphi_{c})}{\varphi_{c}}\right)B_{(c)}^{R} & =\difp{A_{\varphi}^{(c)}}{Z_{c}}-\difp{A_{Z}^{(c)}}{\varphi_{c}}\\
-R_{c}\left(1-\difp{\lambda(R_{c},Z_{c},\varphi_{c})}{\varphi_{c}}\right)B_{(c)}^{Z} & =-\difp{A_{\varphi}^{(c)}}{R_{c}}\\
-R_{c}\left(1-\difp{\lambda(R_{c},Z_{c},\varphi_{c})}{\varphi_{c}}\right)B_{(c)}^{\varphi} & =\difp{A_{Z}^{(c)}}{R_{c}}
-\end{align*}
-
-\end_inset
-
-
-\end_layout
-
-\begin_layout Subsection*
-Efficient interpolation of fields
-\end_layout
-
-\begin_layout Standard
-We spline the following quantities independently:
-\begin_inset Formula 
-\begin{align}
-A_{2} & =A_{Z}^{(c)},\quad A_{3}=A_{\ph}^{(c)}\\
-h_{2} & =\sqrt{B_{(R)}^{\,2}+B_{(Z)}^{\,2}+B_{(\ph)}^{\,2}}=h_{Z}^{(c)},\quad h_{3}=h_{\ph}^{(c)}\\
- & =h_{Z}^{(c)}B^{Z}+h_{\varphi}^{(c)}B^{\varphi},\\
-B & =h_{R}B^{R}+h_{Z}B^{Z}+h_{\varphi}B^{\varphi}
-\end{align}
+\begin{equation}
+A_{\varphi}^{(c)}=A_{\varphi}\left(1+\difp{\lambda}{\varphi_{c}}\right)-\difp{\chi}{\varphi_{c}}
+\end{equation}
 
 \end_inset
 
@@ -420,28 +327,70 @@ Using vector potential as one coordinate
 \end_layout
 
 \begin_layout Standard
-Let's also set as a radial variable the vector potential component 
-\begin_inset Formula $A_{Z}$
+Now we get 
+\begin_inset Formula $A_{Z}^{(c)}(R_{c},\varphi_{c},Z_{c})$
+\end_inset
+
+ on regular grid in 
+\begin_inset Formula $R_{c},\varphi_{c},Z_{c}$
 \end_inset
 
 .
- TODO: Check Sadrilla Abdullaev, canonical variables in tokamaks.
+ Let's also the vector potential component 
+\begin_inset Formula $A_{Z}^{(c)}$
+\end_inset
+
+ set as a radial variable.
+ See also Sadrilla Abdullaev, canonical variables in tokamaks.
  Now invert and interpolate 
-\begin_inset Formula $R_{c}=R_{c}(A_{Z}^{(c)},Z_{c},\varphi_{c})$
+\begin_inset Formula $R_{c}=R_{c}(A_{Z}^{(c)},\varphi_{c},Z_{c})$
 \end_inset
 
 .
  Could be a problem at the edges but not big.
  Reinterpolate all other dependencies on this grid.
  With 
-\begin_inset Formula $\psi\equiv A_{Z}^{(c)}$
+\begin_inset Formula $x_{c}^{1}=\psi_{c}\equiv A_{Z}^{(c)}$
 \end_inset
 
  instead of 
 \begin_inset Formula $R_{c}$
 \end_inset
 
- we have
+ we now continue to compute.
+\end_layout
+
+\begin_layout Standard
+The metric tensor is given by
+\begin_inset Formula 
+\begin{equation}
+g_{ij}^{(c)}=g_{kl}\frac{\partial x^{k}}{\partial x_{c}^{i}}\frac{\partial x^{l}}{\partial x_{c}^{j}}
+\end{equation}
+
+\end_inset
+
+Metric determinant
+\begin_inset Formula 
+\begin{align}
+\sqrt{g_{c}} & =R\det\frac{\partial(x^{1},x^{2},x^{3})}{\partial(x_{c}^{1},x_{c}^{2},x_{c}^{3})}=R\det\left(\begin{array}{ccc}
+\partial_{1}R & \partial_{1}\lambda & 0\\
+\partial_{2}R & 1+\partial_{2}\lambda & 0\\
+\partial_{3}R & \partial_{3}\lambda & 1
+\end{array}\right)\nonumber \\
+ & =R[\partial_{1}R(1+\partial_{2}\lambda)-\partial_{2}R\partial_{1}\lambda].
+\end{align}
+
+\end_inset
+
+From cylindrical coordinates
+\begin_inset Formula 
+\begin{equation}
+\sqrt{g^{(c)}}=R_{c}\left(1+\difp{\lambda(R_{c},\varphi_{c},Z_{c})}{\varphi_{c}}\right)
+\end{equation}
+
+\end_inset
+
+
 \begin_inset Formula 
 \begin{align*}
 \sqrt{g}\difp{R_{c}}{\psi}\bar{B}_{(c)}^{\psi} & =\difp{A_{\varphi}^{(c)}}{Z_{c}}\\
@@ -497,6 +446,57 @@ Re-use in the SIMPLE orbit algorithm
 \[
 A_{\vartheta}\rightarrow Z
 \]
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Subsection*
+Field lines
+\end_layout
+
+\begin_layout Standard
+Non-Canonical
+\begin_inset Formula 
+\begin{align*}
+RB^{R} & =\difp{A_{Z}}{\varphi}-\difp{A_{\varphi}}Z\\
+RB^{\varphi} & =\difp{A_{R}}Z-\difp{A_{Z}}R\\
+RB^{Z} & =\difp{A_{\varphi}}R-\difp{A_{R}}{\varphi}
+\end{align*}
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+Canonical
+\begin_inset Formula 
+\begin{align*}
+R_{c}\left(1+\difp{\lambda(R_{c},Z_{c},\varphi_{c})}{\varphi_{c}}\right)B_{(c)}^{R} & =\difp{A_{Z}^{(c)}}{\varphi_{c}}-\difp{A_{\varphi}^{(c)}}{Z_{c}}\\
+R_{c}\left(1+\difp{\lambda(R_{c},Z_{c},\varphi_{c})}{\varphi_{c}}\right)B_{(c)}^{\varphi} & =-\difp{A_{Z}^{(c)}}{R_{c}}\\
+R_{c}\left(1+\difp{\lambda(R_{c},Z_{c},\varphi_{c})}{\varphi_{c}}\right)B_{(c)}^{Z} & =\difp{A_{\varphi}^{(c)}}{R_{c}}
+\end{align*}
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Subsection*
+Efficient interpolation of fields
+\end_layout
+
+\begin_layout Standard
+We spline the following quantities independently:
+\begin_inset Formula 
+\begin{align}
+A_{2} & =A_{Z}^{(c)},\quad A_{3}=A_{\ph}^{(c)}\\
+h_{2} & =\sqrt{B_{(R)}^{\,2}+B_{(Z)}^{\,2}+B_{(\ph)}^{\,2}}=h_{Z}^{(c)},\quad h_{3}=h_{\ph}^{(c)}\\
+ & =h_{Z}^{(c)}B^{Z}+h_{\varphi}^{(c)}B^{\varphi},\\
+B & =h_{R}B^{R}+h_{Z}B^{Z}+h_{\varphi}B^{\varphi}
+\end{align}
 
 \end_inset
 
