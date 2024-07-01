@@ -30,7 +30,7 @@ plt.ylabel('Z [cm]')
 plt.xlim([rmin, rmax])
 plt.ylim([zmin, zmax])
 
-# 3D plot
+#%% 3D plot
 from mpl_toolkits.mplot3d import Axes3D
 
 tmax = 1000

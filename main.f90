@@ -123,7 +123,7 @@ contains
 
         dx(1) = B(1)/B(2)
         dx(2) = 1d0
-        dx(3) = B(2)/B(2)
+        dx(3) = B(3)/B(2)
     end subroutine Bcan
 
 

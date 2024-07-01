@@ -126,7 +126,7 @@ contains
             r_c, modulo(phi_c + y(1), twopi), z_c, Ar, Ap, Az, Br, Bp, Bz)
 
         dy(1) = -Br/Bp         ! Must still be divided by r_c for covariant Bp
-        dy(2) = Ar - Ap*dy(1)  ! Here it i_r reused so that r_c cancels out
+        dy(2) = Ar + Ap*dy(1)  ! Here it i_r reused so that r_c cancels out
         dy(1) = dy(1) / r_c    ! Finally we divide by r_c
 
     end subroutine rh_can
@@ -228,8 +228,8 @@ contains
                     AZcov = Acyl(3, i_r, i_phi, i_z)
 
                     A1can = ARcov + Aphicov*dlam(1) - dchi(1)
-                    A2can = Aphicov*(1.0d0 + dlam(3)) - dchi(3)
-                    A3can = AZcov + Aphicov*dlam(2) - dchi(2)
+                    A2can = Aphicov*(1.0d0 + dlam(2)) - dchi(2)
+                    A3can = AZcov + Aphicov*dlam(3) - dchi(3)
 
                     Acan(1, i_r, i_phi, i_z) = A1can
                     Acan(2, i_r, i_phi, i_z) = A2can
