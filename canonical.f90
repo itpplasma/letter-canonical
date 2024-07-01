@@ -286,8 +286,8 @@ contains
         do i_r=1,n_r
             call evaluate_splines_3d(spl_lam, xcan(:, i_r, i_phi, i_z), lam)
             xcyl(1, i_r, i_phi, i_z) = xcan(1, i_r, i_phi, i_z)
-            xcyl(2, i_r, i_phi, i_z) = modulo(xcan(3, i_r, i_phi, i_z) + lam, twopi)
-            xcyl(3, i_r, i_phi, i_z) = xcan(2, i_r, i_phi, i_z)
+            xcyl(2, i_r, i_phi, i_z) = modulo(xcan(2, i_r, i_phi, i_z) + lam, twopi)
+            xcyl(3, i_r, i_phi, i_z) = xcan(3, i_r, i_phi, i_z)
         enddo
         enddo
         enddo
