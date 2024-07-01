@@ -157,12 +157,9 @@ contains
                         lam_test(i_r, i_phi, i_z), dlam_test(:, i_r, i_phi, i_z), dummy)
                     call evaluate_splines_3d_der2(spl_chi, x, &
                         chi_test(i_r, i_phi, i_z), dchi_test(:, i_r, i_phi, i_z), dummy)
-                    call evaluate_splines_3d( &
-                        spl_A1, x, A1_test(i_r, i_phi, i_z))
-                    call evaluate_splines_3d( &
-                        spl_A2, x, A2_test(i_r, i_phi, i_z))
-                    call evaluate_splines_3d( &
-                        spl_A3, x, A3_test(i_r, i_phi, i_z))
+                    call evaluate_splines_3d(spl_A1, x, A1_test(i_r, i_phi, i_z))
+                    call evaluate_splines_3d(spl_A2, x, A2_test(i_r, i_phi, i_z))
+                    call evaluate_splines_3d(spl_A3, x, A3_test(i_r, i_phi, i_z))
                 end do
             end do
         end do

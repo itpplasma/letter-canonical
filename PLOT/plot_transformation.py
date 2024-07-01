@@ -4,8 +4,8 @@ import matplotlib.pyplot as plt
 
 from scipy.interpolate import RegularGridInterpolator
 
-shape = (64, 75, 100)
-shape_spl = (63, 74, 49)
+shape = (75, 64, 100)
+shape_spl = (74, 63, 49)
 
 phi = np.linspace(0, 2 * np.pi, shape[0])
 
@@ -13,7 +13,7 @@ def doplot(data, title):
     # Plot 2D slice as contour
     try:
         plt.figure()
-        plt.contour(data[:, 1, :])
+        plt.contour(data[:, :, 1])
         plt.colorbar()
         plt.xlabel("r")
         plt.ylabel("phi")
@@ -23,7 +23,7 @@ def doplot(data, title):
 
     try:
         plt.figure()
-        plt.contour(data[:, :, 1])
+        plt.contour(data[:, 1, :])
         plt.colorbar()
         plt.xlabel("z")
         plt.ylabel("phi")
@@ -33,8 +33,8 @@ def doplot(data, title):
 
     try:
         plt.figure()
-        plt.plot(data[:, 1, 1], 'o-')
-        plt.plot(data[:, 2, 2], 'o-')
+        plt.plot(data[1, :, 1], 'o-')
+        plt.plot(data[2, :, 2], 'o-')
         plt.xlabel("phi")
         plt.title(title)
     except:
