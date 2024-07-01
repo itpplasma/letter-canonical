@@ -10,7 +10,7 @@ program main
     implicit none
     save
 
-    integer, parameter :: n_r=100, n_z=75, n_phi=64
+    integer, parameter :: n_r=100, n_phi=64, n_z=75
     integer :: outfile_unit
     real(8) :: rmin, rmax, zmin, zmax
     !complex(8) :: pert
@@ -31,8 +31,8 @@ program main
     ! call field_type%add_perturbation(5, 2, [pert, pert, pert])
 
     print *, "init_canonical ..."
-    call init_canonical(n_r, n_z, n_phi, [rmin, zmin, 0.0d0], &
-        [rmax, zmax, twopi], field_type)
+    call init_canonical(n_r, n_phi, n_z, [rmin, 0.0d0, zmin], &
+        [rmax, twopi, zmax], field_type)
 
     print *, "init_transformation ..."
     call init_transformation
@@ -60,27 +60,26 @@ contains
         n_flux = 15
 
         do i_fs = 1, n_flux
-            x0 = [170.0d0, 20.0d0, 0.0d0]
-            x0(2) = (i_fs*1.0d0/n_flux - 0.5d0)*130d0
+            x0 = [170.0d0, 0.0d0, 20.0d0]
+            x0(3) = (i_fs*1.0d0/n_flux - 0.5d0)*130d0
             x = x0
             do i_t = 0, nt
-                call odeint_allroutines(&
-                    x, 3, i_t*dt, (i_t+1)*dt, tol, Bnoncan)
+                call odeint_allroutines(x, 3, i_t*dt, (i_t+1)*dt, tol, Bnoncan)
                 write(100, *) x
             end do
         end do
 
         do i_fs = 1, n_flux
-            x0 = [170.0d0, 20.0d0, 0.0d0]
-            x0(2) = (i_fs*1.0d0/n_flux - 0.5d0)*130d0
+            x0 = [170.0d0, 0.0d0, 20.0d0]
+            x0(3) = (i_fs*1.0d0/n_flux - 0.5d0)*130d0
             x = x0
             do i_t = 0, nt
                 call odeint_allroutines(&
                     x, 3, i_t*dt, (i_t+1)*dt, tol, Bcan)
                 call evaluate_splines_3d(spl_lam, x, lam)
                 xcyl(1) = x(1)
-                xcyl(2) = x(2)
-                xcyl(3) = modulo(-x(3) + lam, twopi)
+                xcyl(2) = modulo(x(2) + lam, twopi)
+                xcyl(3) = x(3)
                 write(101, *) xcyl
                 write(102, *) x
             end do
@@ -97,13 +96,12 @@ contains
         real(8), dimension(3), intent(inout) :: dx
         real(8) :: BR, BZ, Bphi, Bphictr
 
-        call magfie_type%compute_bfield(x(1), modulo(x(3), twopi), x(2), &
-            BR, Bphi, BZ)
+        call magfie_type%compute_bfield(x(1), modulo(x(2), twopi), x(3), BR, Bphi, BZ)
 
         Bphictr = Bphi/x(1)  ! contravariant component
-        dx(1) = -BR/Bphictr
-        dx(2) = -BZ/Bphictr
-        dx(3) = -1d0
+        dx(1) = BR/Bphictr
+        dx(2) = 1d0
+        dx(3) = BZ/Bphictr
 
     end subroutine Bnoncan
 
@@ -124,15 +122,15 @@ contains
         B(2) = -dA3s(1)
         B(3) = dA2s(1)
 
-        dx(1) = B(1)/B(3)
-        dx(2) = B(2)/B(3)
-        dx(3) = 1d0
+        dx(1) = B(1)/B(2)
+        dx(2) = 1d0
+        dx(3) = B(2)/B(2)
     end subroutine Bcan
 
 
     subroutine test_splines
 
-        integer, parameter :: n_r_test=49, n_z_test=74, n_phi_test=63
+        integer, parameter :: n_r_test=49, n_phi_test=63, n_z_test=74
 
         real(8), dimension(:,:,:), allocatable :: lam_test, chi_test
         real(8), dimension(:,:,:), allocatable :: A1_test, A2_test, A3_test
@@ -140,32 +138,32 @@ contains
         real(8), dimension(3) :: x
         real(8) :: dummy(6)
 
-        integer :: i_r, i_z, i_phi
+        integer :: i_r, i_phi, i_z
 
-        allocate(lam_test(n_r_test, n_z_test, n_phi_test))
-        allocate(chi_test(n_r_test, n_z_test, n_phi_test))
-        allocate(A1_test(n_r_test, n_z_test, n_phi_test))
-        allocate(A2_test(n_r_test, n_z_test, n_phi_test))
-        allocate(A3_test(n_r_test, n_z_test, n_phi_test))
-        allocate(dlam_test(3, n_r_test, n_z_test, n_phi_test))
-        allocate(dchi_test(3, n_r_test, n_z_test, n_phi_test))
+        allocate(lam_test(n_r_test, n_phi_test, n_z_test))
+        allocate(chi_test(n_r_test, n_phi_test, n_z_test))
+        allocate(A1_test(n_r_test, n_phi_test, n_z_test))
+        allocate(A2_test(n_r_test, n_phi_test, n_z_test))
+        allocate(A3_test(n_r_test, n_phi_test, n_z_test))
+        allocate(dlam_test(3, n_r_test, n_phi_test, n_z_test))
+        allocate(dchi_test(3, n_r_test, n_phi_test, n_z_test))
 
-        do i_phi = 1, n_phi_test
-            do i_z = 1, n_z_test
+        do i_z = 1, n_z_test
+            do i_phi = 1, n_phi_test
                 do i_r = 1, n_r_test
                     x = [rmin + (rmax - rmin) * (i_r - 1) / (n_r_test - 1), &
-                         zmin + (zmax - zmin) * (i_z - 1) / (n_z_test - 1), &
-                         twopi * (i_phi - 1) / (n_phi_test - 1)]
-                    call evaluate_splines_3d_der2( &
-                        spl_lam, x, lam_test(i_r, i_z, i_phi), dlam_test(:,i_r, i_z, i_phi), dummy)
-                    call evaluate_splines_3d_der2( &
-                        spl_chi, x, chi_test(i_r, i_z, i_phi), dchi_test(:, i_r, i_z, i_phi), dummy)
+                         twopi * (i_phi - 1) / (n_phi_test - 1), &
+                         zmin + (zmax - zmin) * (i_z - 1) / (n_z_test - 1)]
+                    call evaluate_splines_3d_der2(spl_lam, x, &
+                        lam_test(i_r, i_phi, i_z), dlam_test(:, i_r, i_phi, i_z), dummy)
+                    call evaluate_splines_3d_der2(spl_chi, x, &
+                        chi_test(i_r, i_phi, i_z), dchi_test(:, i_r, i_phi, i_z), dummy)
                     call evaluate_splines_3d( &
-                        spl_A1, x, A1_test(i_r, i_z, i_phi))
+                        spl_A1, x, A1_test(i_r, i_phi, i_z))
                     call evaluate_splines_3d( &
-                        spl_A2, x, A2_test(i_r, i_z, i_phi))
+                        spl_A2, x, A2_test(i_r, i_phi, i_z))
                     call evaluate_splines_3d( &
-                        spl_A3, x, A3_test(i_r, i_z, i_phi))
+                        spl_A3, x, A3_test(i_r, i_phi, i_z))
                 end do
             end do
         end do
