@@ -1,5 +1,5 @@
 FC = gfortran
-FFLAGS = -g -fPIC -O3 -fopenmp -march=native -mtune=native -L.
+FFLAGS = -g -fPIC -O3 -fopenmp -march=native -mtune=native -L. -Wl,-rpath=.
 
 FFLAGS += -Wall -Wuninitialized -Wno-maybe-uninitialized -Wno-unused-label \
 	-Wno-unused-dummy-argument -fmax-errors=1 \
