@@ -74,8 +74,7 @@ contains
             x0(3) = (i_fs*1.0d0/n_flux - 0.5d0)*130d0
             x = x0
             do i_t = 0, nt
-                call odeint_allroutines(&
-                    x, 3, i_t*dt, (i_t+1)*dt, tol, Bcan)
+                call odeint_allroutines(x, 3, i_t*dt, (i_t+1)*dt, tol, Bcan)
                 call evaluate_splines_3d(spl_lam, x, lam)
                 xcyl(1) = x(1)
                 xcyl(2) = modulo(x(2) + lam, twopi)

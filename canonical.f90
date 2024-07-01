@@ -86,7 +86,7 @@ contains
         do i_z=1,n_z
             !$omp critical
             i_ctr = i_ctr + 1
-            print *,'integrate ODE: ',i_ctr,' of ',n_phi
+            print *,'integrate ODE: ',i_ctr,' of ',n_z
             !$omp end critical
             z_c = zmin + h_z*dble(i_z-1)
             do i_phi=1,n_phi
@@ -228,8 +228,8 @@ contains
                     AZcov = Acyl(3, i_r, i_phi, i_z)
 
                     A1can = ARcov + Aphicov*dlam(1) - dchi(1)
-                    A2can = AZcov + Aphicov*dlam(2) - dchi(2)
-                    A3can = Aphicov*(-1.0d0 + dlam(3)) - dchi(3)
+                    A2can = Aphicov*(1.0d0 + dlam(3)) - dchi(3)
+                    A3can = AZcov + Aphicov*dlam(2) - dchi(2)
 
                     Acan(1, i_r, i_phi, i_z) = A1can
                     Acan(2, i_r, i_phi, i_z) = A2can
