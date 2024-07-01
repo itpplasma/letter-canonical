@@ -1,3 +1,4 @@
+#%%
 import numpy as np
 import matplotlib.pyplot as plt
 
@@ -51,3 +52,5 @@ ax.set_ylim([-rmax, rmax])
 ax.set_zlim([zmin, zmax])
 
 plt.show()
+
+# %%
