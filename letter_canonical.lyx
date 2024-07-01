@@ -477,13 +477,13 @@ The first covariant component of
 \end_inset
 
  is eliminated via a gauge transform to 
-\begin_inset Formula $\v A+\nabla\chi$
+\begin_inset Formula $\v A-\nabla\chi$
 \end_inset
 
 , requiring
 \begin_inset Formula 
 \begin{align}
-\frac{\partial\chi(\v x_{\c})}{\partial x_{\mathrm{c}}^{1}} & \overset{!}{=}-A_{1\c}(\v x_{\c})=-\frac{\partial x^{i}(\v x_{\c})}{\partial x_{\mathrm{c}}^{1}}A_{i}(\v x(\v x_{\c})).\label{eq:dA1c}
+\frac{\partial\chi(\v x_{\c})}{\partial x_{\mathrm{c}}^{1}} & \overset{!}{=}A_{1\c}(\v x_{\c})=\frac{\partial x^{i}(\v x_{\c})}{\partial x_{\mathrm{c}}^{1}}A_{i}(\v x(\v x_{\c})).\label{eq:dA1c}
 \end{align}
 
 \end_inset
@@ -563,7 +563,7 @@ Note that that the formulation still contains non-canonical coordinates
 \begin_inset Formula $x_{\text{c}}^{1}$
 \end_inset
 
-and 
+ and 
 \begin_inset Formula $z^{4}$
 \end_inset
 
@@ -644,7 +644,7 @@ In an additional step, we replace
 \begin_layout Standard
 \begin_inset Formula 
 \begin{equation}
-A_{Z\c}=A_{Z}+\frac{\partial\lambda}{\partial Z_{c}}A_{\varphi}+\frac{\partial\chi}{\partial Z_{\mathrm{c}}}\equiv\psi_{\text{c}}
+A_{Z\c}=A_{Z}+\frac{\partial\lambda}{\partial Z_{c}}A_{\varphi}-\frac{\partial\chi}{\partial Z_{\mathrm{c}}}\equiv\psi_{\text{c}}
 \end{equation}
 
 \end_inset
