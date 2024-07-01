@@ -46,13 +46,85 @@ program main
     print *, "test_integration ..."
     call test_integration
 
+    print *, "test_psi ..."
+    call test_psi
+
 
 contains
+
+    subroutine test_psi
+        real(8), dimension(3) :: x
+        real(8), dimension(:,:,:), allocatable :: psi_of_x
+        real(8), dimension(:), allocatable :: psi_linspace
+        real(8) :: psi_min, psi_max, psi, dpsi(3), d2psi(6)
+        integer :: i_r, i_phi, i_z, counter, counter_max
+
+        counter_max = 32
+
+        allocate(psi_of_x(n_r, n_phi, n_z), psi_linspace(n_r))
+
+        do i_z = 1, n_z
+            do i_phi = 1, n_phi
+                do i_r = 1, n_r
+                    x = [rmin + (rmax - rmin) * (i_r - 1) / (n_r - 1), &
+                         twopi * (i_phi - 1) / (n_phi - 1), &
+                         zmin + (zmax - zmin) * (i_z - 1) / (n_z - 1)]
+                    call evaluate_splines_3d(spl_A3, x, psi_of_x(i_r, i_phi, i_z))
+                end do
+            end do
+        end do
+
+        i_r = 50
+        i_phi = 32
+        i_z = 37
+
+        psi_max = maxval(psi_of_x)
+        psi_min = minval(psi_of_x)
+
+        do i_r = 1, n_r
+            psi_linspace(i_r) = psi_min + (psi_max - psi_min) * (i_r - 1) / (n_r - 1)
+        end do
+
+        i_r = 50
+        i_phi = 32
+        i_z = 37
+
+        x = [rmin + (rmax - rmin) * (i_r - 1) / (n_r - 1), &
+             twopi * (i_phi - 1) / (n_phi - 1), &
+             zmin + (zmax - zmin) * (i_z - 1) / (n_z - 1)]
+
+        psi = psi_of_x(i_r, i_phi, i_z)
+
+        print *, "psi_of_x(i_r, i_phi, i_z) = ", psi_of_x(i_r, i_phi, i_z)
+        print *, "psi_linspace(i_r) = ", psi_linspace(i_r)
+
+        do i_z = 1, n_z
+        do i_phi = 1, n_phi
+        do i_r = 1, n_r
+        ! Newton iteration
+        counter = 0
+        call evaluate_splines_3d_der2(spl_A3, x, psi, dpsi, d2psi)
+        do while (abs(1.0d0 - psi_linspace(i_r)/psi) > 1.0d-13)
+            counter = counter + 1
+            x(1) = x(1) - (psi - psi_linspace(i_r))/dpsi(1)
+            call evaluate_splines_3d_der2(spl_A3, x, psi, dpsi, d2psi)
+            if (counter >= counter_max) then
+                print *, "Newton iteration did not converge at ", counter_max, " steps."
+                print *, counter, counter_max, x(1), psi, psi_linspace(i_r)
+                error stop
+            end if
+        end do
+        end do
+        end do
+        end do
+
+        deallocate(psi_of_x)
+    end subroutine test_psi
 
     subroutine test_integration
         real(8), parameter :: tol = 1.0d-10
         real(8), parameter :: dt = 5.75d-3*twopi
-        integer, parameter :: nt = 30000
+        integer, parameter :: nt = 3000
 
         real(8) :: x0(3), x(3), xcyl(3), lam
         integer :: i_t, i_fs, n_flux

@@ -362,7 +362,7 @@ contains
         do i_z=1,n_z
             do i_phi=1,n_phi
                 do i_r=1,n_r
-                    x(:,i_r, i_phi, i_z) = get_grid_point(i_r, i_phi, i_z)
+                    x(:, i_r, i_phi, i_z) = get_grid_point(i_r, i_phi, i_z)
                 enddo
             enddo
         enddo
