@@ -38,7 +38,7 @@ module canonical
     real(8) :: psi_min, psi_max
     real(8), dimension(:,:,:), allocatable :: psi_of_x, R_of_xc
     real(8), dimension(:), allocatable :: psi_grid
-    type(SplineData3D) :: spl_R_of_xc
+    type(SplineData3D) :: spl_R_of_xc, spl_A2_of_xc
 
 contains
 
@@ -202,7 +202,6 @@ contains
     subroutine init_splines_with_psi
         call init_psi_grid()
         call init_R_of_xc()
-
 
         x_min = [rmin, 0.d0, zmin]
         x_max = [rmax, twopi, zmax]
