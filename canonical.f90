@@ -335,8 +335,8 @@ contains
                     BZcov = Bcyl(3, i_r, i_phi, i_z)
 
                     B1can = BRcov + Bphicov*dlam(1)
-                    B2can = BZcov + Bphicov*dlam(2)
-                    B3can = Bphicov*(-1.0d0 + dlam(3))
+                    B2can = Bphicov*(1.0d0 + dlam(2))
+                    B3can = BZcov + Bphicov*dlam(3)
 
                     hcan(1, i_r, i_phi, i_z) = B2can/Bmod(i_r, i_phi, i_z)
                     hcan(2, i_r, i_phi, i_z) = B3can/Bmod(i_r, i_phi, i_z)

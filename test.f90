@@ -128,8 +128,8 @@ contains
         call cyl_to_cov(x, Bcov)
 
         call compute_Bmod(B, Bmod)
-        hcan_expected(1,:,:,:) = Bcov(3,:,:,:)/Bmod
-        hcan_expected(2,:,:,:) = -Bcov(2,:,:,:)/Bmod
+        hcan_expected(1,:,:,:) = Bcov(2,:,:,:)/Bmod
+        hcan_expected(2,:,:,:) = Bcov(3,:,:,:)/Bmod
 
         call construct_zero_spline(spl_lam)
         call compute_hcan(B, Bmod, hcan_computed)
@@ -146,23 +146,19 @@ contains
 
 
     subroutine test_can_to_cyl
-        use canonical, only: can_to_cyl, spl_lam, generate_regular_grid
+        use canonical, only: can_to_cyl, spl_lam, generate_regular_grid, twopi
         use interpolate, only: destroy_splines_3d
 
-        real(8), dimension(3, n_r, n_z, n_phi) :: xcan, xcyl_computed, &
-            xcyl_reordered
+        real(8), dimension(3, n_r, n_z, n_phi) :: xcan, xcyl_computed
 
         call generate_regular_grid(xcan)
 
         call print_test("test_can_to_cyl")
         call construct_zero_spline(spl_lam)
         call can_to_cyl(xcan, xcyl_computed)
-        xcyl_reordered(1,:,:,:) = xcyl_computed(1,:,:,:)
-        xcyl_reordered(2,:,:,:) = xcyl_computed(3,:,:,:)
-        xcyl_reordered(3,:,:,:) = -xcyl_computed(2,:,:,:)
-        if (any(abs(xcyl_reordered - xcan) > eps)) then
+        if (any(abs(modulo(xcyl_computed - xcan, twopi)) > eps)) then
+            print *, xcyl_computed - xcan
             call print_fail
-            print *, xcyl_reordered
             print *, "should match for identical transformation"
             error stop
         end if
@@ -170,10 +166,7 @@ contains
 
         call construct_linear_spline(spl_lam)
         call can_to_cyl(xcan, xcyl_computed)
-        xcyl_reordered(1,:,:,:) = xcyl_computed(1,:,:,:)
-        xcyl_reordered(2,:,:,:) = xcyl_computed(3,:,:,:)
-        xcyl_reordered(3,:,:,:) = -xcyl_computed(2,:,:,:)
-        if (all(abs(xcyl_reordered - xcan) < eps)) then
+        if (all(abs(modulo(xcyl_computed - xcan, twopi)) < eps)) then
             call print_fail
             print *, "must not match for linear transformation"
             error stop

@@ -43,7 +43,8 @@ test_biotsavart.x: libfield.so libcanonical.so test_biotsavart.f90 test_util.f90
 biotsavart.o: biotsavart.f90
 	$(FC) $(FFLAGS) -o $@ -c $^
 
-libcanonical.so: magfie.f90 magfie_test.f90 magfie_tok.f90 magfie_factory.f90 canonical.f90 libfield.so
+libcanonical.so: magfie.f90 magfie_test.f90 magfie_tok.f90 magfie_factory.f90 \
+	canonical.f90 libfield.so
 	$(FC) $(FFLAGS) -shared -o $@ $^ -lfield
 
 libfield.so: $(SOURCES)
