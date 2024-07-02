@@ -34,6 +34,11 @@ module canonical
 
     class(FieldType), allocatable :: magfie_type
 
+    ! For splining psi
+    real(8) :: psi_min, psi_max
+    real(8), dimension(:,:,:), allocatable :: psi_of_x
+    real(8), dimension(:), allocatable :: psi_grid
+
 contains
 
     subroutine init_canonical(n_r_, n_phi_, n_z_, xmin, xmax, magfie_type_)
@@ -191,6 +196,67 @@ contains
         deallocate(Acyl, B, xcyl, xcan)
 
     end subroutine init_canonical_field_components
+
+
+    subroutine init_splines_with_psi
+        real(8), parameter :: tol = 1d-13
+        integer, parameter :: counter_max = 32
+
+        real(8), dimension(3) :: x
+        real(8) :: psi, dpsi(3), d2psi(6)
+        integer :: i_r, i_phi, i_z, counter
+
+        allocate(psi_of_x(n_r, n_phi, n_z), psi_grid(n_r))
+
+        !$omp parallel private(i_r, i_phi, i_z, x)
+        !$omp do
+        do i_z = 1, n_z
+            do i_phi = 1, n_phi
+                do i_r = 1, n_r
+                    x = [rmin + (rmax - rmin) * (i_r - 1) / (n_r - 1), &
+                         twopi * (i_phi - 1) / (n_phi - 1), &
+                         zmin + (zmax - zmin) * (i_z - 1) / (n_z - 1)]
+                    call evaluate_splines_3d(spl_A3, x, psi_of_x(i_r, i_phi, i_z))
+                end do
+            end do
+        end do
+        !$omp end do
+        !$omp end parallel
+
+        psi_min = minval(psi_of_x)
+        psi_max = maxval(psi_of_x)
+
+        do i_r = 1, n_r
+            psi_grid(i_r) = psi_min + (psi_max - psi_min) * (i_r - 1) / (n_r - 1)
+        end do
+
+        !$omp parallel private(i_r, i_phi, i_z, x, psi, dpsi, d2psi, counter)
+        !$omp do
+        do i_z = 1, n_z
+            do i_phi = 1, n_phi
+                do i_r = 1, n_r
+                    x = [rmin + (rmax - rmin) * (i_r - 1) / (n_r - 1), &
+                         twopi * (i_phi - 1) / (n_phi - 1), &
+                         zmin + (zmax - zmin) * (i_z - 1) / (n_z - 1)]
+                    ! Newton iteration
+                    counter = 0
+                    call evaluate_splines_3d_der2(spl_A3, x, psi, dpsi, d2psi)
+                    do while (abs(1.0d0 - psi_grid(i_r)/psi) > tol)
+                        counter = counter + 1
+                        x(1) = x(1) - (psi - psi_grid(i_r))/dpsi(1)
+                        call evaluate_splines_3d_der2(spl_A3, x, psi, dpsi, d2psi)
+                        if (counter >= counter_max) then
+                            print *, "Newton didn't converge at", counter_max, " steps."
+                            print *, counter, counter_max, x(1), psi, psi_grid(i_r)
+                            error stop
+                        end if
+                    end do
+                end do
+            end do
+        end do
+        !$omp end do
+        !$omp end parallel
+    end subroutine init_splines_with_psi
 
 
     subroutine evaluate_afield_can(x, A1, dA1, A2, dA2, A3, dA3)

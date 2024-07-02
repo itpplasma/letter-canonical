@@ -1,11 +1,13 @@
 program main
     use magfie_factory, only: magfie_type_from_string
+    use magfie, only: FieldType
     use magfie_tok, only: TokFieldType
+    use magfie_test, only: TestFieldType
     use interpolate, only: SplineData3D, construct_splines_3d, &
     evaluate_splines_3d, evaluate_splines_3d_der2, destroy_splines_3d
     use canonical, only: init_canonical, init_transformation, twopi, &
-        init_canonical_field_components, spl_lam, spl_chi, spl_A1, &
-        spl_A2, spl_A3
+        init_canonical_field_components, init_splines_with_psi, &
+        spl_lam, spl_chi, spl_A1, spl_A2, spl_A3
 
     implicit none
     save
@@ -15,7 +17,7 @@ program main
     real(8) :: rmin, rmax, zmin, zmax
     !complex(8) :: pert
 
-    class(TokFieldType), allocatable :: field_type
+    class(FieldType), allocatable :: field_type
 
     ! Workaround, otherwise not initialized without perturbation field
     rmin = 75.d0
@@ -24,6 +26,7 @@ program main
     zmax = 147.38193979933115d0
 
     field_type = TokFieldType()
+    !field_type = TestFieldType()
     ! pert = dcmplx(2.0d3, 2.0d3)
     ! call field_type%add_perturbation(3, -2, [pert, pert, pert])
     ! call field_type%add_perturbation(3, 2, [pert, pert, pert])
@@ -40,6 +43,9 @@ program main
     print *, "init_canonical_field_components ..."
     call init_canonical_field_components
 
+    print *, "init_splines_with_psi ..."
+    call init_splines_with_psi
+
     print *, "test_splines ..."
     call test_splines
 
@@ -53,37 +59,10 @@ program main
 contains
 
     subroutine test_psi
+        use canonical, only: psi_of_x, psi_grid
         real(8), dimension(3) :: x
-        real(8), dimension(:,:,:), allocatable :: psi_of_x
-        real(8), dimension(:), allocatable :: psi_linspace
-        real(8) :: psi_min, psi_max, psi, dpsi(3), d2psi(6)
-        integer :: i_r, i_phi, i_z, counter, counter_max
-
-        counter_max = 32
-
-        allocate(psi_of_x(n_r, n_phi, n_z), psi_linspace(n_r))
-
-        do i_z = 1, n_z
-            do i_phi = 1, n_phi
-                do i_r = 1, n_r
-                    x = [rmin + (rmax - rmin) * (i_r - 1) / (n_r - 1), &
-                         twopi * (i_phi - 1) / (n_phi - 1), &
-                         zmin + (zmax - zmin) * (i_z - 1) / (n_z - 1)]
-                    call evaluate_splines_3d(spl_A3, x, psi_of_x(i_r, i_phi, i_z))
-                end do
-            end do
-        end do
-
-        i_r = 50
-        i_phi = 32
-        i_z = 37
-
-        psi_max = maxval(psi_of_x)
-        psi_min = minval(psi_of_x)
-
-        do i_r = 1, n_r
-            psi_linspace(i_r) = psi_min + (psi_max - psi_min) * (i_r - 1) / (n_r - 1)
-        end do
+        real(8) :: psi
+        integer :: i_r, i_phi, i_z
 
         i_r = 50
         i_phi = 32
@@ -96,27 +75,7 @@ contains
         psi = psi_of_x(i_r, i_phi, i_z)
 
         print *, "psi_of_x(i_r, i_phi, i_z) = ", psi_of_x(i_r, i_phi, i_z)
-        print *, "psi_linspace(i_r) = ", psi_linspace(i_r)
-
-        do i_z = 1, n_z
-        do i_phi = 1, n_phi
-        do i_r = 1, n_r
-        ! Newton iteration
-        counter = 0
-        call evaluate_splines_3d_der2(spl_A3, x, psi, dpsi, d2psi)
-        do while (abs(1.0d0 - psi_linspace(i_r)/psi) > 1.0d-13)
-            counter = counter + 1
-            x(1) = x(1) - (psi - psi_linspace(i_r))/dpsi(1)
-            call evaluate_splines_3d_der2(spl_A3, x, psi, dpsi, d2psi)
-            if (counter >= counter_max) then
-                print *, "Newton iteration did not converge at ", counter_max, " steps."
-                print *, counter, counter_max, x(1), psi, psi_linspace(i_r)
-                error stop
-            end if
-        end do
-        end do
-        end do
-        end do
+        print *, "psi_linspace(i_r) = ", psi_grid(i_r)
 
         deallocate(psi_of_x)
     end subroutine test_psi
