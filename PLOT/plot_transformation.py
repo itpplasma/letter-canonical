@@ -13,10 +13,10 @@ def doplot(data, title):
     # Plot 2D slice as contour
     try:
         plt.figure()
-        plt.contour(data[:, :, 1])
+        plt.contour(data[:, 50, 1])
         plt.colorbar()
-        plt.xlabel("phi")
-        plt.ylabel("z")
+        plt.xlabel(r"$\varphi$")
+        plt.ylabel("Z")
         plt.title(title)
     except:
         pass
@@ -25,8 +25,8 @@ def doplot(data, title):
         plt.figure()
         plt.contour(data[:, 1, :])
         plt.colorbar()
-        plt.xlabel("r")
-        plt.ylabel("z")
+        plt.xlabel("R")
+        plt.ylabel("Z")
         plt.title(title)
     except:
         pass
@@ -34,8 +34,8 @@ def doplot(data, title):
     try:
         plt.figure()
         plt.contour(data[1, :, :])
-        plt.xlabel("r")
-        plt.ylabel("phi")
+        plt.xlabel("R")
+        plt.ylabel(r"$\varphi$")
         plt.title(title)
     except:
         pass
@@ -85,6 +85,8 @@ data = np.loadtxt("A3_spl.out").reshape(shape_spl)
 doplot(data, "A3_spl")
 
 # %%
+data = np.loadtxt("R_of_xc.out").reshape(shape)
+doplot(data, "R_of_xc")
 
 plt.show()
 

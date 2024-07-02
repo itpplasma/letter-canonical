@@ -36,8 +36,9 @@ module canonical
 
     ! For splining psi
     real(8) :: psi_min, psi_max
-    real(8), dimension(:,:,:), allocatable :: psi_of_x
+    real(8), dimension(:,:,:), allocatable :: psi_of_x, R_of_xc
     real(8), dimension(:), allocatable :: psi_grid
+    type(SplineData3D) :: spl_R_of_xc
 
 contains
 
@@ -199,12 +200,22 @@ contains
 
 
     subroutine init_splines_with_psi
-        real(8), parameter :: tol = 1d-13
-        integer, parameter :: counter_max = 32
+        call init_psi_grid()
+        call init_R_of_xc()
 
-        real(8), dimension(3) :: x
-        real(8) :: psi, dpsi(3), d2psi(6)
-        integer :: i_r, i_phi, i_z, counter
+
+        x_min = [rmin, 0.d0, zmin]
+        x_max = [rmax, twopi, zmax]
+
+        call construct_splines_3d([psi_min, 0.0d0, zmin], [psi_max, twopi, zmax], &
+            R_of_xc, order, periodic, spl_R_of_xc)
+
+    end subroutine init_splines_with_psi
+
+
+    subroutine init_psi_grid
+        real(8) :: x(3)
+        integer :: i_r, i_phi, i_z
 
         allocate(psi_of_x(n_r, n_phi, n_z), psi_grid(n_r))
 
@@ -229,6 +240,17 @@ contains
         do i_r = 1, n_r
             psi_grid(i_r) = psi_min + (psi_max - psi_min) * (i_r - 1) / (n_r - 1)
         end do
+    end subroutine init_psi_grid
+
+
+    subroutine init_R_of_xc
+        real(8), parameter :: tol = 1d-13
+        integer, parameter :: counter_max = 32
+
+        real(8) :: x(3), psi, dpsi(3), d2psi(6)
+        integer :: i_r, i_phi, i_z, counter
+
+        allocate(R_of_xc(n_r, n_phi, n_z))
 
         !$omp parallel private(i_r, i_phi, i_z, x, psi, dpsi, d2psi, counter)
         !$omp do
@@ -251,12 +273,13 @@ contains
                             error stop
                         end if
                     end do
+                    R_of_xc(i_r, i_phi, i_z) = x(1)
                 end do
             end do
         end do
         !$omp end do
         !$omp end parallel
-    end subroutine init_splines_with_psi
+    end subroutine init_R_of_xc
 
 
     subroutine evaluate_afield_can(x, A1, dA1, A2, dA2, A3, dA3)

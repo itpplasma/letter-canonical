@@ -159,6 +159,7 @@ contains
 
 
     subroutine test_splines
+        use canonical, only: R_of_xc
 
         integer, parameter :: n_r_test=49, n_phi_test=63, n_z_test=74
 
@@ -237,6 +238,10 @@ contains
         close(outfile_unit)
         open(newunit=outfile_unit, file="A3_spl.out")
             write(outfile_unit, *) A3_test
+        close(outfile_unit)
+
+        open(newunit=outfile_unit, file="R_of_xc.out")
+            write(outfile_unit, *) R_of_xc
         close(outfile_unit)
 
         deallocate(lam_test, chi_test, A1_test, A2_test, A3_test)
