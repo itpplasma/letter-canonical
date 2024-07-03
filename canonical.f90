@@ -6,6 +6,8 @@ module canonical
     implicit none
     save
 
+    logical, parameter :: debug = .True.
+
     real(8), parameter :: pi = atan(1.d0)*4.d0
     real(8), parameter :: twopi = atan(1.d0)*8.d0
 
@@ -200,6 +202,9 @@ contains
 
 
     subroutine init_splines_with_psi
+        real(8), dimension(:,:,:), allocatable :: Aphi_of_xc
+        integer :: i_r, i_phi, i_z, debug_unit
+
         call init_psi_grid()
         call init_R_of_xc()
 
@@ -208,6 +213,25 @@ contains
 
         call construct_splines_3d([psi_min, 0.0d0, zmin], [psi_max, twopi, zmax], &
             R_of_xc, order, periodic, spl_R_of_xc)
+
+        allocate(Aphi_of_xc(n_r, n_phi, n_z))
+
+        do i_z = 1, n_z
+            do i_phi = 1, n_phi
+                do i_r = 1, n_r
+                    call evaluate_splines_3d( &
+                        spl_A2, [R_of_xc(i_r, i_phi, i_z), 0.0d0, zmin], &
+                        Aphi_of_xc(i_r, i_phi, i_z) &
+                    )
+                end do
+            end do
+        end do
+
+        if (debug) then
+            open(newunit=debug_unit, file="Aphi_of_xc.out")
+            write(debug_unit, *) Aphi_of_xc
+            close(debug_unit)
+        end if
 
     end subroutine init_splines_with_psi
 
