@@ -7,7 +7,7 @@ program main
     evaluate_splines_3d, evaluate_splines_3d_der2, destroy_splines_3d
     use canonical, only: init_canonical, init_transformation, twopi, &
         init_canonical_field_components, init_splines_with_psi, &
-        spl_lam, spl_chi, spl_A1, spl_A2, spl_A3
+        spl_lam, spl_chi, spl_A1, spl_A2, spl_A3, spl_R_of_xc, spl_Aphi_of_xc
 
     implicit none
     save
@@ -82,12 +82,22 @@ contains
     subroutine test_integration
         real(8), parameter :: tol = 1.0d-10
         real(8), parameter :: dt = 5.75d-3*twopi
-        integer, parameter :: nt = 1000
+        integer, parameter :: nt = 30000
+        integer, parameter :: n_flux = 15
 
-        real(8) :: x0(3), x(3), xcyl(3), lam
-        integer :: i_t, i_fs, n_flux
+        call test_integration_noncan(tol, dt, nt, n_flux)
+        call test_integration_can(tol, dt, nt, n_flux)
+        call test_integration_can2(tol, dt, nt, n_flux)
+    end subroutine test_integration
 
-        n_flux = 15
+
+    subroutine test_integration_noncan(tol, dt, nt, n_flux)
+        real(8), intent(in) :: tol, dt
+        integer, intent(in) :: nt, n_flux
+
+        real(8) :: x0(3), x(3), lam
+        integer :: i_t, i_fs
+
         do i_fs = 1, n_flux
             x0 = [170.0d0, 0.0d0, 20.0d0]
             x0(3) = (i_fs*1.0d0/n_flux - 0.5d0)*130d0
@@ -99,22 +109,7 @@ contains
                 write(100, *) x
             end do
         end do
-
-        do i_fs = 1, n_flux
-            x0 = [170.0d0, 0.0d0, 20.0d0]
-            x0(3) = (i_fs*1.0d0/n_flux - 0.5d0)*130d0
-            x = x0
-            do i_t = 0, nt
-                call odeint_allroutines(x, 3, i_t*dt, (i_t+1)*dt, tol, Bcan)
-                call evaluate_splines_3d(spl_lam, x, lam)
-                xcyl(1) = x(1)
-                xcyl(2) = modulo(x(2) + lam, twopi)
-                xcyl(3) = x(3)
-                write(101, *) xcyl
-                write(102, *) x
-            end do
-        end do
-    end subroutine test_integration
+    end subroutine
 
 
     subroutine Bnoncan(t, x, dx)
@@ -136,8 +131,31 @@ contains
     end subroutine Bnoncan
 
 
+    subroutine test_integration_can(tol, dt, nt, n_flux)
+        real(8), intent(in) :: tol, dt
+        integer, intent(in) :: nt, n_flux
+
+        real(8) :: x0(3), x(3), xcyl(3), lam
+        integer :: i_t, i_fs
+
+        do i_fs = 1, n_flux
+            x0 = [170.0d0, 0.0d0, 20.0d0]
+            x0(3) = (i_fs*1.0d0/n_flux - 0.5d0)*130d0
+            x = x0
+            do i_t = 0, nt
+                call odeint_allroutines(x, 3, i_t*dt, (i_t+1)*dt, tol, Bcan)
+                call evaluate_splines_3d(spl_lam, x, lam)
+                xcyl(1) = x(1)
+                xcyl(2) = modulo(x(2) + lam, twopi)
+                xcyl(3) = x(3)
+                write(101, *) xcyl
+                write(102, *) x
+            end do
+        end do
+    end subroutine
+
+
     subroutine Bcan(t, x, dx)
-        use magfie_test, only: AMPL, AMPL2
         use canonical, only: evaluate_afield_can
 
         real(8), intent(in) :: t  ! plus threadprivate phi_c, z_c from module
@@ -156,6 +174,49 @@ contains
         dx(2) = 1d0
         dx(3) = B(3)/B(2)
     end subroutine Bcan
+
+
+    subroutine test_integration_can2(tol, dt, nt, n_flux)
+        real(8), intent(in) :: tol, dt
+        integer, intent(in) :: nt, n_flux
+
+        real(8) :: x0(3), xc(3), x(3), xcyl(3), lam, psi0
+        integer :: i_t, i_fs
+
+        do i_fs = 1, n_flux
+            x0 = [170.0d0, 0.0d0, 20.0d0]
+            x0(3) = (i_fs*1.0d0/n_flux - 0.5d0)*130d0
+            xc(2:3) = x0(2:3)
+            call evaluate_splines_3d(spl_A3, x0, psi0)
+            xc(1) = psi0
+            do i_t = 0, nt
+                call odeint_allroutines(xc, 3, i_t*dt, (i_t+1)*dt, tol, Bcan2)
+                x(2:3) = xc(2:3)
+                call evaluate_splines_3d(spl_R_of_xc, xc, x(1))
+                call evaluate_splines_3d(spl_lam, x, lam)
+                xcyl(1) = x(1)
+                xcyl(2) = modulo(x(2) + lam, twopi)
+                xcyl(3) = x(3)
+                write(103, *) xcyl
+                write(104, *) x
+                write(105, *) xc
+            end do
+        end do
+    end subroutine
+
+
+    subroutine Bcan2(t, xc, dxc)
+        real(8), intent(in) :: t  ! plus threadprivate phi_c, z_c from module
+        real(8), dimension(3), intent(in) :: xc
+        real(8), dimension(3), intent(inout) :: dxc
+        real(8) :: Aphi, dAphi(3), dummy(6)
+
+        call evaluate_splines_3d_der2(spl_Aphi_of_xc, xc, Aphi, dAphi, dummy)
+
+        dxc(1) = dAphi(3)
+        dxc(2) = 1d0
+        dxc(3) = -dAphi(1)
+    end subroutine Bcan2
 
 
     subroutine test_splines

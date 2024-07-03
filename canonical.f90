@@ -203,6 +203,7 @@ contains
 
     subroutine init_splines_with_psi
         real(8), dimension(:,:,:), allocatable :: Aphi_of_xc
+        real(8) :: x(3)
         integer :: i_r, i_phi, i_z, debug_unit
 
         call init_psi_grid()
@@ -216,19 +217,22 @@ contains
 
         allocate(Aphi_of_xc(n_r, n_phi, n_z))
 
+        !$omp parallel private(i_r, i_phi, i_z, x)
+        !$omp do
         do i_z = 1, n_z
             do i_phi = 1, n_phi
                 do i_r = 1, n_r
-                    call evaluate_splines_3d( &
-                        spl_A2, [R_of_xc(i_r, i_phi, i_z), 0.0d0, zmin], &
-                        Aphi_of_xc(i_r, i_phi, i_z) &
-                    )
+                    x = get_grid_point(i_r, i_phi, i_z)
+                    x(1) = R_of_xc(i_r, i_phi, i_z)
+                    call evaluate_splines_3d(spl_A2, x, Aphi_of_xc(i_r, i_phi, i_z))
                 end do
             end do
         end do
+        !$omp end do
+        !$omp end parallel
 
-        call construct_splines_3d( &
-            x_min, x_max, Aphi_of_xc, order, periodic, spl_Aphi_of_xc)
+        call construct_splines_3d([psi_min, 0.0d0, zmin], [psi_max, twopi, zmax], &
+            Aphi_of_xc, order, periodic, spl_Aphi_of_xc)
 
         if (debug) then
             open(newunit=debug_unit, file="Aphi_of_xc.out")
@@ -250,9 +254,7 @@ contains
         do i_z = 1, n_z
             do i_phi = 1, n_phi
                 do i_r = 1, n_r
-                    x = [rmin + (rmax - rmin) * (i_r - 1) / (n_r - 1), &
-                         twopi * (i_phi - 1) / (n_phi - 1), &
-                         zmin + (zmax - zmin) * (i_z - 1) / (n_z - 1)]
+                    x = get_grid_point(i_r, i_phi, i_z)
                     call evaluate_splines_3d(spl_A3, x, psi_of_x(i_r, i_phi, i_z))
                 end do
             end do
@@ -461,7 +463,7 @@ contains
     end subroutine compute_hcan
 
 
-    subroutine cyl_to_cov(xcyl, V)
+    pure subroutine cyl_to_cov(xcyl, V)
         real(8), intent(in) :: xcyl(:,:,:,:)
         real(8), intent(inout) :: V(:,:,:,:)
 
@@ -469,7 +471,7 @@ contains
     end subroutine cyl_to_cov
 
 
-    subroutine generate_regular_grid(x)
+    pure subroutine generate_regular_grid(x)
         real(8), intent(inout) :: x(:,:,:,:)
 
         integer :: i_r, i_phi, i_z
@@ -485,7 +487,7 @@ contains
     end subroutine generate_regular_grid
 
 
-    function get_grid_point(i_r, i_phi, i_z)
+    pure function get_grid_point(i_r, i_phi, i_z)
         integer, intent(in) :: i_r, i_phi, i_z
         real(8) :: get_grid_point(3)
 

@@ -7,28 +7,24 @@ rmax = 264.42281879194627
 zmin = -150
 zmax = 147.38193979933115
 
+def plot_poincare_cuts(filename, linestyle):
+    data = np.loadtxt(filename)
+    for i in range(data.shape[0] - 1):
+        if(np.sign(np.mod(data[i, 1], 2*np.pi) - np.pi) !=
+        np.sign(np.mod(data[i+1, 1], 2*np.pi) - np.pi)):
+            r = 0.5*(data[i, 0] + data[i+1, 0])
+            z = 0.5*(data[i, 2] + data[i+1, 2])
+            plt.plot(r, z, linestyle)
+    plt.xlabel('R [cm]')
+    plt.ylabel('Z [cm]')
+    plt.axis('equal')
+
+
 plt.figure()
-data = np.loadtxt("../fort.100")
-for i in range(data.shape[0] - 1):
-    if(np.sign(np.mod(data[i, 1], 2*np.pi) - np.pi) !=
-       np.sign(np.mod(data[i+1, 1], 2*np.pi) - np.pi)):
-        r = 0.5*(data[i, 0] + data[i+1, 0])
-        z = 0.5*(data[i, 2] + data[i+1, 2])
-        plt.plot(r, z, 'b,')
+plot_poincare_cuts("../fort.100", "b,")
+plot_poincare_cuts("../fort.101", "r,")
+plot_poincare_cuts("../fort.103", "g,")
 
-
-data = np.loadtxt("../fort.101")
-for i in range(data.shape[0] - 1):
-    if(np.sign(np.mod(data[i, 1], 2*np.pi) - np.pi) !=
-       np.sign(np.mod(data[i+1, 1], 2*np.pi) - np.pi)):
-        r = 0.5*(data[i, 0] + data[i+1, 0])
-        z = 0.5*(data[i, 2] + data[i+1, 2])
-        plt.plot(r, z, 'r,')
-
-plt.xlabel('R [cm]')
-plt.ylabel('Z [cm]')
-plt.xlim([rmin, rmax])
-plt.ylim([zmin, zmax])
 
 #%% RZ plane plot
 plt.figure()
