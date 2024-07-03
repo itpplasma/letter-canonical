@@ -30,10 +30,21 @@ plt.ylabel('Z [cm]')
 plt.xlim([rmin, rmax])
 plt.ylim([zmin, zmax])
 
+#%% RZ plane plot
+plt.figure()
+data = np.loadtxt("../fort.100")
+plt.plot(data[:, 0], data[:, 2], 'b,')
+data = np.loadtxt("../fort.101")
+plt.plot(data[:, 0], data[:, 2], 'r,')
+plt.xlabel('R [cm]')
+plt.ylabel('Z [cm]')
+plt.axis('equal')
+
+
 #%% 3D plot
 from mpl_toolkits.mplot3d import Axes3D
 
-tmax = 1000
+tmax = 1500
 
 fig = plt.figure()
 ax = fig.add_subplot(111, projection='3d')

@@ -55,7 +55,6 @@ program main
     print *, "test_psi ..."
     call test_psi
 
-
 contains
 
     subroutine test_psi
@@ -83,16 +82,17 @@ contains
     subroutine test_integration
         real(8), parameter :: tol = 1.0d-10
         real(8), parameter :: dt = 5.75d-3*twopi
-        integer, parameter :: nt = 3000
+        integer, parameter :: nt = 1000
 
         real(8) :: x0(3), x(3), xcyl(3), lam
         integer :: i_t, i_fs, n_flux
 
         n_flux = 15
-
         do i_fs = 1, n_flux
             x0 = [170.0d0, 0.0d0, 20.0d0]
             x0(3) = (i_fs*1.0d0/n_flux - 0.5d0)*130d0
+            call evaluate_splines_3d(spl_lam, x0, lam)
+            x0(2) = modulo(x0(2) + lam, twopi)
             x = x0
             do i_t = 0, nt
                 call odeint_allroutines(x, 3, i_t*dt, (i_t+1)*dt, tol, Bnoncan)

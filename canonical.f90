@@ -40,7 +40,7 @@ module canonical
     real(8) :: psi_min, psi_max
     real(8), dimension(:,:,:), allocatable :: psi_of_x, R_of_xc
     real(8), dimension(:), allocatable :: psi_grid
-    type(SplineData3D) :: spl_R_of_xc, spl_A2_of_xc
+    type(SplineData3D) :: spl_R_of_xc, spl_Aphi_of_xc
 
 contains
 
@@ -226,6 +226,9 @@ contains
                 end do
             end do
         end do
+
+        call construct_splines_3d( &
+            x_min, x_max, Aphi_of_xc, order, periodic, spl_Aphi_of_xc)
 
         if (debug) then
             open(newunit=debug_unit, file="Aphi_of_xc.out")

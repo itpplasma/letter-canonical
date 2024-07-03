@@ -58,7 +58,7 @@ def doplot3d(data, title, rname="R"):
     fig.update_layout(
         scene=dict(
             xaxis=dict(title="Z"),
-            yaxis=dict(title=r"$\varphi$"),
+            yaxis=dict(title="φ"),
             zaxis=dict(title=rname),
         )
     )
