@@ -14,6 +14,8 @@ def plot_poincare_cuts(filename, linestyle):
         np.sign(np.mod(data[i+1, 1], 2*np.pi) - np.pi)):
             r = 0.5*(data[i, 0] + data[i+1, 0])
             z = 0.5*(data[i, 2] + data[i+1, 2])
+            r = max(min([r, rmax]), rmin)
+            z = max(min([z, zmax]), zmin)
             plt.plot(r, z, linestyle)
     plt.xlabel('R [cm]')
     plt.ylabel('Z [cm]')
@@ -24,6 +26,8 @@ plt.figure()
 plot_poincare_cuts("../fort.100", "b,")
 plot_poincare_cuts("../fort.101", "r,")
 plot_poincare_cuts("../fort.103", "g,")
+
+#%%
 
 
 #%% RZ plane plot
