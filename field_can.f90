@@ -1,6 +1,7 @@
 module field_can
   use, intrinsic :: iso_fortran_env, only: dp => real64
-  use field_can_base, only: field_can_data_t
+  use field_can_base
+  use field_can_cyl
 
   implicit none
 

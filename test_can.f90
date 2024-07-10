@@ -1,24 +1,43 @@
 program test_can
+    use, intrinsic :: iso_fortran_env, only: dp => real64
+    use magfie, only: FieldType
+    use magfie_tok, only: TokFieldType
+    use canonical, only: twopi, init_canonical, init_transformation, &
+        init_canonical_field_components
 
-    ! use new_vmec_stuff_mod, only : netcdffile, multharm,ns_A,ns_s,ns_tp
-    ! use parmot_mod, only : rmu,ro0
-    use velo_mod,   only : isw_field_type
-    use orbit_symplectic
-    use field_can_mod
-    use simple
-    use new_vmec_stuff_mod, only: rmajor
+    use integrator
+    use field_can
+    use field_can_cyl
 
     implicit none
-    save
 
     real(dp) :: z0(4), vpar0
-    type(Tracer) :: norb
-    type(FieldCan) :: f
+    class(field_can_cyl_t), allocatable :: field
+    type(field_can_data_t) :: f
 
-    integer :: npoiper2
-    real(dp) :: rbig, dtau, dtaumax
+    integer, parameter :: n_r=100, n_phi=64, n_z=75
+    real(dp) :: rmin, rmax, zmin, zmax
+    !complex(8) :: pert
 
-    isw_field_type = 2
+    class(FieldType), allocatable :: field_type
+
+    ! Workaround, otherwise not initialized without perturbation field
+    rmin = 75.d0
+    rmax = 264.42281879194627d0
+    zmin = -150.d0
+    zmax = 147.38193979933115d0
+
+    field_type = TokFieldType()
+
+    print *, "init_canonical ..."
+    call init_canonical(n_r, n_phi, n_z, [rmin, 0.0d0, zmin], &
+        [rmax, twopi, zmax], field_type)
+
+    print *, "init_transformation ..."
+    call init_transformation
+
+    print *, "init_canonical_field_components ..."
+    call init_canonical_field_components
 
     ! Initial conditions
     z0(1) = 0.1d0  ! r
@@ -26,37 +45,14 @@ program test_can
     z0(3) = 0.1d0  ! phi
     vpar0 = 0.8d0  ! parallel velocity
 
-    if (isw_field_type == -1) then
-      call FieldCan_init(f, 1d-5, 1d0, vpar0, isw_field_type)
-      call eval_field(f, z0(1), z0(2), z0(3), 0)
-    else
-      call init_field(norb, 'wout.nc', 5, 5, 3, 0)
+    allocate(field)
 
-      npoiper2 = 64
-      rbig = rmajor*1.0d2
-      dtaumax = twopi*rbig/npoiper2
-      dtau = dtaumax
+    call field_can_init(f, 1d-5, 1d0, vpar0)
+    call field%evaluate(f, z0(1), z0(2), z0(3), 0)
 
-      call init_params(norb, 2, 4, 3.5d6, npoiper2, 1, 1d-8)  ! fusion alphas)
-
-      ! Initial conditions
-      z0(1) = 0.1d0  ! r
-      z0(2) = 0.7d0  ! theta
-      z0(3) = 0.1d0  ! phi
-      vpar0 = 0.1d0  ! parallel velocity
-
-      ! ro0 = mc/e*v0, different by sqrt(2) from other modules
-      ! vpar_bar = vpar/sqrt(T/m), different by sqrt(2) from other modules
-      call FieldCan_init(f, 0d0, ro0/dsqrt(2d0), vpar0*dsqrt(2d0), isw_field_type)
-      call eval_field(f, z0(1), z0(2), z0(3), 0)
-      f%mu = .5d0**2*(1.d0-vpar0**2)/f%Bmod*2d0 ! mu by factor 2 from other modules
-    end if
-
-    z0(4) = vpar0*f%hph + f%Aph/f%ro0  ! p_phi
-    print *, z0(4)
     call do_test
 
-    contains
+contains
 
     function relerr(a, b)
         real(dp) :: relerr
@@ -69,8 +65,8 @@ program test_can
         real(dp), intent(in) :: x0(3)
         integer, intent(in) :: i, j
         real(dp) hi, hj
-        type(FieldCan) :: f00, f01, f10, f11
-        type(FieldCan) :: d2fnum
+        type(field_can_data_t) :: f00, f01, f10, f11
+        type(field_can_data_t) :: d2fnum
         real(dp) :: pphi, x(3), dxi(3), dxj(3)
         real(dp), dimension(10) ::  d2vparnum, d2Hnum, d2pthnum
         real(dp) :: vpar00, vpar11, vpar10, vpar01, &
@@ -86,35 +82,35 @@ program test_can
         dxj(j) = .5d0*hj
 
         x = x0 - dxi - dxj
-        call eval_field(f, x(1), x(2), x(3), 0)
+        call field%evaluate(f, x(1), x(2), x(3), 0)
         call get_val(f, pphi)
         f00 = f
         vpar00 = f%vpar
         H00 = f%H
         pth00 = f%pth
         x = x0 - dxi + dxj
-        call eval_field(f, x(1), x(2), x(3), 0)
+        call field%evaluate(f, x(1), x(2), x(3), 0)
         call get_val(f, pphi)
         f01 = f
         vpar01 = f%vpar
         H10 = f%H
         pth01 = f%pth
         x = x0 + dxi - dxj
-        call eval_field(f, x(1), x(2), x(3), 0)
+        call field%evaluate(f, x(1), x(2), x(3), 0)
         call get_val(f, pphi)
         f10 = f
         vpar10 = f%vpar
         H01 = f%H
         pth10 = f%pth
         x = x0 + dxi + dxj
-        call eval_field(f, x(1), x(2), x(3), 0)
+        call field%evaluate(f, x(1), x(2), x(3), 0)
         call get_val(f, pphi)
         f11 = f
         vpar11 = f%vpar
         H11 = f%H
         pth11 = f%pth
 
-        call eval_field(f, x0(1), x0(2), x0(3), 2)
+        call field%evaluate(f, x0(1), x0(2), x0(3), 2)
         call get_derivatives2(f, pphi)
 
         if (i==1 .and. j==1) k=1
@@ -156,72 +152,12 @@ program test_can
         print *, 'd2pth(',i,j,')', f%d2pth(k), d2pthnum(k), relerr(d2pthnum(k), f%d2pth(k))
     end subroutine der2
 
-    subroutine test_jac1(si)
-      type(SymplecticIntegrator) :: si
-      real(dp) :: x1(2), dx1(2), jac1(2,2), x10(2), h1(2), jac1num(2,2), fvec1(2)
-      integer :: k
-
-      h1(1) = 1d-6
-      h1(2) = z0(4)*1d-6
-
-      do k = 1,2
-        dx1 = 0d0
-        dx1(k) = h1(k)*0.5d0
-        x10 = si%z((/1,4/)) + (/1d-4, 1d-2/)
-
-        x1 = x10 + dx1
-        call f_sympl_euler1(si, f, 2, x1, fvec1, 0)
-        jac1num(:, k) = fvec1
-
-        x1 = x10 - dx1
-        call f_sympl_euler1(si, f, 2, x1, fvec1, 0)
-        jac1num(:, k) = (jac1num(:, k) - fvec1)/h1(k)
-
-        x1 = x10
-        call f_sympl_euler1(si, f, 2, x1, fvec1, 0)
-        call jac_sympl_euler1(si, f, x1, jac1)
-
-      end do
-
-      print *, 'jac_sympl_euler1(1,1)', jac1(1,1), jac1num(1,1), relerr(jac1(1,1), jac1num(1,1))
-      print *, 'jac_sympl_euler1(1,2)', jac1(1,2), jac1num(1,2), relerr(jac1(1,2), jac1num(1,2))
-      print *, 'jac_sympl_euler1(2,1)', jac1(2,1), jac1num(2,1), relerr(jac1(2,1), jac1num(2,1))
-      print *, 'jac_sympl_euler1(2,2)', jac1(2,2), jac1num(2,2), relerr(jac1(2,2), jac1num(2,2))
-    end subroutine test_jac1
-
-
-    subroutine test_newton(si)
-      type(SymplecticIntegrator) :: si
-      integer, parameter :: n = 2
-      real(dp) :: x(n), fvec(n), fjac(n,n), ijac(n,n)
-      integer :: k
-
-      x = si%z((/1,4/)) + (/1d-4, 1d-2/)
-
-      do k=1,10
-        call f_sympl_euler1(si, f, n, x, fvec, 1)
-        call jac_sympl_euler1(si, f, x, fjac)
-        ijac(1,1) = fjac(2,2)
-        ijac(1,2) = -fjac(1,2)
-        ijac(2,1) = -fjac(2,1)
-        ijac(2,2) = fjac(1,1)
-        ijac = ijac/(fjac(1,1)*fjac(2,2) - fjac(1,2)*fjac(2,1))
-        x = x - matmul(ijac, fvec)
-      enddo
-
-      call f_sympl_euler1(si, f, n, x, fvec, 1)
-
-    end subroutine
-
 
     subroutine do_test()
-
-        type(SymplecticIntegrator) :: euler1
-
         real(dp) :: dz(4)
         integer :: i, j, k
         real(dp) :: dx
-        type(FieldCan) :: dfnum
+        type(field_can_data_t) :: dfnum
         real(dp) :: dvparnum(4), dHnum(4), dpthnum(4)
 
         print *, 'f\t', 'derivative\t', 'numerical derivative\t', 'relative error'
@@ -232,7 +168,7 @@ program test_can
             dz = 0d0
             dx = 1d-8
             dz(k) = .5d0*dx
-            call eval_field(f, z0(1) + dz(1), z0(2) + dz(2), z0(3) + dz(3), 0)
+            call field%evaluate(f, z0(1) + dz(1), z0(2) + dz(2), z0(3) + dz(3), 0)
             call get_val(f, z0(4))
             dfnum%dAth(k) = f%Ath
             dfnum%dAph(k) = f%Aph
@@ -242,7 +178,7 @@ program test_can
             dvparnum(k) = f%vpar
             dHnum(k) = f%H
             dpthnum(k) = f%pth
-            call eval_field(f, z0(1) - dz(1), z0(2) - dz(2), z0(3) - dz(3), 0)
+            call field%evaluate(f, z0(1) - dz(1), z0(2) - dz(2), z0(3) - dz(3), 0)
             call get_val(f, z0(4))
             dfnum%dAth(k) = (dfnum%dAth(k) - f%Ath)/dx
             dfnum%dAph(k) = (dfnum%dAph(k) - f%Aph)/dx
@@ -252,7 +188,7 @@ program test_can
             dvparnum(k) = (dvparnum(k) - f%vpar)/dx
             dHnum(k) = (dHnum(k) - f%H)/dx
             dpthnum(k) = (dpthnum(k) - f%pth)/dx
-            call eval_field(f, z0(1), z0(2), z0(3), 0)
+            call field%evaluate(f, z0(1), z0(2), z0(3), 0)
             call get_derivatives(f, z0(4))
 
             print *, 'dAth (',k,')', f%dAth(k), dfnum%dAth(k), relerr(dfnum%dAth(k), f%dAth(k))
@@ -289,10 +225,6 @@ program test_can
         enddo
 
         ! TODO: second ders in pphi and mixed
-
-        call orbit_sympl_init(euler1, f, z0, 1.0d0, 1, 1d-12, 0, 0)
-        call test_jac1(euler1)
-        call test_newton(euler1)
     end subroutine do_test
 
-    end program test_can
+end program test_can
