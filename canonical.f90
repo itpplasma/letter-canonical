@@ -310,16 +310,16 @@ contains
     end subroutine init_R_of_xc
 
 
-    subroutine evaluate_afield_can(x, A1, dA1, A2, dA2, A3, dA3)
+    subroutine evaluate_afield_can(x, A1, dA1, d2A1, A2, dA2, d2A2, A3, dA3, d2A3)
         use magfie_test, only: AMPL
 
-        real(8), intent(in) :: x(3)
-        real(8), intent(out) :: A1, A2, A3, dA1(3), dA2(3), dA3(3)
-        real(8) :: dummy(6)
+        real(8), intent(in) :: x(3)  ! R, phi_c, Z
+        real(8), intent(out) :: A1, A2, A3, dA1(3), dA2(3), dA3(3), &
+                                d2A1(6), d2A2(6), d2A3(6)
 
-        call evaluate_splines_3d_der2(spl_A1, x, A1, dA1, dummy)
-        call evaluate_splines_3d_der2(spl_A2, x, A2, dA2, dummy)
-        call evaluate_splines_3d_der2(spl_A3, x, A3, dA3, dummy)
+        call evaluate_splines_3d_der2(spl_A1, x, A1, dA1, d2A1)
+        call evaluate_splines_3d_der2(spl_A2, x, A2, dA2, d2A2)
+        call evaluate_splines_3d_der2(spl_A3, x, A3, dA3, d2A3)
 
     end subroutine evaluate_afield_can
 
@@ -327,7 +327,7 @@ contains
     subroutine compute_Acan(Acyl, Acan)
         real(8), dimension(:,:,:,:), intent(in) :: Acyl   ! physical components
         real(8), dimension(:,:,:,:), intent(inout) :: Acan  ! covariant
-        ! Acan stores only second and third component, as the first vanishes
+        ! TODO: Acan only with second and third component, as the first vanishes
 
         integer :: i_phi, i_z, i_r
         real(8) :: x(3)

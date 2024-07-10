@@ -1,12 +1,12 @@
 module field_can_mod
 
-  use diag_mod, only : icounter
-  use boozer_sub, only : splint_boozer_coord
+  use diag_mod, only: icounter
 
   implicit none
 
   type :: FieldCan
-    integer :: field_type  ! -1: testing, 0: canonical, 2: Boozer
+    integer :: field_type  ! -1: testing, 0: canonical, 2: Boozer, &
+                           !  3: canonical cylindrical
 
     double precision :: Ath, Aph
     double precision :: hth, hph
@@ -153,6 +153,51 @@ module field_can_mod
   end subroutine get_derivatives2
 
 
+  subroutine eval_field_can_cyl(f, r, th_c, ph_c, mode_secders)
+    use interpolate, only: evaluate_splines_3d_der2
+    use canonical, only: spl_A2, spl_A3, spl_h2, spl_h3, spl_Bmod
+
+    integer, parameter :: reorder(3) = [1, 3, 2]  ! dr, dph, dth -> dr, dth, dph
+    integer, parameter :: reorder2(6) = [1, 3, 2, 6, 5, 4]
+    ! drdr, drdph, drdth, dphdph, dphdth, dthdth ->
+    ! drdr, drdth, drdph, dthdth, dthdph, dphdph
+
+    type(FieldCan), intent(inout) :: f
+    double precision, intent(in) :: r, th_c, ph_c
+    integer, intent(in) :: mode_secders
+
+    real(8) :: x(3), a, da(3), d2a(6)
+
+    x = [r, ph_c, th_c]
+
+    call evaluate_splines_3d_der2(spl_A2, x, a, da, d2a)
+    f%Aph = a
+    f%dAph = da(reorder)
+    f%d2Aph = d2a(reorder2)
+
+    call evaluate_splines_3d_der2(spl_A3, x, a, da, d2a)
+    f%Ath = a
+    f%dAth = da(reorder)
+    f%d2Ath = d2a(reorder2)
+
+    call evaluate_splines_3d_der2(spl_h2, x, a, da, d2a)
+    f%hph = a
+    f%dhph = da(reorder)
+    f%d2hph = d2a(reorder2)
+
+    call evaluate_splines_3d_der2(spl_h3, x, a, da, d2a)
+    f%hth = a
+    f%dhth = da(reorder)
+    f%d2hth = d2a(reorder2)
+
+    call evaluate_splines_3d_der2(spl_Bmod, x, a, da, d2a)
+    f%Bmod = a
+    f%dBmod = da(reorder)
+    f%d2Bmod = d2a(reorder2)
+
+  end subroutine eval_field_can_cyl
+
+
   !ccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
   !
   subroutine eval_field(f, r, th_c, ph_c, mode_secders)
@@ -173,12 +218,8 @@ module field_can_mod
     integer, intent(in) :: mode_secders
 
     select case (f%field_type)
-      case (-1)
-        call eval_field_test(f, r, th_c, ph_c, mode_secders)
-      case (0)
-        call eval_field_can(f, r, th_c, ph_c, mode_secders)
-      case (2)
-        call eval_field_booz(f, r, th_c, ph_c, mode_secders)
+      case (3)
+        call eval_field_can_cyl(f, r, th_c, ph_c, mode_secders)
       case default
         print *, 'Illegal field type ', f%field_type, ' for eval_field'
         stop

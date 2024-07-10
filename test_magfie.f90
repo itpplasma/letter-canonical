@@ -1,4 +1,4 @@
-program main
+program test_magfie
     use magfie_factory, only: magfie_type_from_string
     use magfie, only: FieldType
     use magfie_tok, only: TokFieldType
@@ -161,10 +161,12 @@ contains
         real(8), intent(in) :: t  ! plus threadprivate phi_c, z_c from module
         real(8), dimension(3), intent(in) :: x
         real(8), dimension(3), intent(inout) :: dx
-        real(8) :: A1s, A2s, A3s, dA1s(3), dA2s(3), dA3s(3)
+        real(8) :: A1s, A2s, A3s, dA1s(3), dA2s(3), dA3s(3), d2A1s(6), &
+                   d2A2s(6), d2A3s(6)
         real(8) :: B(3)
 
-        call evaluate_afield_can(x, A1s, dA1s, A2s, dA2s, A3s, dA3s)
+        call evaluate_afield_can(x, A1s, dA1s, d2A1s, A2s, dA2s, d2A2s, &
+            A3s, dA3s, d2A3s)
 
         B(1) = dA3s(2) - dA2s(3)
         B(2) = -dA3s(1)
@@ -308,4 +310,4 @@ contains
         deallocate(lam_test, chi_test, A1_test, A2_test, A3_test)
     end subroutine test_splines
 
-end program main
+end program test_magfie

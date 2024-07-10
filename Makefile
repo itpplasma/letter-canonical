@@ -5,28 +5,26 @@ FFLAGS += -Wall -Wuninitialized -Wno-maybe-uninitialized -Wno-unused-label \
 	-Wno-unused-dummy-argument -fmax-errors=1 \
 	-I$(CODE)/libneo/build -L$(CODE)/libneo/build
 
-SOURCES = libneo_kinds.f90 math_constants.f90 spl_three_to_five.f90
+LIBNEO_SOURCES := libneo_kinds.f90 math_constants.f90 spl_three_to_five.f90 \
+	odeint_rkf45.f90 contrib/rkf45.f90 interpolate.f90
+LIBNEO_SOURCES := $(addprefix ../libneo/src/, $(LIBNEO_SOURCES))
 
-MAGFIE_SOURCES = spline5_RZ.f90 \
-theta_rz_mod.f90 \
-extract_fluxcoord_mod.f90 \
-amn_mod.f90 \
-field_mod.f90 \
-field_eq_mod.f90 \
-field_c_mod.f90 \
-input_files.f90 \
-input_files.f90 \
-inthecore_mod.f90 \
-field_divB0.f90 \
-bdivfree_mod.f90 \
-bdivfree.f90
+MAGFIE_SOURCES := spline5_RZ.f90 \
+	theta_rz_mod.f90 \
+	extract_fluxcoord_mod.f90 \
+	amn_mod.f90 \
+	field_mod.f90 \
+	field_eq_mod.f90 \
+	field_c_mod.f90 \
+	input_files.f90 \
+	input_files.f90 \
+	inthecore_mod.f90 \
+	field_divB0.f90 \
+	bdivfree_mod.f90 \
+	bdivfree.f90
+MAGFIE_SOURCES := $(addprefix ../libneo/src/magfie/, $(MAGFIE_SOURCES))
 
-SOURCES += $(addprefix magfie/, $(MAGFIE_SOURCES))
-
-SOURCES += odeint_rkf45.f90 contrib/rkf45.f90 interpolate.f90
-SOURCES := $(addprefix ../libneo/src/, $(SOURCES))
-
-all: test_magfie.x test.x test_large.x test_biotsavart.x
+all: letter_canonical.x test_magfie.x test.x test_large.x test_biotsavart.x
 
 letter_canonical.x: libfield.so libcanonical.so main.f90
 	$(FC) $(FFLAGS) -o $@ $^ -lfield -lcanonical
@@ -46,11 +44,11 @@ test_biotsavart.x: libfield.so libcanonical.so test_biotsavart.f90 test_util.f90
 biotsavart.o: biotsavart.f90
 	$(FC) $(FFLAGS) -o $@ -c $^
 
-libcanonical.so: magfie.f90 magfie_test.f90 magfie_tok.f90 magfie_factory.f90 \
-	canonical.f90 libfield.so
+libcanonical.so: libfield.so magfie.f90 magfie_test.f90 magfie_tok.f90 \
+	magfie_factory.f90 canonical.f90 field_can.f90
 	$(FC) $(FFLAGS) -shared -o $@ $^ -lfield
 
-libfield.so: $(SOURCES)
+libfield.so: $(LIBNEO_SOURCES) $(MAGFIE_SOURCES)
 	$(FC) $(FFLAGS) -shared -o $@ $^
 
 clean_objects:
