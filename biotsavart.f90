@@ -35,7 +35,7 @@ module biotsavart
 
 
     subroutine load_coils_file(filename, coils)
-        character(len=*), intent(in) :: filename
+        character(*), intent(in) :: filename
         type(CoilsData), intent(out) :: coils
 
         integer :: unit
@@ -53,7 +53,7 @@ module biotsavart
 
 
     subroutine save_coils_file(filename, coils)
-        character(len=*), intent(in) :: filename
+        character(*), intent(in) :: filename
         type(CoilsData), intent(in) :: coils
 
         integer :: unit
