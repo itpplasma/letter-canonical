@@ -336,7 +336,15 @@ es.
 \end_layout
 
 \begin_layout Standard
-We write the guiding-center Lagrangian skipping the term 
+We write the guiding-center Lagrangian 
+\begin_inset Formula $L_{\mathrm{gc}}$
+\end_inset
+
+ with Hamiltonian 
+\begin_inset Formula $H$
+\end_inset
+
+ skipping the term 
 \begin_inset Formula $J_{\perp}\dot{\phi}$
 \end_inset
 
@@ -346,8 +354,8 @@ We write the guiding-center Lagrangian skipping the term
 \begin_layout Standard
 \begin_inset Formula 
 \begin{align}
-L_{\mathrm{gc}}(\v x,z^{4})= & A_{1}^{\star}(\v x,z^{4})\dot{x}^{1}+A_{2}^{\star}(\v x,z^{4})\dot{x}^{2}\nonumber \\
- & +A_{3}^{\star}(\v x,z^{4})\dot{x}^{3}-H(\v x,z^{4})
+L_{\mathrm{gc}}(\v x,z^{4})= & \frac{e_{\alpha}}{c}\left(A_{1}^{\star}(\v x,z^{4})\dot{x}^{1}+A_{2}^{\star}(\v x,z^{4})\dot{x}^{2}\right.\nonumber \\
+ & \left.+A_{3}^{\star}(\v x,z^{4})\dot{x}^{3}\right)-H(\v x,z^{4})
 \end{align}
 
 \end_inset
@@ -359,7 +367,7 @@ in terms of non-canonical coordinates
 , where
 \begin_inset Formula 
 \begin{equation}
-A_{i}^{\star}(\v x,z^{4})=m_{\alpha}v_{\parallel}(\v x,z^{4})\frac{B_{i}(\v x)}{B(\v x)}+\frac{e_{\alpha}}{c}A_{i}(\v x)
+A_{i}^{\star}(\v x,z^{4})=\frac{v_{\parallel}(\v x,z^{4})}{\omega_{c,\alpha}(\v x)}B_{i}(\v x)+A_{i}(\v x)
 \end{equation}
 
 \end_inset
@@ -377,20 +385,16 @@ A_{i}^{\star}(\v x,z^{4})=m_{\alpha}v_{\parallel}(\v x,z^{4})\frac{B_{i}(\v x)}{
 \begin_inset Formula $v_{\parallel}$
 \end_inset
 
-, magnetic field modulus 
-\begin_inset Formula $B$
+, speed of light 
+\begin_inset Formula $c$
 \end_inset
 
-, species mass 
-\begin_inset Formula $m_{\alpha}$
-\end_inset
-
-, charge 
+ and species charge 
 \begin_inset Formula $e_{\alpha}$
 \end_inset
 
- and speed of light 
-\begin_inset Formula $c$
+ and gyrofrequency 
+\begin_inset Formula $\omega_{c,\alpha}$
 \end_inset
 
  appear.
@@ -406,12 +410,37 @@ A_{i}^{\star}(\v x,z^{4})=m_{\alpha}v_{\parallel}(\v x,z^{4})\frac{B_{i}(\v x)}{
 \begin_inset Formula $v_{\parallel}$
 \end_inset
 
- itself, the Hamiltonian 
+ itself, Hamiltonian 
 \begin_inset Formula $H$
 \end_inset
 
 , or, as we will see later, the toroidal canonical momentum 
 \begin_inset Formula $p_{\varphi}$
+\end_inset
+
+.
+ In terms of 
+\begin_inset Formula $(\v x,v_{\parallel})$
+\end_inset
+
+, the Hamiltonian is given by
+\begin_inset Formula 
+\begin{equation}
+H(\boldsymbol{x},v_{\parallel})=\frac{m_{\alpha}v_{\parallel}^{\,2}}{2}+J_{\perp}\omega_{c\alpha}(\v x)+e_{\alpha}\Phi_{e}(\v x),
+\end{equation}
+
+\end_inset
+
+with species mass 
+\begin_inset Formula $m_{\alpha}$
+\end_inset
+
+, perpendicular invariant 
+\begin_inset Formula $J_{\perp}$
+\end_inset
+
+ and electric scalar potential 
+\begin_inset Formula $\Phi_{e}$
 \end_inset
 
 .

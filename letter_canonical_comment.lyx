@@ -443,9 +443,9 @@ B_{Z}^{(c)} & =\difp R{Z_{c}}B_{R}+\difp{\varphi}{Z_{c}}B_{\varphi}+\difp Z{Z_{c
 
 Re-use in the SIMPLE orbit algorithm
 \begin_inset Formula 
-\[
+\begin{equation}
 A_{\vartheta}\rightarrow Z
-\]
+\end{equation}
 
 \end_inset
 
@@ -459,11 +459,11 @@ Field lines
 \begin_layout Standard
 Non-Canonical
 \begin_inset Formula 
-\begin{align*}
+\begin{align}
 RB^{R} & =\difp{A_{Z}}{\varphi}-\difp{A_{\varphi}}Z\\
 RB^{\varphi} & =\difp{A_{R}}Z-\difp{A_{Z}}R\\
 RB^{Z} & =\difp{A_{\varphi}}R-\difp{A_{R}}{\varphi}
-\end{align*}
+\end{align}
 
 \end_inset
 
@@ -473,11 +473,11 @@ RB^{Z} & =\difp{A_{\varphi}}R-\difp{A_{R}}{\varphi}
 \begin_layout Standard
 Canonical
 \begin_inset Formula 
-\begin{align*}
+\begin{align}
 R_{c}\left(1+\difp{\lambda(R_{c},Z_{c},\varphi_{c})}{\varphi_{c}}\right)B_{(c)}^{R} & =\difp{A_{Z}^{(c)}}{\varphi_{c}}-\difp{A_{\varphi}^{(c)}}{Z_{c}}\\
 R_{c}\left(1+\difp{\lambda(R_{c},Z_{c},\varphi_{c})}{\varphi_{c}}\right)B_{(c)}^{\varphi} & =-\difp{A_{Z}^{(c)}}{R_{c}}\\
 R_{c}\left(1+\difp{\lambda(R_{c},Z_{c},\varphi_{c})}{\varphi_{c}}\right)B_{(c)}^{Z} & =\difp{A_{\varphi}^{(c)}}{R_{c}}
-\end{align*}
+\end{align}
 
 \end_inset
 
@@ -485,130 +485,195 @@ R_{c}\left(1+\difp{\lambda(R_{c},Z_{c},\varphi_{c})}{\varphi_{c}}\right)B_{(c)}^
 \end_layout
 
 \begin_layout Subsection*
-Efficient interpolation of fields
-\end_layout
-
-\begin_layout Standard
-We spline the following quantities independently:
-\begin_inset Formula 
-\begin{align}
-A_{2} & =A_{Z}^{(c)},\quad A_{3}=A_{\ph}^{(c)}\\
-h_{2} & =\sqrt{B_{(R)}^{\,2}+B_{(Z)}^{\,2}+B_{(\ph)}^{\,2}}=h_{Z}^{(c)},\quad h_{3}=h_{\ph}^{(c)}\\
- & =h_{Z}^{(c)}B^{Z}+h_{\varphi}^{(c)}B^{\varphi},\\
-B & =h_{R}B^{R}+h_{Z}B^{Z}+h_{\varphi}B^{\varphi}
-\end{align}
-
-\end_inset
-
-
-\end_layout
-
-\begin_layout Section*
-Unified Variant (TODO)
+Field lines as limiting case of guiding centers
 \end_layout
 
 \begin_layout Standard
 \begin_inset Formula 
 \begin{align}
-x^{1} & =R(\v x_{c})\\
-x^{2} & =\varphi(\v x_{c})=x_{c}^{2}+\lambda\\
-x^{3} & =Z(\v x_{c})=x_{c}^{3}
+L_{\mathrm{gc}}(\v x,z^{4}) & =\frac{e_{\alpha}}{c}A_{i}^{\star}(\v x,z^{4})\dot{x}^{i}-H(\boldsymbol{x},z^{4})\\
+A_{i}^{\star}(\v x,z^{4}) & =\frac{v_{\parallel}(\v x,z^{4})}{\omega_{c,\alpha}(\v x)}B_{i}(\v x)+A_{i}(\v x)
 \end{align}
 
 \end_inset
 
-where we get 
-\begin_inset Formula $R(\v x_{c})$
+with 
+\begin_inset Formula 
+\begin{align}
+B_{i} & =\frac{g_{ij}}{\sqrt{g}}\varepsilon^{jkl}\frac{\partial}{\partial x^{k}}A_{l}(\v x).\\
+H & =\frac{m_{\alpha}v_{\parallel}(\v x,z^{4})}{2}+J_{\perp}\omega_{c,\alpha}(\v x)+e_{\alpha}\Phi_{e}(\v x).
+\end{align}
+
 \end_inset
 
- from the inverse relation with 
-\begin_inset Formula $x_{c}^{1}=A_{3}^{(c)}(R,x_{c}^{2},x_{c}^{3})$
+We assume spatial length scales 
+\begin_inset Formula $L_{0}$
+\end_inset
+
+ of fields in Cartesian coordinates with 
+\begin_inset Formula $g=I$
+\end_inset
+
+ and gyrofrequency of the order 
+\begin_inset Formula $\omega_{c0}$
 \end_inset
 
 .
  
-\end_layout
-
-\begin_layout Standard
-The vector potential is defined via a coordinate and gauge transform such
- that
 \begin_inset Formula 
 \begin{equation}
-0\overset{!}{=}A_{1}^{(c)}=\difp R{x_{c}^{1}}A_{R}+\underbrace{\difp Z{x_{c}^{1}}}_{0}A_{Z}+\difp{\lambda}{x_{c}^{1}}A_{\varphi}-\difp{\chi}{x_{c}^{1}}.\label{eq:A1c}
+\frac{v_{\parallel0}}{L_{0}\omega_{c0}}=\varepsilon
 \end{equation}
 
 \end_inset
 
-The second component matches the first coordinate with
-\begin_inset Formula 
-\begin{equation}
-x_{c}^{1}\overset{!}{=}A_{2}^{(c)}=\difp R{x_{c}^{2}}A_{R}+A_{Z}+\difp{\lambda}{x_{c}^{2}}A_{\varphi}-\difp{\chi}{x_{c}^{2}}.
-\end{equation}
-
+to be small with ordering parameter 
+\begin_inset Formula $\varepsilon\ll1$
 \end_inset
 
-The second condition is
-\begin_inset Formula 
-\begin{align}
-0\overset{!}{=}B_{1\mathrm{c}} & =\frac{\partial R}{\partial x_{c}^{1}}B_{R}+\frac{\partial\lambda}{\partial x_{c}^{1}}.
-\end{align}
-
+.
+ Furthermore we assume no electric field and pick a strongly passing orbit
+ with 
+\begin_inset Formula $J_{\perp}=0$
 \end_inset
 
-We require thus
-\end_layout
-
-\begin_layout Standard
-\begin_inset Formula 
-\begin{equation}
-\frac{\partial f}{\partial x_{c}^{1}}=-\frac{\partial R}{\partial x_{c}^{1}}\frac{B_{R}}{B_{\varphi}},\label{eq:dx3-2}
-\end{equation}
-
-\end_inset
-
-and
-\begin_inset Formula 
-\begin{align}
-\difp{\chi}{x_{c}^{1}} & =\difp R{x_{c}^{1}}A_{R}+\difp{\lambda}{x_{c}^{1}}A_{\varphi}\nonumber \\
- & =\difp R{x_{c}^{1}}\left(A_{R}-\frac{B_{R}}{B_{\varphi}}A_{\varphi}\right).
-\end{align}
-
-\end_inset
-
-We have
-\begin_inset Formula 
-\[
-x_{c}^{1}=A_{2}^{(c)}(R,x_{c}^{2},x_{c}^{3})
-\]
-
-\end_inset
-
-so
+.
+ Then we have
 \begin_inset Formula 
 \begin{align*}
-\left(\difp{(x_{c}^{1},x_{c}^{2},x_{c}^{3})}{(R,x_{c}^{2},x_{c}^{3})}\right)^{-1} & =\left(\begin{array}{ccc}
-\difp{A_{2}^{(c)}(R,x_{c}^{2},x_{c}^{3})}R & \difp{A_{2}^{(c)}(R,x_{c}^{2},x_{c}^{3})}{x_{c}^{2}} & \difp{A_{2}^{(c)}(R,x_{c}^{2},x_{c}^{3})}{x_{c}^{3}}\\
-0 & 1 & 0\\
-0 & 0 & 1
-\end{array}\right)^{-1}\\
- & =\left(\begin{array}{ccc}
-\frac{1}{\difp{A_{2}^{(c)}(R,x_{c}^{2},x_{c}^{3})}R} & -\frac{\difp{A_{2}^{(c)}(R,x_{c}^{2},x_{c}^{3})}{x_{c}^{2}}}{\difp{A_{2}^{(c)}(R,x_{c}^{2},x_{c}^{3})}R} & -\frac{\difp{A_{2}^{(c)}(R,x_{c}^{2},x_{c}^{3})}{x_{c}^{3}}}{\difp{A_{2}^{(c)}(R,x_{c}^{2},x_{c}^{3})}R}\\
-0 & 1 & 0\\
-0 & 0 & 1
-\end{array}\right)
+L_{\mathrm{gc}}(\v x,z^{4}) & =\frac{e_{\alpha}}{c}\left(\varepsilon\frac{L_{0}\omega_{c0}}{v_{\parallel0}}\frac{v_{\parallel}(\v x,z^{4})}{\omega_{c,\alpha}(\v x)}B_{i}(\v x)+A_{i}(\v x,z^{4})\right)\dot{x}^{i}-\underbrace{\varepsilon\frac{L_{0}\omega_{c0}}{v_{\parallel0}}\frac{m_{\alpha}v_{\parallel}^{\,2}(\v x,z^{4})}{2}}_{H}
 \end{align*}
 
 \end_inset
 
-So we can set
+In the first term in the Lagrangian it is clear by construction, that the
+ the first term is of 
+\begin_inset Formula $\mathcal{O}(\varepsilon)$
+\end_inset
+
+ compared to 
+\begin_inset Formula $A_{i}(\v x,z^{4})$
+\end_inset
+
+.
+ To compare 
+\begin_inset Formula $H$
+\end_inset
+
+, we divide 
+\begin_inset Formula $L_{\mathrm{gc}}(\v x,z^{4})$
+\end_inset
+
+ by 
+\begin_inset Formula $m_{\alpha}L_{0}$
+\end_inset
+
+ and to obtain the resulting order of magnitude of
 \begin_inset Formula 
 \begin{equation}
-x_{c}^{1}\overset{!}{=}A_{2}^{(c)}=-\frac{\difp{A_{2}^{(c)}(R,x_{c}^{2},x_{c}^{3})}{x_{c}^{2}}}{\difp{A_{2}^{(c)}(R,x_{c}^{2},x_{c}^{3})}R}A_{R}+A_{Z}+\difp{\lambda}{x_{c}^{2}}A_{\varphi}-\difp{\chi}{x_{c}^{2}}.
+\frac{e_{\alpha}}{c}\frac{A_{i}(\v x,z^{4})}{m_{\alpha}L_{0}}\dot{x}^{i}\approx\frac{e_{\alpha}B_{0}}{m_{\alpha}c}v_{\parallel0}=\omega_{c0}v_{\parallel0},
 \end{equation}
 
 \end_inset
 
+where we put 
+\begin_inset Formula $\dot{x}^{i}\approx v_{\parallel0}$
+\end_inset
 
+.
+ In comparison,
+\begin_inset Formula 
+\begin{equation}
+\frac{H}{m_{\alpha}L_{0}}=\varepsilon\omega_{c0}v_{\parallel0}\underbrace{\frac{v_{\parallel}^{\,2}(\v x,z^{4})}{2v_{\parallel0}^{2}}}_{\mathcal{O}(1)}.
+\end{equation}
+
+\end_inset
+
+Again, this term is of 
+\begin_inset Formula $\mathcal{O}(\varepsilon)$
+\end_inset
+
+ compared to the leading order term above.
+ Skipping the verbose notation and just marking orders with 
+\begin_inset Formula $\varepsilon$
+\end_inset
+
+, we finally obtain
+\begin_inset Formula 
+\begin{align}
+L_{\mathrm{gc}}(\v x,z^{4}) & =\frac{e_{\alpha}}{c}A_{i}(\v x)\dot{x}^{i}\nonumber \\
+ & +\varepsilon m_{\alpha}\left(v_{\parallel}(\v x,z^{4})h_{i}(\v x)\dot{x}^{i}-\frac{v_{\parallel}^{\,2}(\v x,z^{4})}{2}\right),
+\end{align}
+
+\end_inset
+
+where 
+\begin_inset Formula $h_{i}=B_{i}/B$
+\end_inset
+
+.
+ Euler-Lagrange equations for 
+\begin_inset Formula $\v x$
+\end_inset
+
+ of 
+\begin_inset Formula $\mathcal{O}(1)$
+\end_inset
+
+ are
+\begin_inset Formula 
+\begin{equation}
+\dot{\v x}\times(\nabla\times\v A)=0.
+\end{equation}
+
+\end_inset
+
+This is an underdetermined set that states that orbits must not have components
+ orthogonal to 
+\begin_inset Formula $\v B=\nabla\times\v A$
+\end_inset
+
+.
+ The component 
+\begin_inset Formula $\dot{\v x}\cdot\v B$
+\end_inset
+
+ is chosen freely.
+ Euler-Lagrange equations for 
+\begin_inset Formula $z^{4}$
+\end_inset
+
+ are of 
+\begin_inset Formula $\mathcal{O}(\varepsilon)$
+\end_inset
+
+ where a common factor 
+\begin_inset Formula $\varepsilon$
+\end_inset
+
+ can be cancelled.
+ Choosing 
+\begin_inset Formula $z^{4}=v_{\parallel}$
+\end_inset
+
+ we obtain the simplest variant,
+\begin_inset Formula 
+\begin{equation}
+h_{i}(\v x)\dot{x}^{i}=v_{\parallel},
+\end{equation}
+
+\end_inset
+
+just stating that 
+\begin_inset Formula $v_{\parallel}$
+\end_inset
+
+ is the parallel velocity.
+ It makes no restrictions to choose an arbitrary 
+\begin_inset Formula $v_{\parallel}(t)$
+\end_inset
+
+ to follow the field lines.
 \end_layout
 
 \begin_layout Subsection*
@@ -617,19 +682,19 @@ Tensor-product splines for FEEC
 
 \begin_layout Standard
 \begin_inset Formula 
-\begin{align*}
+\begin{align}
 \chi & =\sum\varphi_{i}(x^{1})\varphi_{j}(x^{2})\varphi_{k}(x^{3})\\
- & \downarrow\mathrm{grad}\\
+ & \downarrow\mathrm{grad}\nonumber \\
 A_{1} & =\sum\varphi_{i}^{\prime}(x^{1})\varphi_{j}(x^{2})\varphi_{k}(x^{3})\\
 A_{2} & =\sum\varphi_{i}(x^{1})\varphi_{j}^{\prime}(x^{2})\varphi_{k}(x^{3})\\
 A_{3} & =\sum\varphi_{i}(x^{1})\varphi_{j}(x^{2})\varphi_{k}^{\prime}(x^{3})\\
- & \downarrow\mathrm{curl}\\
+ & \downarrow\mathrm{curl}\nonumber \\
 \sqrt{g}B^{1} & =\sum\varphi_{i}(x^{1})\varphi_{j}^{\prime}(x^{2})\varphi_{k}^{\prime}(x^{3})\\
 \sqrt{g}B^{2} & =\sum\varphi_{i}^{\prime}(x^{1})\varphi_{j}(x^{2})\varphi_{k}^{\prime}(x^{3})\\
 \sqrt{g}B^{3} & =\sum\varphi_{i}^{\prime}(x^{1})\varphi_{j}^{\prime}(x^{2})\varphi_{k}(x^{3})\\
- & \downarrow\mathrm{div}\\
+ & \downarrow\mathrm{div}\nonumber \\
 \rho & =\sum\varphi_{i}^{\prime}(x^{1})\varphi_{j}^{\prime}(x^{2})\varphi_{k}^{\prime}(x^{3})
-\end{align*}
+\end{align}
 
 \end_inset
 
