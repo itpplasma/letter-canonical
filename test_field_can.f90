@@ -1,4 +1,4 @@
-program test_can
+program test_field_can
     use, intrinsic :: iso_fortran_env, only: dp => real64
     use magfie, only: FieldType
     use magfie_tok, only: TokFieldType
@@ -227,4 +227,4 @@ contains
         ! TODO: second ders in pphi and mixed
     end subroutine do_test
 
-end program test_can
+end program test_field_can

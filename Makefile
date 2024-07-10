@@ -38,12 +38,13 @@ MAGFIE_SOURCES := spline5_RZ.f90 \
 	bdivfree.f90
 MAGFIE_SOURCES := $(addprefix ../libneo/src/magfie/, $(MAGFIE_SOURCES))
 
-all: letter_canonical.x test_can.x test_magfie.x test.x test_large.x test_biotsavart.x
+all: letter_canonical.x \
+	test_field_can.x test_magfie.x test.x test_large.x test_biotsavart.x
 
 letter_canonical.x: libfield.so libcanonical.so main.f90
 	$(FC) $(FFLAGS) -o $@ $^ -lfield -lcanonical
 
-test_can.x: libfield.so libcanonical.so test_can.f90
+test_field_can.x: libfield.so libcanonical.so test_field_can.f90
 	$(FC) $(FFLAGS) -o $@ $^ -lfield -lcanonical
 
 test_magfie.x: libfield.so libcanonical.so test_magfie.f90
