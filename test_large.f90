@@ -1,4 +1,5 @@
 program test_large
+    use, intrinsic :: iso_fortran_env, only: dp => real64
     use test_util, only: print_test, print_ok, print_fail
 
     implicit none
@@ -14,7 +15,7 @@ contains
         use magfie_test, only: TestFieldType
         use canonical, only: init_canonical, twopi
 
-        real(8) :: rmin, rmax, zmin, zmax
+        real(dp) :: rmin, rmax, zmin, zmax
 
         call print_test("Test Setup")
         rmin = 75.d0
@@ -33,15 +34,15 @@ contains
         use interpolate, only: SplineData3D, construct_splines_3d, &
             evaluate_splines_3d, evaluate_splines_3d_der2
 
-        real(8), parameter :: tol=5.0d-3
-        real(8), dimension(:,:,:,:), allocatable :: xcyl, B, Acyl
+        real(dp), parameter :: tol=5.0d-3
+        real(dp), dimension(:,:,:,:), allocatable :: xcyl, B, Acyl
         type(SplineData3D) :: spl_AR, spl_AZ, spl_Aphicov, &
             spl_BR, spl_BZ, spl_Bphi
 
-        real(8) :: BR, BZ, Bphi, AR, AZ, Aphicov, dAR(3), dAZ(3), dAphicov(3), &
+        real(dp) :: BR, BZ, Bphi, AR, AZ, Aphicov, dAR(3), dAZ(3), dAphicov(3), &
             B_pitch(2), dummy(6)
-        real(8) :: BR_expected, BZ_expected, Bphi_expected, B_pitch_expected(2)
-        real(8) :: x(3), gii(3), sqrtg
+        real(dp) :: BR_expected, BZ_expected, Bphi_expected, B_pitch_expected(2)
+        real(dp) :: x(3), gii(3), sqrtg
 
         allocate(xcyl(3, n_r, n_phi, n_z))
         allocate(B(3, n_r, n_phi, n_z), Acyl(3, n_r, n_phi, n_z))

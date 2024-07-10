@@ -26,7 +26,7 @@ subroutine construct_splines_3d(x_min, x_max, fcn, order, periodic, spl)
     type(SplineData3D), intent(inout) :: spl
 
     integer :: kx, ky, kz, iflag, i, nx, ny, nz
-    real(8) :: x(size(fcn, 1)), y(size(fcn, 2)), z(size(fcn, 3)), h
+    real(dp) :: x(size(fcn, 1)), y(size(fcn, 2)), z(size(fcn, 3)), h
 
     nx = size(fcn, 1)
     ny = size(fcn, 2)

@@ -1,13 +1,13 @@
 program test_biotsavart
+    use, intrinsic :: iso_fortran_env, only: dp => real64
     use test_util, only: print_test, print_ok, print_fail
 
     implicit none
 
-    character(len=*), parameter :: test_coils_file = "coils.test"
-    character(len=*), parameter :: real_coils_file = &
-        "/proj/plasma/data/W7X/COILS/coils.w7x"
+    character(*), parameter :: test_coils_file = "coils.test"
+    character(*), parameter :: real_coils_file = "/proj/plasma/data/W7X/COILS/coils.w7x"
 
-    real(8), parameter :: large_distance = 1.0d3
+    real(dp), parameter :: large_distance = 1.0d3
 
     call test_load_coils_file
     call test_compute_vector_potential
@@ -42,13 +42,13 @@ program test_biotsavart
         use biotsavart, only: CoilsData, compute_vector_potential, &
             deinit_coils_data, clight
 
-        real(8), parameter :: tol = 1.0e-9
+        real(dp), parameter :: tol = 1.0e-9
         integer, parameter :: N_TEST = 3
 
         type(CoilsData) :: coils
-        real(8) :: x_test(3, N_TEST)
-        real(8), dimension(3) :: x, A, A_expected
-        real(8) :: sqrt_term, L, R, AZ_expected
+        real(dp) :: x_test(3, N_TEST)
+        real(dp), dimension(3) :: x, A, A_expected
+        real(dp) :: sqrt_term, L, R, AZ_expected
         integer :: i
 
         call print_test("compute_vector_potential")
@@ -86,8 +86,8 @@ program test_biotsavart
 
 
     function Rcyl(x)
-        real(8), dimension(3), intent(in) :: x
-        real(8) :: Rcyl
+        real(dp), dimension(3), intent(in) :: x
+        real(dp) :: Rcyl
 
         Rcyl = sqrt(x(1)**2 + x(2)**2)
     end function Rcyl
@@ -98,7 +98,7 @@ program test_biotsavart
 
         type(CoilsData), intent(out) :: coils
 
-        real(8), dimension(2) :: x, y, z, current
+        real(dp), dimension(2) :: x, y, z, current
 
         x = [0.0d0, 0.0d0]
         y = [0.0d0, 0.0d0]

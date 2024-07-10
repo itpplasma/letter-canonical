@@ -11,12 +11,12 @@ program test_can
     implicit none
     save
 
-    double precision :: z0(4), vpar0
+    real(dp) :: z0(4), vpar0
     type(Tracer) :: norb
     type(FieldCan) :: f
 
     integer :: npoiper2
-    real(8) :: rbig, dtau, dtaumax
+    real(dp) :: rbig, dtau, dtaumax
 
     isw_field_type = 2
 
@@ -59,21 +59,21 @@ program test_can
     contains
 
     function relerr(a, b)
-        double precision :: relerr
-        double precision, intent(in) :: a, b
+        real(dp) :: relerr
+        real(dp), intent(in) :: a, b
         relerr = merge(a, (a - b)/b, b == 0d0)
     end function relerr
 
 
     subroutine der2(x0, pphi, i, j)
-        double precision, intent(in) :: x0(3)
+        real(dp), intent(in) :: x0(3)
         integer, intent(in) :: i, j
-        double precision hi, hj
+        real(dp) hi, hj
         type(FieldCan) :: f00, f01, f10, f11
         type(FieldCan) :: d2fnum
-        double precision :: pphi, x(3), dxi(3), dxj(3)
-        double precision, dimension(10) ::  d2vparnum, d2Hnum, d2pthnum
-        double precision :: vpar00, vpar11, vpar10, vpar01, &
+        real(dp) :: pphi, x(3), dxi(3), dxj(3)
+        real(dp), dimension(10) ::  d2vparnum, d2Hnum, d2pthnum
+        real(dp) :: vpar00, vpar11, vpar10, vpar01, &
             H00, H11, H10, H01, pth00, pth11, pth10, pth01
         integer :: k
 
@@ -158,7 +158,7 @@ program test_can
 
     subroutine test_jac1(si)
       type(SymplecticIntegrator) :: si
-      double precision :: x1(2), dx1(2), jac1(2,2), x10(2), h1(2), jac1num(2,2), fvec1(2)
+      real(dp) :: x1(2), dx1(2), jac1(2,2), x10(2), h1(2), jac1num(2,2), fvec1(2)
       integer :: k
 
       h1(1) = 1d-6
@@ -193,7 +193,7 @@ program test_can
     subroutine test_newton(si)
       type(SymplecticIntegrator) :: si
       integer, parameter :: n = 2
-      double precision :: x(n), fvec(n), fjac(n,n), ijac(n,n)
+      real(dp) :: x(n), fvec(n), fjac(n,n), ijac(n,n)
       integer :: k
 
       x = si%z((/1,4/)) + (/1d-4, 1d-2/)
@@ -218,11 +218,11 @@ program test_can
 
         type(SymplecticIntegrator) :: euler1
 
-        double precision :: dz(4)
+        real(dp) :: dz(4)
         integer :: i, j, k
-        double precision :: dx
+        real(dp) :: dx
         type(FieldCan) :: dfnum
-        double precision :: dvparnum(4), dHnum(4), dpthnum(4)
+        real(dp) :: dvparnum(4), dHnum(4), dpthnum(4)
 
         print *, 'f\t', 'derivative\t', 'numerical derivative\t', 'relative error'
 

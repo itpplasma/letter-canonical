@@ -5,6 +5,17 @@ FFLAGS += -Wall -Wuninitialized -Wno-maybe-uninitialized -Wno-unused-label \
 	-Wno-unused-dummy-argument -fmax-errors=1 \
 	-I$(CODE)/libneo/build -L$(CODE)/libneo/build
 
+SOURCES := magfie.f90 \
+	magfie_test.f90 \
+	magfie_tok.f90 \
+	magfie_factory.f90 \
+	canonical.f90 \
+	field_can_base.f90 \
+	field_can_cyl.f90 \
+	field_can.f90
+
+OBJECTS := $(SOURCES:.f90=.o)
+
 LIBNEO_SOURCES := libneo_kinds.f90 math_constants.f90 spl_three_to_five.f90 \
 	odeint_rkf45.f90 contrib/rkf45.f90 interpolate.f90
 LIBNEO_SOURCES := $(addprefix ../libneo/src/, $(LIBNEO_SOURCES))
@@ -44,9 +55,11 @@ test_biotsavart.x: libfield.so libcanonical.so test_biotsavart.f90 test_util.f90
 biotsavart.o: biotsavart.f90
 	$(FC) $(FFLAGS) -o $@ -c $^
 
-libcanonical.so: libfield.so magfie.f90 magfie_test.f90 magfie_tok.f90 \
-	magfie_factory.f90 canonical.f90 field_can.f90
+libcanonical.so: libfield.so $(OBJECTS)
 	$(FC) $(FFLAGS) -shared -o $@ $^ -lfield
+
+%.o: %.f90
+	$(FC) $(FFLAGS) -c $<
 
 libfield.so: $(LIBNEO_SOURCES) $(MAGFIE_SOURCES)
 	$(FC) $(FFLAGS) -shared -o $@ $^

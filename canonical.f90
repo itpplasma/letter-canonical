@@ -1,4 +1,5 @@
 module canonical
+    use, intrinsic :: iso_fortran_env, only: dp => real64
     use magfie, only: FieldType
     use interpolate, only: SplineData3D, construct_splines_3d, &
         evaluate_splines_3d, evaluate_splines_3d_der2
@@ -8,22 +9,22 @@ module canonical
 
     logical, parameter :: debug = .True.
 
-    real(8), parameter :: pi = atan(1.d0)*4.d0
-    real(8), parameter :: twopi = atan(1.d0)*8.d0
+    real(dp), parameter :: pi = atan(1.d0)*4.d0
+    real(dp), parameter :: twopi = atan(1.d0)*8.d0
 
     integer, parameter :: nper = 1  ! Number of periods (TODO: make this a variable)
 
-    real(8) :: rmin, rmax, zmin, zmax
+    real(dp) :: rmin, rmax, zmin, zmax
 
-    real(8) :: phi_c, z_c  ! Temporary variables for the ODE integration
+    real(dp) :: phi_c, z_c  ! Temporary variables for the ODE integration
     !$omp threadprivate(phi_c, z_c)
 
     ! Number and spacing of grid points
     integer :: n_r, n_phi, n_z
-    real(8) :: h_r, h_phi, h_z
+    real(dp) :: h_r, h_phi, h_z
 
     ! For splines
-    real(8) :: x_min(3), x_max(3)
+    real(dp) :: x_min(3), x_max(3)
     integer, parameter :: order(3) = [3, 3, 3]
     logical, parameter :: periodic(3) = [.False., .True., .False.]
 
@@ -37,9 +38,9 @@ module canonical
     class(FieldType), allocatable :: magfie_type
 
     ! For splining psi
-    real(8) :: psi_min, psi_max
-    real(8), dimension(:,:,:), allocatable :: psi_of_x, R_of_xc
-    real(8), dimension(:), allocatable :: psi_grid
+    real(dp) :: psi_min, psi_max
+    real(dp), dimension(:,:,:), allocatable :: psi_of_x, R_of_xc
+    real(dp), dimension(:), allocatable :: psi_grid
     type(SplineData3D) :: spl_R_of_xc, spl_Aphi_of_xc
 
 contains
@@ -48,7 +49,7 @@ contains
         use magfie, only: init_magfie
 
         integer, intent(in) :: n_r_, n_phi_, n_z_  ! Number of grid points
-        real(8), intent(in) :: xmin(3), xmax(3)
+        real(dp), intent(in) :: xmin(3), xmax(3)
         class(FieldType), intent(in) :: magfie_type_
 
         magfie_type = magfie_type_
@@ -75,13 +76,13 @@ contains
 
     subroutine get_transformation(lam_phi, chi_gauge)
 
-        real(8), intent(inout), dimension(:,:,:) :: lam_phi, chi_gauge
+        real(dp), intent(inout), dimension(:,:,:) :: lam_phi, chi_gauge
 
         integer, parameter :: ndim=2
-        real(8), parameter :: relerr=1d-8
+        real(dp), parameter :: relerr=1d-8
 
-        real(8), allocatable :: y(:), dy(:)
-        real(8) :: r1, r2
+        real(dp), allocatable :: y(:), dy(:)
+        real(dp) :: r1, r2
         integer :: i_r, i_phi, i_z, i_ctr
 
         i_ctr=0
@@ -125,10 +126,10 @@ contains
     subroutine rh_can(r_c, y, dy)
         use magfie, only: compute_abfield
 
-        real(8), intent(in) :: r_c  ! plus threadprivate phi_c, z_c from module
-        real(8), dimension(2), intent(in) :: y  ! lam_phi, chi_gauge
-        real(8), dimension(2), intent(inout) :: dy
-        real(8) :: Br, Bp, Bz, Ar, Ap, Az
+        real(dp), intent(in) :: r_c  ! plus threadprivate phi_c, z_c from module
+        real(dp), dimension(2), intent(in) :: y  ! lam_phi, chi_gauge
+        real(dp), dimension(2), intent(inout) :: dy
+        real(dp) :: Br, Bp, Bz, Ar, Ap, Az
 
         call magfie_type%compute_abfield(&
             r_c, modulo(phi_c + y(1), twopi), z_c, Ar, Ap, Az, Br, Bp, Bz)
@@ -141,7 +142,7 @@ contains
 
 
     subroutine init_transformation
-        real(8), dimension(:,:,:), allocatable :: lam_phi, chi_gauge
+        real(dp), dimension(:,:,:), allocatable :: lam_phi, chi_gauge
         integer :: outfile_unit
 
         allocate(lam_phi(n_r, n_phi, n_z), chi_gauge(n_r, n_phi, n_z))
@@ -166,9 +167,9 @@ contains
     subroutine init_canonical_field_components
         use magfie_test, only: AMPL
 
-        real(8), dimension(:,:,:,:), allocatable :: xcan, xcyl, B, Acyl
-        real(8), dimension(:,:,:,:), allocatable :: hcan, Acan
-        real(8), dimension(:,:,:), allocatable :: Bmod
+        real(dp), dimension(:,:,:,:), allocatable :: xcan, xcyl, B, Acyl
+        real(dp), dimension(:,:,:,:), allocatable :: hcan, Acan
+        real(dp), dimension(:,:,:), allocatable :: Bmod
 
 
         allocate(xcan(3,n_r,n_phi,n_z), xcyl(3,n_r,n_phi,n_z))
@@ -202,8 +203,8 @@ contains
 
 
     subroutine init_splines_with_psi
-        real(8), dimension(:,:,:), allocatable :: Aphi_of_xc
-        real(8) :: x(3)
+        real(dp), dimension(:,:,:), allocatable :: Aphi_of_xc
+        real(dp) :: x(3)
         integer :: i_r, i_phi, i_z, debug_unit
 
         call init_psi_grid()
@@ -244,7 +245,7 @@ contains
 
 
     subroutine init_psi_grid
-        real(8) :: x(3)
+        real(dp) :: x(3)
         integer :: i_r, i_phi, i_z
 
         allocate(psi_of_x(n_r, n_phi, n_z), psi_grid(n_r))
@@ -272,10 +273,10 @@ contains
 
 
     subroutine init_R_of_xc
-        real(8), parameter :: tol = 1d-13
+        real(dp), parameter :: tol = 1d-13
         integer, parameter :: counter_max = 32
 
-        real(8) :: x(3), psi, dpsi(3), d2psi(6)
+        real(dp) :: x(3), psi, dpsi(3), d2psi(6)
         integer :: i_r, i_phi, i_z, counter
 
         allocate(R_of_xc(n_r, n_phi, n_z))
@@ -313,8 +314,8 @@ contains
     subroutine evaluate_afield_can(x, A1, dA1, d2A1, A2, dA2, d2A2, A3, dA3, d2A3)
         use magfie_test, only: AMPL
 
-        real(8), intent(in) :: x(3)  ! R, phi_c, Z
-        real(8), intent(out) :: A1, A2, A3, dA1(3), dA2(3), dA3(3), &
+        real(dp), intent(in) :: x(3)  ! R, phi_c, Z
+        real(dp), intent(out) :: A1, A2, A3, dA1(3), dA2(3), dA3(3), &
                                 d2A1(6), d2A2(6), d2A3(6)
 
         call evaluate_splines_3d_der2(spl_A1, x, A1, dA1, d2A1)
@@ -325,14 +326,14 @@ contains
 
 
     subroutine compute_Acan(Acyl, Acan)
-        real(8), dimension(:,:,:,:), intent(in) :: Acyl   ! physical components
-        real(8), dimension(:,:,:,:), intent(inout) :: Acan  ! covariant
+        real(dp), dimension(:,:,:,:), intent(in) :: Acyl   ! physical components
+        real(dp), dimension(:,:,:,:), intent(inout) :: Acan  ! covariant
         ! TODO: Acan only with second and third component, as the first vanishes
 
         integer :: i_phi, i_z, i_r
-        real(8) :: x(3)
-        real(8) :: ARcov, AZcov, Aphicov, A1can, A2can, A3can
-        real(8) :: lam, chi, dlam(3), dchi(3), dummy(6)
+        real(dp) :: x(3)
+        real(dp) :: ARcov, AZcov, Aphicov, A1can, A2can, A3can
+        real(dp) :: lam, chi, dlam(3), dchi(3), dummy(6)
 
         do i_z=1,n_z
             do i_phi=1,n_phi
@@ -362,13 +363,13 @@ contains
         use magfie, only: compute_abfield
 
         ! Order of coordinates: R, Z, phi
-        real(8), intent(in) :: xcyl(:,:,:,:)
-        real(8), intent(inout) :: B(:,:,:,:), A(:,:,:,:)
+        real(dp), intent(in) :: xcyl(:,:,:,:)
+        real(dp), intent(inout) :: B(:,:,:,:), A(:,:,:,:)
 
-        real(8) :: A1, A2, A3, B1, B2, B3
+        real(dp) :: A1, A2, A3, B1, B2, B3
 
         integer :: i_r, i_phi, i_z
-        real(8) :: r, z, phi
+        real(dp) :: r, z, phi
 
         do i_z=1,n_z
             do i_phi=1,n_phi
@@ -392,11 +393,11 @@ contains
 
     subroutine can_to_cyl(xcan, xcyl)
         ! TODO: write this also for vector and not just array
-        real(8), intent(in) :: xcan(:,:,:,:)
-        real(8), intent(out) :: xcyl(:,:,:,:)
+        real(dp), intent(in) :: xcan(:,:,:,:)
+        real(dp), intent(out) :: xcyl(:,:,:,:)
 
         integer :: i_r, i_phi, i_z
-        real(8) :: lam
+        real(dp) :: lam
 
         do i_phi=1,n_phi
         do i_z=1,n_z
@@ -413,8 +414,8 @@ contains
 
 
     subroutine compute_Bmod(B, Bmod)
-        real(8), dimension(:,:,:,:), intent(in) :: B   ! physical components
-        real(8), dimension(:,:,:), intent(inout) :: Bmod
+        real(dp), dimension(:,:,:,:), intent(in) :: B   ! physical components
+        real(dp), dimension(:,:,:), intent(inout) :: Bmod
 
         integer :: i_r, i_phi, i_z
 
@@ -433,14 +434,14 @@ contains
 
 
     subroutine compute_hcan(Bcyl, Bmod, hcan)
-        real(8), dimension(:,:,:,:), intent(in) :: Bcyl   ! physical components
-        real(8), dimension(:,:,:), intent(in) :: Bmod
-        real(8), dimension(:,:,:,:), intent(inout) :: hcan  ! covariant
+        real(dp), dimension(:,:,:,:), intent(in) :: Bcyl   ! physical components
+        real(dp), dimension(:,:,:), intent(in) :: Bmod
+        real(dp), dimension(:,:,:,:), intent(inout) :: hcan  ! covariant
 
         integer :: i_r, i_phi, i_z
-        real(8) :: x(3)
-        real(8) :: BRcov, BZcov, Bphicov, B1can, B2can, B3can
-        real(8) :: lam, dlam(3), dummy(6)
+        real(dp) :: x(3)
+        real(dp) :: BRcov, BZcov, Bphicov, B1can, B2can, B3can
+        real(dp) :: lam, dlam(3), dummy(6)
 
         do i_z=1,n_z
             do i_phi=1,n_phi
@@ -464,15 +465,15 @@ contains
 
 
     pure subroutine cyl_to_cov(xcyl, V)
-        real(8), intent(in) :: xcyl(:,:,:,:)
-        real(8), intent(inout) :: V(:,:,:,:)
+        real(dp), intent(in) :: xcyl(:,:,:,:)
+        real(dp), intent(inout) :: V(:,:,:,:)
 
         V(2,:,:,:) = V(2,:,:,:)*xcyl(1,:,:,:)
     end subroutine cyl_to_cov
 
 
     pure subroutine generate_regular_grid(x)
-        real(8), intent(inout) :: x(:,:,:,:)
+        real(dp), intent(inout) :: x(:,:,:,:)
 
         integer :: i_r, i_phi, i_z
 
@@ -489,7 +490,7 @@ contains
 
     pure function get_grid_point(i_r, i_phi, i_z)
         integer, intent(in) :: i_r, i_phi, i_z
-        real(8) :: get_grid_point(3)
+        real(dp) :: get_grid_point(3)
 
         get_grid_point = [ &
             rmin + h_r*dble(i_r-1), &

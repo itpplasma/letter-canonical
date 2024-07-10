@@ -1,4 +1,5 @@
 program test_magfie
+    use, intrinsic :: iso_fortran_env, only: dp => real64
     use magfie_factory, only: magfie_type_from_string
     use magfie, only: FieldType
     use magfie_tok, only: TokFieldType
@@ -14,7 +15,7 @@ program test_magfie
 
     integer, parameter :: n_r=100, n_phi=64, n_z=75
     integer :: outfile_unit
-    real(8) :: rmin, rmax, zmin, zmax
+    real(dp) :: rmin, rmax, zmin, zmax
     !complex(8) :: pert
 
     class(FieldType), allocatable :: field_type
@@ -59,8 +60,8 @@ contains
 
     subroutine test_psi
         use canonical, only: psi_of_x, psi_grid
-        real(8), dimension(3) :: x
-        real(8) :: psi
+        real(dp), dimension(3) :: x
+        real(dp) :: psi
         integer :: i_r, i_phi, i_z
 
         i_r = 50
@@ -80,8 +81,8 @@ contains
     end subroutine test_psi
 
     subroutine test_integration
-        real(8), parameter :: tol = 1.0d-10
-        real(8), parameter :: dt = 5.75d-3*twopi
+        real(dp), parameter :: tol = 1.0d-10
+        real(dp), parameter :: dt = 5.75d-3*twopi
         integer, parameter :: nt = 30000
         integer, parameter :: n_flux = 15
 
@@ -92,10 +93,10 @@ contains
 
 
     subroutine test_integration_noncan(tol, dt, nt, n_flux)
-        real(8), intent(in) :: tol, dt
+        real(dp), intent(in) :: tol, dt
         integer, intent(in) :: nt, n_flux
 
-        real(8) :: x0(3), x(3), lam
+        real(dp) :: x0(3), x(3), lam
         integer :: i_t, i_fs
 
         do i_fs = 1, n_flux
@@ -116,10 +117,10 @@ contains
         use canonical, only: magfie_type
         use magfie, only: compute_bfield
 
-        real(8), intent(in) :: t  ! plus threadprivate phi_c, z_c from module
-        real(8), dimension(3), intent(in) :: x
-        real(8), dimension(3), intent(inout) :: dx
-        real(8) :: BR, BZ, Bphi, Bphictr
+        real(dp), intent(in) :: t  ! plus threadprivate phi_c, z_c from module
+        real(dp), dimension(3), intent(in) :: x
+        real(dp), dimension(3), intent(inout) :: dx
+        real(dp) :: BR, BZ, Bphi, Bphictr
 
         call magfie_type%compute_bfield(x(1), modulo(x(2), twopi), x(3), BR, Bphi, BZ)
 
@@ -132,10 +133,10 @@ contains
 
 
     subroutine test_integration_can(tol, dt, nt, n_flux)
-        real(8), intent(in) :: tol, dt
+        real(dp), intent(in) :: tol, dt
         integer, intent(in) :: nt, n_flux
 
-        real(8) :: x0(3), x(3), xcyl(3), lam
+        real(dp) :: x0(3), x(3), xcyl(3), lam
         integer :: i_t, i_fs
 
         do i_fs = 1, n_flux
@@ -158,12 +159,12 @@ contains
     subroutine Bcan(t, x, dx)
         use canonical, only: evaluate_afield_can
 
-        real(8), intent(in) :: t  ! plus threadprivate phi_c, z_c from module
-        real(8), dimension(3), intent(in) :: x
-        real(8), dimension(3), intent(inout) :: dx
-        real(8) :: A1s, A2s, A3s, dA1s(3), dA2s(3), dA3s(3), d2A1s(6), &
+        real(dp), intent(in) :: t  ! plus threadprivate phi_c, z_c from module
+        real(dp), dimension(3), intent(in) :: x
+        real(dp), dimension(3), intent(inout) :: dx
+        real(dp) :: A1s, A2s, A3s, dA1s(3), dA2s(3), dA3s(3), d2A1s(6), &
                    d2A2s(6), d2A3s(6)
-        real(8) :: B(3)
+        real(dp) :: B(3)
 
         call evaluate_afield_can(x, A1s, dA1s, d2A1s, A2s, dA2s, d2A2s, &
             A3s, dA3s, d2A3s)
@@ -179,10 +180,10 @@ contains
 
 
     subroutine test_integration_can2(tol, dt, nt, n_flux)
-        real(8), intent(in) :: tol, dt
+        real(dp), intent(in) :: tol, dt
         integer, intent(in) :: nt, n_flux
 
-        real(8) :: x0(3), xc(3), x(3), xcyl(3), lam, psi0
+        real(dp) :: x0(3), xc(3), x(3), xcyl(3), lam, psi0
         integer :: i_t, i_fs
 
         do i_fs = 1, n_flux
@@ -208,10 +209,10 @@ contains
 
 
     subroutine Bcan2(t, xc, dxc)
-        real(8), intent(in) :: t  ! plus threadprivate phi_c, z_c from module
-        real(8), dimension(3), intent(in) :: xc
-        real(8), dimension(3), intent(inout) :: dxc
-        real(8) :: Aphi, dAphi(3), dummy(6)
+        real(dp), intent(in) :: t  ! plus threadprivate phi_c, z_c from module
+        real(dp), dimension(3), intent(in) :: xc
+        real(dp), dimension(3), intent(inout) :: dxc
+        real(dp) :: Aphi, dAphi(3), dummy(6)
 
         call evaluate_splines_3d_der2(spl_Aphi_of_xc, xc, Aphi, dAphi, dummy)
 
@@ -226,11 +227,11 @@ contains
 
         integer, parameter :: n_r_test=49, n_phi_test=63, n_z_test=74
 
-        real(8), dimension(:,:,:), allocatable :: lam_test, chi_test
-        real(8), dimension(:,:,:), allocatable :: A1_test, A2_test, A3_test
-        real(8), dimension(:,:,:,:), allocatable :: dlam_test, dchi_test
-        real(8), dimension(3) :: x
-        real(8) :: dummy(6)
+        real(dp), dimension(:,:,:), allocatable :: lam_test, chi_test
+        real(dp), dimension(:,:,:), allocatable :: A1_test, A2_test, A3_test
+        real(dp), dimension(:,:,:,:), allocatable :: dlam_test, dchi_test
+        real(dp), dimension(3) :: x
+        real(dp) :: dummy(6)
 
         integer :: i_r, i_phi, i_z
 

@@ -1,13 +1,13 @@
 module field_can_cyl
     use, intrinsic :: iso_fortran_env, only: dp => real64
-    use field_can_base, only: field_can_type, field_can_data_type
+    use field_can_base, only: field_can_t, field_can_data_t
 
     implicit none
 
-    type, extends(field_can_type) :: field_can_cyl_type
+    type, extends(field_can_t) :: field_can_cyl_t
     contains
         procedure :: evaluate => evaluate_cyl
-    end type field_can_cyl_type
+    end type field_can_cyl_t
 
     contains
 
@@ -15,18 +15,18 @@ module field_can_cyl
         use interpolate, only: evaluate_splines_3d_der2
         use canonical, only: spl_A2, spl_A3, spl_h2, spl_h3, spl_Bmod
 
-        class(field_can_cyl_type), intent(in) :: self
-        type(field_can_data_type), intent(inout) :: f
+        class(field_can_cyl_t), intent(in) :: self
+        type(field_can_data_t), intent(inout) :: f
 
         integer, parameter :: reorder(3) = [1, 3, 2]  ! dr, dph, dth -> dr, dth, dph
         integer, parameter :: reorder2(6) = [1, 3, 2, 6, 5, 4]
         ! drdr, drdph, drdth, dphdph, dphdth, dthdth ->
         ! drdr, drdth, drdph, dthdth, dthdph, dphdph
 
-        double precision, intent(in) :: r, th_c, ph_c
+        real(dp), intent(in) :: r, th_c, ph_c
         integer, intent(in) :: mode_secders
 
-        real(8) :: x(3), a, da(3), d2a(6)
+        real(dp) :: x(3), a, da(3), d2a(6)
 
         x = [r, ph_c, th_c]
 

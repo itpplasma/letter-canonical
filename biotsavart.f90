@@ -1,17 +1,18 @@
 module biotsavart
+    use, intrinsic :: iso_fortran_env, only: dp => real64
     implicit none
 
-    real(8), parameter :: clight = 2.99792458d10
+    real(dp), parameter :: clight = 2.99792458d10
 
     type CoilsData
-        real(8), dimension(:), allocatable :: x, y, z, current
+        real(dp), dimension(:), allocatable :: x, y, z, current
     end type CoilsData
 
     contains
 
 
     subroutine init_coils_data(x, y, z, current, coils)
-        real(8), intent(in) :: x(:), y(:), z(:), current(:)
+        real(dp), intent(in) :: x(:), y(:), z(:), current(:)
         type(CoilsData), intent(out) :: coils
 
         integer :: n_points
@@ -87,9 +88,9 @@ module biotsavart
     function compute_vector_potential(coils, x) result(A)
         ! Formula of Hanson and Hirshman (2002)
         type(CoilsData), intent(in) :: coils
-        real(8), intent(in) :: x(3)
+        real(dp), intent(in) :: x(3)
 
-        real(8) :: A(3), dx_i(3), dx_f(3), dl(3), R_i, R_f, L, eps, log_term
+        real(dp) :: A(3), dx_i(3), dx_f(3), dl(3), R_i, R_f, L, eps, log_term
         integer :: i
 
         A = 0.0d0

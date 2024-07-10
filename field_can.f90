@@ -1,14 +1,14 @@
 module field_can
   use, intrinsic :: iso_fortran_env, only: dp => real64
-  use field_can_base, only: field_can_data_type
+  use field_can_base, only: field_can_data_t
 
   implicit none
 
 contains
 
     subroutine field_can_init(f, mu, ro0, vpar)
-        type(field_can_data_type), intent(inout) :: f
-        double precision, intent(in), optional  :: mu, ro0, vpar
+        type(field_can_data_t), intent(inout) :: f
+        real(dp), intent(in), optional  :: mu, ro0, vpar
 
         if (present(mu)) then
         f%mu = mu
@@ -38,8 +38,8 @@ contains
     ! computes values of H, pth and vpar at z=(r, th, ph, pphi)
     !
     !
-        type(field_can_data_type), intent(inout) :: f
-        double precision, intent(in) :: pphi
+        type(field_can_data_t), intent(inout) :: f
+        real(dp), intent(in) :: pphi
 
         f%vpar = (pphi - f%Aph/f%ro0)/f%hph
         f%H = f%vpar**2/2d0 + f%mu*f%Bmod
@@ -55,8 +55,8 @@ contains
     ! computes H, pth and vpar at z=(r, th, ph, pphi) and their derivatives
     !
     !
-        type(field_can_data_type), intent(inout) :: f
-        double precision, intent(in) :: pphi
+        type(field_can_data_t), intent(inout) :: f
+        real(dp), intent(in) :: pphi
 
         call get_val(f, pphi)
 
@@ -81,8 +81,8 @@ contains
     ! d2dr2, d2drdth, d2drph, d2dth2, d2dthdph, d2dph2,
     ! d2dpphdr, d2dpphdth, d2dpphdph, d2dpph2
     !
-        type(field_can_data_type), intent(inout) :: f
-        double precision, intent(in) :: pphi
+        type(field_can_data_t), intent(inout) :: f
+        real(dp), intent(in) :: pphi
 
         call get_derivatives(f, pphi)
 

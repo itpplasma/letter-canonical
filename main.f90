@@ -1,4 +1,5 @@
 program main
+    use, intrinsic :: iso_fortran_env, only: dp => real64
     use magfie, only: FieldType
     use magfie_tok, only: TokFieldType
     use canonical, only: twopi, init_canonical, init_transformation, &
@@ -12,7 +13,7 @@ contains
 
     subroutine letter_canonical
         integer, parameter :: n_r=100, n_phi=64, n_z=75
-        real(8) :: rmin, rmax, zmin, zmax
+        real(dp) :: rmin, rmax, zmin, zmax
         !complex(8) :: pert
 
         class(FieldType), allocatable :: field_type

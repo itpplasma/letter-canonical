@@ -1,9 +1,10 @@
 module magfie_test
+    use, intrinsic :: iso_fortran_env, only: dp => real64
     use magfie, only: FieldType
 
     implicit none
 
-    real(8), parameter :: AMPL = 1.0d-7, AMPL2 = 2.0d-6
+    real(dp), parameter :: AMPL = 1.0d-7, AMPL2 = 2.0d-6
 
     type, extends(FieldType) :: TestFieldType
         contains
@@ -20,8 +21,8 @@ module magfie_test
 
     subroutine compute_abfield(self, R, phi, Z, AR, Aphi, AZ, BR, Bphi, BZ)
         class(TestFieldType), intent(in) :: self
-        real(8), intent(in) :: R, phi, Z
-        real(8), intent(out) :: AR, Aphi, AZ, BR, Bphi, BZ
+        real(dp), intent(in) :: R, phi, Z
+        real(dp), intent(out) :: AR, Aphi, AZ, BR, Bphi, BZ
 
         AR = AMPL*R*cos(phi)
         Aphi = -0.5d0*AMPL2*Z*R
@@ -32,8 +33,8 @@ module magfie_test
 
     subroutine compute_bfield(self, R, phi, Z, BR, Bphi, BZ)
         class(TestFieldType), intent(in) :: self
-        real(8), intent(in) :: R, phi, Z
-        real(8), intent(out) :: BR, Bphi, BZ
+        real(dp), intent(in) :: R, phi, Z
+        real(dp), intent(out) :: BR, Bphi, BZ
 
         BR = 0.5d0*AMPL2*R
         Bphi = 1.0d0/R

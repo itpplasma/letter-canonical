@@ -1,10 +1,11 @@
 program test
+    use, intrinsic :: iso_fortran_env, only: dp => real64
     use test_util, only: print_test, print_ok, print_fail
 
     implicit none
 
     integer, parameter :: n_r=2, n_z=3, n_phi=4
-    real(8) :: eps = 1d-10
+    real(dp) :: eps = 1d-10
 
     call setup
     call test_magfie_factory
@@ -20,7 +21,7 @@ contains
         use magfie_test, only: TestFieldType
         use canonical, only: init_canonical, twopi
 
-        real(8) :: xmin(3), xmax(3)
+        real(dp) :: xmin(3), xmax(3)
         xmin = [100.0d0, -150.0d0, 0.0d0]
         xmax = [200.0d0, 150.0d0, twopi]
 
@@ -55,7 +56,7 @@ contains
     subroutine test_get_grid_point
         use canonical, only: get_grid_point, pi, rmin, rmax, zmin, zmax
 
-        real(8) :: x_expected(3), x_computed(3)
+        real(dp) :: x_expected(3), x_computed(3)
 
         call print_test("test_get_grid_point")
 
@@ -74,8 +75,8 @@ contains
     subroutine test_generate_regular_grid
         use canonical, only: generate_regular_grid, pi, rmin, rmax, zmin, zmax
 
-        real(8) :: grid_computed(3, n_r, n_z, n_phi)
-        real(8) :: x_computed(3), x_expected(3)
+        real(dp) :: grid_computed(3, n_r, n_z, n_phi)
+        real(dp) :: x_computed(3), x_expected(3)
 
         call print_test("test_generate_regular_grid")
 
@@ -96,8 +97,8 @@ contains
     subroutine test_compute_Bmod
         use canonical, only: compute_Bmod
 
-        real(8), dimension(3, n_r, n_z, n_phi) :: B
-        real(8), dimension(n_r, n_z, n_phi) :: Bmod_computed
+        real(dp), dimension(3, n_r, n_z, n_phi) :: B
+        real(dp), dimension(n_r, n_z, n_phi) :: Bmod_computed
 
         call print_test("test_compute_Bmod")
 
@@ -115,9 +116,9 @@ contains
             generate_regular_grid, cyl_to_cov, spl_lam
         use interpolate, only: destroy_splines_3d
 
-        real(8), dimension(3, n_r, n_z, n_phi) :: B, Bcov, x
-        real(8), dimension(n_r, n_z, n_phi) :: Bmod
-        real(8), dimension(2, n_r, n_z, n_phi) :: hcan_expected, hcan_computed
+        real(dp), dimension(3, n_r, n_z, n_phi) :: B, Bcov, x
+        real(dp), dimension(n_r, n_z, n_phi) :: Bmod
+        real(dp), dimension(2, n_r, n_z, n_phi) :: hcan_expected, hcan_computed
 
         call print_test("test_compute_hcan")
 
@@ -149,7 +150,7 @@ contains
         use canonical, only: can_to_cyl, spl_lam, generate_regular_grid, twopi
         use interpolate, only: destroy_splines_3d
 
-        real(8), dimension(3, n_r, n_z, n_phi) :: xcan, xcyl_computed
+        real(dp), dimension(3, n_r, n_z, n_phi) :: xcan, xcyl_computed
 
         call generate_regular_grid(xcan)
 
@@ -183,11 +184,11 @@ contains
 
         type(SplineData3D), intent(out) :: spl
 
-        real(8) :: x_min(3), x_max(3)
+        real(dp) :: x_min(3), x_max(3)
         integer, parameter :: order(3) = [3, 3, 3]
         logical, parameter :: periodic(3) = [.False., .False., .True.]
 
-        real(8), dimension(n_r, n_z, n_phi) :: zeros
+        real(dp), dimension(n_r, n_z, n_phi) :: zeros
 
         x_min = [rmin, zmin, 0.d0]
         x_max = [rmax, zmax, twopi]
@@ -203,11 +204,11 @@ contains
 
         type(SplineData3D), intent(out) :: spl
 
-        real(8) :: x_min(3), x_max(3)
+        real(dp) :: x_min(3), x_max(3)
         integer, parameter :: order(3) = [3, 3, 3]
         logical, parameter :: periodic(3) = [.False., .False., .True.]
 
-        real(8), dimension(n_r, n_z, n_phi) :: linear
+        real(dp), dimension(n_r, n_z, n_phi) :: linear
 
         x_min = [rmin, zmin, 0.d0]
         x_max = [rmax, zmax, twopi]
@@ -219,7 +220,7 @@ contains
 
 
     subroutine fill_linear(x)
-        real(8), intent(inout) :: x(n_r, n_z, n_phi)
+        real(dp), intent(inout) :: x(n_r, n_z, n_phi)
 
         integer :: i_r, i_z, i_phi
 

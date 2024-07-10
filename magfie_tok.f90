@@ -1,4 +1,5 @@
 module magfie_tok
+    use, intrinsic :: iso_fortran_env, only: dp => real64
     use magfie, only: FieldType
 
     implicit none
@@ -50,10 +51,10 @@ module magfie_tok
 
     subroutine compute_abfield(self, R, phi, Z, AR, Aphi, AZ, BR, Bphi, BZ)
         class(TokFieldType), intent(in) :: self
-        real(8), intent(in) :: R, phi, Z
-        real(8), intent(out) :: AR, Aphi, AZ, BR, Bphi, BZ
+        real(dp), intent(in) :: R, phi, Z
+        real(dp), intent(out) :: AR, Aphi, AZ, BR, Bphi, BZ
 
-        real(8) :: dummy
+        real(dp) :: dummy
 
         call my_field(R, phi, Z, BR, Bphi, BZ,dummy,dummy,dummy, &
                    dummy,dummy,dummy,dummy,dummy,dummy,AR, Aphi, AZ)
@@ -65,10 +66,10 @@ module magfie_tok
 
     subroutine compute_bfield(self, R, phi, Z, BR, Bphi, BZ)
         class(TokFieldType), intent(in) :: self
-        real(8), intent(in) :: R, phi, Z
-        real(8), intent(out) :: BR, Bphi, BZ
+        real(dp), intent(in) :: R, phi, Z
+        real(dp), intent(out) :: BR, Bphi, BZ
 
-        real(8) :: dummy
+        real(dp) :: dummy
 
         call my_field(R, phi, Z, BR, Bphi, BZ,dummy,dummy,dummy, &
             dummy,dummy,dummy,dummy,dummy,dummy,dummy,dummy,dummy)
@@ -79,10 +80,10 @@ module magfie_tok
 
     subroutine perturb_afield(self, R, phi, Z, AR, Aphi, AZ)
         class(TokFieldType), intent(in) :: self
-        real(8), intent(in) :: R, phi, Z
-        real(8), intent(out) :: AR, Aphi, AZ
+        real(dp), intent(in) :: R, phi, Z
+        real(dp), intent(out) :: AR, Aphi, AZ
 
-        real(8) :: theta
+        real(dp) :: theta
         complex(8) :: expfac, ARmn, Aphimn, AZmn
         integer :: i
 
@@ -111,10 +112,10 @@ module magfie_tok
 
     subroutine perturb_bfield(self, R, phi, Z, BR, Bphi, BZ)
         class(TokFieldType), intent(in) :: self
-        real(8), intent(in) :: R, phi, Z
-        real(8), intent(inout) :: BR, Bphi, BZ
+        real(dp), intent(in) :: R, phi, Z
+        real(dp), intent(inout) :: BR, Bphi, BZ
 
-        real(8) :: theta
+        real(dp) :: theta
         complex(8) :: expfac, BRmn, Bphimn, BZmn
         integer :: i
 
@@ -231,8 +232,8 @@ module magfie_tok
 
         implicit none
 
-        double precision, intent(in) :: r, phi, z
-        double precision, intent(inout) :: Br, Bp, Bz, dBrdR, dBrdp, dBrdZ,   &
+        real(dp), intent(in) :: r, phi, z
+        real(dp), intent(inout) :: Br, Bp, Bz, dBrdR, dBrdp, dBrdZ,   &
                                         dBpdR, dBpdp, dBpdZ, dBzdR, dBzdp, dBzdZ,   &
                                         Ar, Ap, Az
 

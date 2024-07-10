@@ -1,4 +1,5 @@
 module magfie
+    use, intrinsic :: iso_fortran_env, only: dp => real64
 
     implicit none
 
@@ -18,19 +19,19 @@ module magfie
 
     interface
         subroutine compute_abfield(self, R, phi, Z, AR, Aphi, AZ, BR, Bphi, BZ)
-            import :: FieldType
+            import :: FieldType, dp
             class (FieldType), intent(in) :: self
-            real(8), intent(in) :: R, phi, Z
-            real(8), intent(out) :: AR, Aphi, AZ, BR, Bphi, BZ
+            real(dp), intent(in) :: R, phi, Z
+            real(dp), intent(out) :: AR, Aphi, AZ, BR, Bphi, BZ
         end subroutine
     end interface
 
     interface
         subroutine compute_bfield(self, R, phi, Z, BR, Bphi, BZ)
-            import :: FieldType
+            import :: FieldType, dp
             class (FieldType), intent(in) :: self
-            real(8), intent(in) :: R, phi, Z
-            real(8), intent(out) :: BR, Bphi, BZ
+            real(dp), intent(in) :: R, phi, Z
+            real(dp), intent(out) :: BR, Bphi, BZ
         end subroutine
     end interface
 
