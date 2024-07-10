@@ -1,6 +1,8 @@
 FC = gfortran
-FFLAGS = -g -fPIC -O3 -fopenmp -march=native -mtune=native -L. -Wl,-rpath=.
+#FFLAGS = -g -fPIC -O3 -fopenmp -march=native -mtune=native -L. -Wl,-rpath=.
+FFLAGS = -g -fPIC -O0
 
+FFLAGS += -L. -Wl,-rpath=.
 FFLAGS += -Wall -Wuninitialized -Wno-maybe-uninitialized -Wno-unused-label \
 	-Wno-unused-dummy-argument -fmax-errors=1 \
 	-I$(CODE)/libneo/build -L$(CODE)/libneo/build

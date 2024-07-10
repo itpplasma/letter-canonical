@@ -37,11 +37,6 @@ module integrator_euler1
 
             call newton1(si, self%field, f, x, maxit, xlast)
 
-            if (x(1) > 1.0) then
-                ierr = 1
-                return
-            end if
-
             if (x(1) < 0.0) then
                 print *, 'r<0, z = ', x(1), si%z(2), si%z(3), x(2)
                 x(1) = 0.01

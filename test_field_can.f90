@@ -45,7 +45,7 @@ program test_field_can
     z0(3) = 0.1d0  ! phi
     vpar0 = 0.8d0  ! parallel velocity
 
-    allocate(field)
+    field = field_can_cyl_t()
 
     call field_can_init(f, 1d-5, 1d0, vpar0)
     call field%evaluate(f, z0(1), z0(2), z0(3), 0)
