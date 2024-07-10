@@ -1,13 +1,10 @@
-module field_can_mod
+module field_can_base
 
   use diag_mod, only: icounter
 
   implicit none
 
-  type :: FieldCan
-    integer :: field_type  ! -1: testing, 0: canonical, 2: Boozer, &
-                           !  3: canonical cylindrical
-
+  type :: field_can_data_type
     double precision :: Ath, Aph
     double precision :: hth, hph
     double precision :: Bmod
@@ -30,7 +27,23 @@ module field_can_mod
     double precision, dimension(10) :: d2vpar, d2H, d2pth
 
     double precision :: mu, ro0
-  end type FieldCan
+  end type field_can_data_type
+
+  ! abstract base class
+  type, abstract :: field_can_type
+    contains
+    procedure(evaluate), deferred :: evaluate
+  end type field_can_type
+
+  abstract interface
+    subroutine evaluate(self, f, r, th_c, ph_c, mode_secders)
+      import field_can_type, field_can_data_type
+      class(field_can_type), intent(in) :: self
+      type(field_can_data_type), intent(inout) :: f
+      double precision, intent(in) :: r, th_c, ph_c
+      integer, intent(in) :: mode_secders
+    end subroutine evaluate
+  end interface
 
   contains
 
@@ -227,4 +240,4 @@ module field_can_mod
 
   end subroutine eval_field
 
-  end module field_can_mod
+  end module field_can_base
