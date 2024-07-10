@@ -26,9 +26,12 @@ SOURCES += $(addprefix magfie/, $(MAGFIE_SOURCES))
 SOURCES += odeint_rkf45.f90 contrib/rkf45.f90 interpolate.f90
 SOURCES := $(addprefix ../libneo/src/, $(SOURCES))
 
-all: letter-canonical.x test.x test_large.x test_biotsavart.x
+all: test_magfie.x test.x test_large.x test_biotsavart.x
 
-letter-canonical.x: libfield.so libcanonical.so main.f90
+letter_canonical.x: libfield.so libcanonical.so main.f90
+	$(FC) $(FFLAGS) -o $@ $^ -lfield -lcanonical
+
+test_magfie.x: libfield.so libcanonical.so test_magfie.f90
 	$(FC) $(FFLAGS) -o $@ $^ -lfield -lcanonical
 
 test.x: libfield.so libcanonical.so test_util.f90 test.f90
