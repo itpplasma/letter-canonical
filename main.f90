@@ -43,17 +43,22 @@ program main
     print *, "init_canonical_field_components ..."
     call init_canonical_field_components
 
-    field = field_can_cyl_t()
-    call field_can_init(f, 1d-5, 1d0, vpar0)
-
     ! Initial conditions
     z0(1) = 170d0  ! r
     z0(2) = 20d0   ! z
     z0(3) = 0.0d0  ! phi
     vpar0 = 0.8d0  ! parallel velocity
 
+    field = field_can_cyl_t()
+    call field_can_init(f, 1d-5, 1d0, vpar0)
+    call field%evaluate(f, z0(1), z0(2), z0(3), 0)
+
+    z0(4) = vpar0*f%hph + f%Aph/f%ro0  ! p_phi
+    print *, 'z0 = ', z0
+    call get_derivatives2(f, z0(4))
+
     integ = symplectic_integrator_euler1_t(field)
-    call integrator_init(si, field, f, z0, dt=1d-9, ntau=1, rtol=1d-13)
+    call integrator_init(si, field, f, z0, dt=1d-12, ntau=1, rtol=1d-13)
 
     allocate(out(5,nt))
 
