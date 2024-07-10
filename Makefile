@@ -1,6 +1,6 @@
 FC = gfortran
-#FFLAGS = -g -fPIC -O3 -fopenmp -march=native -mtune=native -L. -Wl,-rpath=.
-FFLAGS = -g -fPIC -O0
+#FFLAGS = -g -fPIC -O0
+FFLAGS = -g -fPIC -O3 -fopenmp -march=native -mtune=native -L. -Wl,-rpath=.
 
 FFLAGS += -L. -Wl,-rpath=.
 FFLAGS += -Wall -Wuninitialized -Wno-maybe-uninitialized -Wno-unused-label \

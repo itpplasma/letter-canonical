@@ -76,7 +76,6 @@ module integrator_euler1
         tolref(2) = dabs(x(2))
 
         do kit = 1, maxit
-            if(x(1) > 1d0) return
             if(x(1) < 0d0) x(1) = 0.01d0
 
             call f_sympl_euler1(si, field, f, n, x, fvec)

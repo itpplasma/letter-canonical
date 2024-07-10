@@ -23,7 +23,6 @@ program main
     real(dp) :: z0(4), vpar0
     real(dp), allocatable :: out(:, :)
 
-    real(dp) :: starttime, endtime
     integer :: kt, ierr
 
     ! Workaround, otherwise not initialized without perturbation field
@@ -53,8 +52,8 @@ program main
     z0(3) = 0.0d0  ! phi
     vpar0 = 0.8d0  ! parallel velocity
 
-    integ = symplectic_integrator_euler1_t()
-    call integrator_init(si, field, f, z0, dt=1d-3, ntau=1, rtol=1d-13)
+    integ = symplectic_integrator_euler1_t(field)
+    call integrator_init(si, field, f, z0, dt=1d-9, ntau=1, rtol=1d-13)
 
     allocate(out(5,nt))
 
@@ -72,7 +71,6 @@ program main
         out(1:4,kt) = si%z
         out(5,kt) = f%H
     end do
-    print *, outname(1:10), endtime-starttime
 
     open(unit=20, file=outname, action='write', recl=4096)
     do kt = 1, nt
