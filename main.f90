@@ -12,7 +12,7 @@ program main
 
     integer, parameter :: n_r=100, n_phi=64, n_z=75
     integer :: nt
-    character(*), parameter :: outname = "euler1.out"
+    character(*), parameter :: outname = "rk45.out"
     real(dp), parameter :: qe = 1d0, m = 1d0, c = 1d0, mu = 1d-5
 
     class(FieldType), allocatable :: field_type
@@ -27,7 +27,7 @@ program main
 
     integer :: kt, ierr
 
-    nt = 32000
+    nt = 64000
 
     ! Workaround, otherwise not initialized without perturbation field
     rmin = 75.d0
@@ -65,12 +65,12 @@ program main
     print *, 'vpar0 = ', vpar0
     print *, 'z0 = ', z0
 
-    integ = symplectic_integrator_euler1_t(field)
-    call integrator_init(si, field, f, z0, dt=1.0d0, ntau=1, rtol=1d-12)
+    integ = symplectic_integrator_rk45_t(field)
+    call integrator_init(si, field, f, z0, dt=2.0d-3, ntau=10, rtol=1d-8)
 
     allocate(out(5,nt))
 
-    out(:,1:)=0d0
+    out=0d0
 
     out(1:4,1) = z0
     out(5,1) = f%H
@@ -86,9 +86,7 @@ program main
         out(5,kt) = f%H
     end do
     endtime = omp_get_wtime()
-    print *, outname(1:10), endtime-starttime
-
-    nt = kt
+    print *, trim(outname), endtime-starttime
 
     open(unit=20, file=outname, action='write', recl=4096)
     do kt = 1, nt

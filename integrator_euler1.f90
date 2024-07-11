@@ -35,8 +35,10 @@ module integrator_euler1
         do while(ktau .lt. si%ntau)
             si%pthold = f%pth
 
-            x(1)=si%z(1)
-            x(2)=si%z(4)
+            call self%field%evaluate(f, si%z(1), si%z(2), si%z(3), 2)
+            call get_derivatives2(f, si%z(4))
+            x(1) = si%z(1) - si%dt*(f%dH(2) - f%hth/f%hph*f%dH(3))/f%dpth(1)
+            x(2) = si%z(4) - si%dt*(f%dH(3) - f%dH(1)*f%dpth(3)/f%dpth(1))
 
             call newton1(si, self%field, f, x, maxit, xlast, ierr)
             if (ierr /= 0) return
@@ -51,8 +53,10 @@ module integrator_euler1
 
             call extrapolate_field(f, x, xlast)
 
+            write(6602,*) si%z(1), si%z(2), si%z(3), si%z(4), si%dt*f%dH(1)/f%dpth(1)
             si%z(2) = si%z(2) + si%dt*f%dH(1)/f%dpth(1)
             si%z(3) = si%z(3) + si%dt*(f%vpar - f%dH(1)/f%dpth(1)*f%hth)/f%hph
+
 
             ktau = ktau+1
         enddo
@@ -91,19 +95,6 @@ module integrator_euler1
             ijac(2,2) = 1d0/(fjac(2,2) - fjac(1,2)*fjac(2,1)/fjac(1,1))
             xlast = x
             x = x - matmul(ijac, fvec)
-
-            print *
-            print *
-            print *, kit, ' / ', maxit
-            print *
-            print *, fjac
-            print *
-            print *, ijac
-            print *
-            print *, fvec
-            print *
-            print *, x
-            print *
 
             ! Don't take too small values in pphi as tolerance reference
             tolref(2) = max(dabs(x(2)), tolref(2))
@@ -149,7 +140,7 @@ module integrator_euler1
         call get_derivatives2(f, x(2))
 
         fvec(1) = f%dpth(1)*(f%pth - si%pthold) + si%dt*(f%dH(2)*f%dpth(1) - f%dH(1)*f%dpth(2))
-        fvec(2) = f%dpth(1)*(x(2) - si%z(4))  + si%dt*(f%dH(3)*f%dpth(1) - f%dH(1)*f%dpth(3))
+        fvec(2) = f%dpth(1)*(x(2) - si%z(4)) + si%dt*(f%dH(3)*f%dpth(1) - f%dH(1)*f%dpth(3))
 
     end subroutine f_sympl_euler1
 

@@ -3,7 +3,9 @@ module integrator
     use field_can
 
     use integrator_base
+    use integrator_euler0
     use integrator_euler1
+    use integrator_rk45
 
     implicit none
 

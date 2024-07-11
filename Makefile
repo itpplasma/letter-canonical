@@ -17,6 +17,8 @@ SOURCES := magfie.f90 \
 	field_can_cyl.f90 \
 	field_can.f90 \
 	integrator_base.f90 \
+	integrator_rk45.f90 \
+	integrator_euler0.f90 \
 	integrator_euler1.f90 \
 	integrator.f90
 
