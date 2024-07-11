@@ -95,7 +95,12 @@ contains
         do i_z=1,n_z
             !$omp critical
             i_ctr = i_ctr + 1
-            print *,'integrate ODE: ',i_ctr,' of ',n_z
+            write(*,'(A, I4, A, I4)',advance='no') 'integrate ODE: ', i_ctr, ' of ', n_z
+            if (i_ctr < n_z) then
+                write(*, '(A)', advance="no") char(13)
+            else
+                write(*, *)
+            end if
             !$omp end critical
             z_c = zmin + h_z*dble(i_z-1)
             do i_phi=1,n_phi

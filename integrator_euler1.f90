@@ -35,6 +35,9 @@ module integrator_euler1
         do while(ktau .lt. si%ntau)
             si%pthold = f%pth
 
+            x(1)=si%z(1)
+            x(2)=si%z(4)
+
             call newton1(si, self%field, f, x, maxit, xlast)
 
             if (x(1) < 0.0) then

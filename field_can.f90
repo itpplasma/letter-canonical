@@ -1,6 +1,7 @@
 module field_can
   use, intrinsic :: iso_fortran_env, only: dp => real64
   use field_can_base
+  use field_can_test
   use field_can_cyl
 
   implicit none
@@ -12,21 +13,21 @@ contains
         real(dp), intent(in), optional  :: mu, ro0, vpar
 
         if (present(mu)) then
-        f%mu = mu
+            f%mu = mu
         else
-        f%mu = 0d0
+            f%mu = 0d0
         end if
 
         if (present(ro0)) then
-        f%ro0 = ro0
+            f%ro0 = ro0
         else
-        f%ro0 = 0d0
+            f%ro0 = 0d0
         end if
 
         if (present(vpar)) then
-        f%vpar = vpar
+            f%vpar = vpar
         else
-        f%vpar = 0d0
+            f%vpar = 0d0
         end if
 
     end subroutine field_can_init

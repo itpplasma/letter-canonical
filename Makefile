@@ -13,6 +13,7 @@ SOURCES := magfie.f90 \
 	magfie_factory.f90 \
 	canonical.f90 \
 	field_can_base.f90 \
+	field_can_test.f90 \
 	field_can_cyl.f90 \
 	field_can.f90 \
 	integrator_base.f90 \
@@ -20,6 +21,7 @@ SOURCES := magfie.f90 \
 	integrator.f90
 
 OBJECTS := $(SOURCES:.f90=.o)
+OBJECTS := $(addprefix OBJS/, $(OBJECTS))
 
 LIBNEO_SOURCES := libneo_kinds.f90 math_constants.f90 spl_three_to_five.f90 \
 	odeint_rkf45.f90 contrib/rkf45.f90 interpolate.f90
@@ -40,10 +42,13 @@ MAGFIE_SOURCES := spline5_RZ.f90 \
 	bdivfree.f90
 MAGFIE_SOURCES := $(addprefix ../libneo/src/magfie/, $(MAGFIE_SOURCES))
 
-all: letter_canonical.x \
+all: letter_canonical.x test_integrator.x \
 	test_field_can.x test_magfie.x test.x test_large.x test_biotsavart.x
 
 letter_canonical.x: libfield.so libcanonical.so main.f90
+	$(FC) $(FFLAGS) -o $@ $^ -lfield -lcanonical
+
+test_integrator.x: libfield.so libcanonical.so test_integrator.f90
 	$(FC) $(FFLAGS) -o $@ $^ -lfield -lcanonical
 
 test_field_can.x: libfield.so libcanonical.so test_field_can.f90
@@ -67,14 +72,14 @@ biotsavart.o: biotsavart.f90
 libcanonical.so: libfield.so $(OBJECTS)
 	$(FC) $(FFLAGS) -shared -o $@ $^ -lfield
 
-%.o: %.f90
-	$(FC) $(FFLAGS) -c $<
+OBJS/%.o: %.f90
+	$(FC) $(FFLAGS) -c $< -o $@
 
 libfield.so: $(LIBNEO_SOURCES) $(MAGFIE_SOURCES)
 	$(FC) $(FFLAGS) -shared -o $@ $^
 
 clean_objects:
-	rm -f *.o
+	rm -f OBJS/*.o *.o
 
 clean:
-	rm -f *.x *.so *.o *.mod
+	rm -f *.x *.so OBJS/*.o *.o *.mod

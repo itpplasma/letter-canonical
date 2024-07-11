@@ -5,10 +5,10 @@
     "version": "0.2.0",
     "configurations": [
         {
-            "name": "(gdb) letter-canonical",
+            "name": "(gdb) letter_canonical",
             "type": "cppdbg",
             "request": "launch",
-            "program": "${workspaceFolder}/letter-canonical.x",
+            "program": "${workspaceFolder}/letter_canonical.x",
             "args": [],
             "stopAtEntry": false,
             "cwd": "${workspaceFolder}",

@@ -17,14 +17,13 @@ module field_can_cyl
 
         class(field_can_cyl_t), intent(in) :: self
         type(field_can_data_t), intent(inout) :: f
+        real(dp), intent(in) :: r, th_c, ph_c
+        integer, intent(in) :: mode_secders
 
         integer, parameter :: reorder(3) = [1, 3, 2]  ! dr, dph, dth -> dr, dth, dph
         integer, parameter :: reorder2(6) = [1, 3, 2, 6, 5, 4]
         ! drdr, drdph, drdth, dphdph, dphdth, dthdth ->
         ! drdr, drdth, drdph, dthdth, dthdph, dphdph
-
-        real(dp), intent(in) :: r, th_c, ph_c
-        integer, intent(in) :: mode_secders
 
         real(dp) :: x(3), a, da(3), d2a(6)
 

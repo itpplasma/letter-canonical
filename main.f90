@@ -50,10 +50,14 @@ program main
     vpar0 = 0.8d0  ! parallel velocity
 
     field = field_can_cyl_t()
-    call field_can_init(f, 1d-5, 1d0, vpar0)
+    call field_can_init(f, mu=0d0, ro0=1d0, vpar=vpar0)
     call field%evaluate(f, z0(1), z0(2), z0(3), 0)
 
     z0(4) = vpar0*f%hph + f%Aph/f%ro0  ! p_phi
+    print *, 'f%hph = ', f%hph
+    print *, 'f%Aph = ', f%Aph
+    print *, 'f%ro0 = ', f%ro0
+    print *, 'vpar0 = ', vpar0
     print *, 'z0 = ', z0
     call get_derivatives2(f, z0(4))
 
