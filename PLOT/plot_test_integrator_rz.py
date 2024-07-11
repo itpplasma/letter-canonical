@@ -25,5 +25,15 @@ plt.ylim(-60, 60)
 
 # %%
 plt.figure()
-plt.plot(H, '-', label='Euler')
+plt.plot(H[2:], '-', label='Euler')
+plt.xlabel("Timestep")
+plt.ylabel("Hamiltonian H")
+plt.ylim(H[2:-1].min()*0.999, H[2:-1].max()*1.001)
+# %%
+
+plt.figure()
+plt.plot(Z)
+plt.xlabel("Timestep")
+plt.ylabel("Z(t)")
+plt.ylim(Z[2:-1].min()*1.001, Z[2:-1].max()*0.999)
 # %%

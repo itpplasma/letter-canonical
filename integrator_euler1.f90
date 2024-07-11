@@ -54,6 +54,8 @@ module integrator_euler1
             si%z(2) = si%z(2) + si%dt*f%dH(1)/f%dpth(1)
             si%z(3) = si%z(3) + si%dt*(f%vpar - f%dH(1)/f%dpth(1)*f%hth)/f%hph
 
+            print *, f%dH(1)/f%dpth(1), si%dt*(f%vpar - f%dH(1)/f%dpth(1)*f%hth)/f%hph
+
             ktau = ktau+1
         enddo
     end subroutine orbit_timestep_sympl_euler1

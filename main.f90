@@ -11,7 +11,7 @@ program main
     implicit none
 
     integer, parameter :: n_r=100, n_phi=64, n_z=75
-    integer, parameter :: nt=32000
+    integer :: nt
     character(*), parameter :: outname = "euler1.out"
     real(dp), parameter :: qe = 1d0, m = 1d0, c = 1d0, mu = 1d-5
 
@@ -26,6 +26,8 @@ program main
     real(dp), allocatable :: out(:, :)
 
     integer :: kt, ierr
+
+    nt = 32000
 
     ! Workaround, otherwise not initialized without perturbation field
     rmin = 75.d0
@@ -46,8 +48,8 @@ program main
     call init_canonical_field_components
 
     ! Initial conditions
-    z0(1) = 180d0  ! r
-    z0(2) = 40d0   ! z
+    z0(1) = 163d0   ! r
+    z0(2) = -27.5d0 ! z
     z0(3) = 0.0d0  ! phi
     vpar0 = 0.8d0  ! parallel velocity
 
@@ -64,7 +66,7 @@ program main
     print *, 'z0 = ', z0
 
     integ = symplectic_integrator_euler1_t(field)
-    call integrator_init(si, field, f, z0, dt=1.0d0, ntau=2, rtol=1d-13)
+    call integrator_init(si, field, f, z0, dt=1.0d0, ntau=1, rtol=1d-13)
 
     allocate(out(5,nt))
 
@@ -85,6 +87,8 @@ program main
     end do
     endtime = omp_get_wtime()
     print *, outname(1:10), endtime-starttime
+
+    nt = kt
 
     open(unit=20, file=outname, action='write', recl=4096)
     do kt = 1, nt
