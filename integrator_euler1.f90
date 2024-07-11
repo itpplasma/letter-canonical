@@ -54,8 +54,6 @@ module integrator_euler1
             si%z(2) = si%z(2) + si%dt*f%dH(1)/f%dpth(1)
             si%z(3) = si%z(3) + si%dt*(f%vpar - f%dH(1)/f%dpth(1)*f%hth)/f%hph
 
-            print *, f%dH(1)/f%dpth(1), si%dt*(f%vpar - f%dH(1)/f%dpth(1)*f%hth)/f%hph
-
             ktau = ktau+1
         enddo
     end subroutine orbit_timestep_sympl_euler1
@@ -94,9 +92,26 @@ module integrator_euler1
             xlast = x
             x = x - matmul(ijac, fvec)
 
+            print *
+            print *
+            print *, kit, ' / ', maxit
+            print *
+            print *, fjac
+            print *
+            print *, ijac
+            print *
+            print *, fvec
+            print *
+            print *, x
+            print *
+
             ! Don't take too small values in pphi as tolerance reference
             tolref(2) = max(dabs(x(2)), tolref(2))
             tolref(2) = max(dabs(x(2)), tolref(2))
+
+            print *, dabs(fvec), ' / ', si%atol
+            print *, dabs(x-xlast), ' / ', si%rtol*tolref
+            print *
 
             if (all(dabs(fvec) < si%atol)) return
             if (all(dabs(x-xlast) < si%rtol*tolref)) return
