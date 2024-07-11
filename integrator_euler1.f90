@@ -25,22 +25,56 @@ module integrator_euler1
         integer, intent(out) :: ierr
 
         integer, parameter :: n = 2
-        integer, parameter :: maxit = 32
+        integer, parameter :: maxit = 64
 
         real(dp), dimension(n) :: x, xlast
         integer :: ktau
+
+        real(dp) :: x1min, x1max, x2min, x2max, fvec(2)
+        integer :: nR, nZ, i, j
+
+        nR = 100
+        nZ = 100
+
+        x1min = 163d0
+        x1max = 164d0
+        x2min = -28d0
+        x2max = -27d0
+
+        ! si%z(1) = 163.65101623987172d0
+        ! si%z(2) = -27.595344619263866d0
+        ! si%z(3) = 0.0d0
+
+        ! call self%field%evaluate(f, si%z(1), si%z(2), si%z(3), 2)
+        ! call get_derivatives2(f, si%z(4))
+        ! x(2) = si%z(4)
+
+        ! ! do i = 1, nR
+        ! !     !do j = 1, nZ
+        ! !         si%z(1) = x1min + i*(x1max-x1min)/nR
+        ! !         !si%z(2) = x2min + j*(x2max-x2min)/nZ
+        ! !         x(1) = si%z(1)
+        ! !         x(2) = si%z(4)
+        ! !         call f_sympl_euler1(si, self%field, f, n, x, fvec)
+        ! !         write(6603,*) si%z, x(2), fvec
+        ! !     !end do
+        ! ! end do
+        ! ! stop
 
         ierr = 0
         ktau = 0
         do while(ktau .lt. si%ntau)
             si%pthold = f%pth
 
-            call self%field%evaluate(f, si%z(1), si%z(2), si%z(3), 2)
-            call get_derivatives2(f, si%z(4))
-            x(1) = si%z(1) - si%dt*(f%dH(2) - f%hth/f%hph*f%dH(3))/f%dpth(1)
-            x(2) = si%z(4) - si%dt*(f%dH(3) - f%dH(1)*f%dpth(3)/f%dpth(1))
+            ! call self%field%evaluate(f, si%z(1), si%z(2), si%z(3), 2)
+            ! call get_derivatives2(f, si%z(4))
+            ! x(1) = si%z(1) - si%dt*(f%dH(2) - f%hth/f%hph*f%dH(3))/f%dpth(1)
+            ! x(2) = si%z(4) - si%dt*(f%dH(3) - f%dH(1)*f%dpth(3)/f%dpth(1))
+            x(1) = si%z(1)
+            x(2) = si%z(4)
 
-            call newton1(si, self%field, f, x, maxit, xlast, ierr)
+            !call newton1(si, self%field, f, x, maxit, xlast, ierr)
+            call picard1(si, self%field, f, x, maxit, xlast, ierr)
             if (ierr /= 0) return
 
             if (x(1) < 0.0) then
@@ -51,7 +85,9 @@ module integrator_euler1
             si%z(1) = x(1)
             si%z(4) = x(2)
 
-            call extrapolate_field(f, x, xlast)
+            !call extrapolate_field(f, x, xlast)
+            call self%field%evaluate(f, si%z(1), si%z(2), si%z(3), 2)
+            call get_derivatives2(f, si%z(4))
 
             write(6602,*) si%z(1), si%z(2), si%z(3), si%z(4), si%dt*f%dH(1)/f%dpth(1)
             si%z(2) = si%z(2) + si%dt*f%dH(1)/f%dpth(1)
@@ -62,6 +98,41 @@ module integrator_euler1
         enddo
     end subroutine orbit_timestep_sympl_euler1
 
+
+    !ccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
+    !
+    subroutine picard1(si, field, f, x, maxit, xlast, ierr)
+        !
+            integer, parameter :: n = 2
+
+            type(symplectic_integrator_data_t), intent(inout) :: si
+            class(field_can_t), intent(in) :: field
+            type(field_can_data_t), intent(inout) :: f
+            real(dp), intent(inout) :: x(n)
+            integer, intent(in) :: maxit
+            real(dp), intent(out) :: xlast(n)
+            integer, intent(out) :: ierr
+
+            integer :: kit
+
+
+            do kit = 1, maxit
+                call field%evaluate(f, x(1), si%z(2), si%z(3), 2)
+                call get_derivatives2(f, x(2))
+
+                x(1) = x(1) - 1d-11 *(f%dpth(1)*(f%pth - si%pthold) + si%dt*(f%dH(2)*f%dpth(1) - f%dH(1)*f%dpth(2)))
+                x(2) = si%z(4) - si%dt*(f%dH(3)*f%dpth(1) - f%dH(1)*f%dpth(3))/f%dpth(1)
+
+                if(isnan(x(1)) .or. isnan(x(2))) then
+                    print *, 'picard1: nan'
+                    print *, si%z(1), si%z(2), si%z(3), si%z(4)
+                    ierr = 1
+                    return
+                end if
+                !print *, 'picard1: ', x(1), x(2)
+
+            enddo
+    end subroutine picard1
 
     !ccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
     !
@@ -99,10 +170,6 @@ module integrator_euler1
             ! Don't take too small values in pphi as tolerance reference
             tolref(2) = max(dabs(x(2)), tolref(2))
             tolref(2) = max(dabs(x(2)), tolref(2))
-
-            print *, dabs(fvec), ' / ', si%atol
-            print *, dabs(x-xlast), ' / ', si%rtol*tolref
-            print *
 
             if (all(dabs(fvec) < si%atol)) return
             if (all(dabs(x-xlast) < si%rtol*tolref)) return

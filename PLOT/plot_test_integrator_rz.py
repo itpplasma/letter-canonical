@@ -13,7 +13,7 @@ plt.ylabel('Z [cm]')
 plt.axis('equal')
 
 # Load data
-data = np.loadtxt('../rk45.out')
+data = np.loadtxt('../orbit.out')
 R = data[:,0]
 Z = data[:,1]
 phi = data[:,2]
@@ -36,4 +36,12 @@ plt.plot(Z)
 plt.xlabel("Timestep")
 plt.ylabel("Z(t)")
 plt.ylim(Z[2:-1].min()*1.001, Z[2:-1].max()*0.999)
+# %%
+
+
+plt.figure()
+plt.plot(phi)
+plt.xlabel("Timestep")
+plt.ylabel("phi(t)")
+plt.ylim(phi[2:-1].min()*1.001, phi[2:-1].max()*0.999)
 # %%

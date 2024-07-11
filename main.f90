@@ -12,7 +12,7 @@ program main
 
     integer, parameter :: n_r=100, n_phi=64, n_z=75
     integer :: nt
-    character(*), parameter :: outname = "rk45.out"
+    character(*), parameter :: outname = "orbit.out"
     real(dp), parameter :: qe = 1d0, m = 1d0, c = 1d0, mu = 1d-5
 
     class(FieldType), allocatable :: field_type
@@ -25,9 +25,9 @@ program main
     real(dp) :: z0(4), vpar0, starttime, endtime
     real(dp), allocatable :: out(:, :)
 
-    integer :: kt, ierr
+    integer :: kt, ierr, nmax
 
-    nt = 64000
+    nt = 8000
 
     ! Workaround, otherwise not initialized without perturbation field
     rmin = 75.d0
@@ -65,8 +65,8 @@ program main
     print *, 'vpar0 = ', vpar0
     print *, 'z0 = ', z0
 
-    integ = symplectic_integrator_rk45_t(field)
-    call integrator_init(si, field, f, z0, dt=2.0d-3, ntau=10, rtol=1d-8)
+    integ = symplectic_integrator_euler1_t(field)
+    call integrator_init(si, field, f, z0, dt=1.0d1, ntau=10, rtol=1d-10)
 
     allocate(out(5,nt))
 
@@ -80,6 +80,7 @@ program main
         call integ%timestep(si, f, ierr)
         if (.not. ierr==0) then
             print *, si%z
+            nmax = kt-1
             exit
         endif
         out(1:4,kt) = si%z
@@ -89,7 +90,7 @@ program main
     print *, trim(outname), endtime-starttime
 
     open(unit=20, file=outname, action='write', recl=4096)
-    do kt = 1, nt
+    do kt = 1, nmax
         write(20,*) out(:,kt)
     end do
     close(20)
