@@ -1,5 +1,6 @@
 program main
     use, intrinsic :: iso_fortran_env, only: dp => real64
+    use omp_lib
     use magfie, only: FieldType
     use magfie_tok, only: TokFieldType
     use canonical, only: twopi, init_canonical, init_transformation, &
@@ -10,8 +11,9 @@ program main
     implicit none
 
     integer, parameter :: n_r=100, n_phi=64, n_z=75
-    integer, parameter :: nt=100
+    integer, parameter :: nt=32000
     character(*), parameter :: outname = "euler1.out"
+    real(dp), parameter :: qe = 1d0, m = 1d0, c = 1d0, mu = 1d-5
 
     class(FieldType), allocatable :: field_type
     class(field_can_cyl_t), allocatable :: field
@@ -20,7 +22,7 @@ program main
     type(symplectic_integrator_data_t) :: si
 
     real(dp) :: rmin, rmax, zmin, zmax
-    real(dp) :: z0(4), vpar0
+    real(dp) :: z0(4), vpar0, starttime, endtime
     real(dp), allocatable :: out(:, :)
 
     integer :: kt, ierr
@@ -50,19 +52,19 @@ program main
     vpar0 = 0.8d0  ! parallel velocity
 
     field = field_can_cyl_t()
-    call field_can_init(f, mu=0d0, ro0=1d0, vpar=vpar0)
-    call field%evaluate(f, z0(1), z0(2), z0(3), 0)
+    call field_can_init(f, mu, c*m/qe, vpar0)
+    call field%evaluate(f, z0(1), z0(2), z0(3), 2)
 
     z0(4) = vpar0*f%hph + f%Aph/f%ro0  ! p_phi
+    call get_derivatives2(f, z0(4))
     print *, 'f%hph = ', f%hph
     print *, 'f%Aph = ', f%Aph
     print *, 'f%ro0 = ', f%ro0
     print *, 'vpar0 = ', vpar0
     print *, 'z0 = ', z0
-    call get_derivatives2(f, z0(4))
 
     integ = symplectic_integrator_euler1_t(field)
-    call integrator_init(si, field, f, z0, dt=1d-12, ntau=1, rtol=1d-13)
+    call integrator_init(si, field, f, z0, dt=0.5d0, ntau=1, rtol=1d-13)
 
     allocate(out(5,nt))
 
@@ -70,6 +72,7 @@ program main
 
     out(1:4,1) = z0
     out(5,1) = f%H
+    starttime = omp_get_wtime()
     do kt = 2, nt
         ierr = 0
         call integ%timestep(si, f, ierr)
@@ -80,6 +83,8 @@ program main
         out(1:4,kt) = si%z
         out(5,kt) = f%H
     end do
+    endtime = omp_get_wtime()
+    print *, outname(1:10), endtime-starttime
 
     open(unit=20, file=outname, action='write', recl=4096)
     do kt = 1, nt

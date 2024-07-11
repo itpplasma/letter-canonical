@@ -37,6 +37,10 @@ program test_integrator
     z0(4) = m*vpar0*f%hph + qe/c*f%Aph  ! p_phi
 
     call get_derivatives2(f, z0(4))
+    print *, 'f%hph = ', f%hph
+    print *, 'f%Aph = ', f%Aph
+    print *, 'f%ro0 = ', f%ro0
+    print *, 'vpar0 = ', vpar0
     print *, 'z0 = ', z0
 
     taub = 7800d0  ! estimated bounce time
@@ -46,6 +50,7 @@ program test_integrator
     dt = taub/steps_per_bounce
     nt = nbounce*steps_per_bounce
 
+    print *, 'dt: ', dt
     print *, 'timesteps: ', nt
 
     integ = symplectic_integrator_euler1_t(field)
