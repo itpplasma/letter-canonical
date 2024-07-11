@@ -64,7 +64,7 @@ program main
     print *, 'z0 = ', z0
 
     integ = symplectic_integrator_euler1_t(field)
-    call integrator_init(si, field, f, z0, dt=0.5d0, ntau=1, rtol=1d-13)
+    call integrator_init(si, field, f, z0, dt=1.0d0, ntau=1, rtol=1d-13)
 
     allocate(out(5,nt))
 
