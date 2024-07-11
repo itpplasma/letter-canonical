@@ -12,8 +12,8 @@ def plot_poincare_cuts(filename, linestyle):
     for i in range(data.shape[0] - 1):
         if(np.sign(np.mod(data[i, 1], 2*np.pi) - np.pi) !=
         np.sign(np.mod(data[i+1, 1], 2*np.pi) - np.pi)):
-            r = 0.5*(data[i, 0] + data[i+1, 0])
-            z = 0.5*(data[i, 2] + data[i+1, 2])
+            r = data[i, 0]
+            z = data[i, 2]
             r = max(min([r, rmax]), rmin)
             z = max(min([z, zmax]), zmin)
             plt.plot(r, z, linestyle)

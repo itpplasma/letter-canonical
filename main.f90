@@ -46,8 +46,8 @@ program main
     call init_canonical_field_components
 
     ! Initial conditions
-    z0(1) = 170d0  ! r
-    z0(2) = 20d0   ! z
+    z0(1) = 180d0  ! r
+    z0(2) = 40d0   ! z
     z0(3) = 0.0d0  ! phi
     vpar0 = 0.8d0  ! parallel velocity
 
@@ -64,7 +64,7 @@ program main
     print *, 'z0 = ', z0
 
     integ = symplectic_integrator_euler1_t(field)
-    call integrator_init(si, field, f, z0, dt=1.0d0, ntau=1, rtol=1d-13)
+    call integrator_init(si, field, f, z0, dt=1.0d0, ntau=2, rtol=1d-13)
 
     allocate(out(5,nt))
 

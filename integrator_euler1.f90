@@ -27,7 +27,7 @@ module integrator_euler1
         integer, parameter :: n = 2
         integer, parameter :: maxit = 32
 
-        double precision, dimension(n) :: x, xlast
+        real(dp), dimension(n) :: x, xlast
         integer :: ktau
 
         ierr = 0
@@ -38,7 +38,8 @@ module integrator_euler1
             x(1)=si%z(1)
             x(2)=si%z(4)
 
-            call newton1(si, self%field, f, x, maxit, xlast)
+            call newton1(si, self%field, f, x, maxit, xlast, ierr)
+            if (ierr /= 0) return
 
             if (x(1) < 0.0) then
                 print *, 'r<0, z = ', x(1), si%z(2), si%z(3), x(2)
@@ -60,19 +61,20 @@ module integrator_euler1
 
     !ccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
     !
-    subroutine newton1(si, field, f, x, maxit, xlast)
+    subroutine newton1(si, field, f, x, maxit, xlast, ierr)
     !
+        integer, parameter :: n = 2
+
         type(symplectic_integrator_data_t), intent(inout) :: si
         class(field_can_t), intent(in) :: field
         type(field_can_data_t), intent(inout) :: f
-        integer, parameter :: n = 2
-
-        double precision, intent(inout) :: x(n)
+        real(dp), intent(inout) :: x(n)
         integer, intent(in) :: maxit
-        double precision, intent(out) :: xlast(n)
+        real(dp), intent(out) :: xlast(n)
+        integer, intent(out) :: ierr
 
-        double precision :: fvec(n), fjac(n,n), ijac(n,n)
-        double precision :: tolref(n)
+        real(dp) :: fvec(n), fjac(n,n), ijac(n,n)
+        real(dp) :: tolref(n)
         integer :: kit
 
         tolref(1) = 1d0
@@ -97,6 +99,7 @@ module integrator_euler1
             if (all(dabs(fvec) < si%atol)) return
             if (all(dabs(x-xlast) < si%rtol*tolref)) return
         enddo
+        ierr = 1
         print *, 'newton1: maximum iterations reached: ', maxit
         write(6601,*) x(1), x(2)
         write(6601,*) x-xlast
@@ -122,8 +125,8 @@ module integrator_euler1
         class(field_can_t), intent(in) :: field
         type(field_can_data_t), intent(inout) :: f
         integer, intent(in) :: n
-        double precision, intent(in) :: x(n)
-        double precision, intent(out) :: fvec(n)
+        real(dp), intent(in) :: x(n)
+        real(dp), intent(out) :: fvec(n)
 
         call field%evaluate(f, x(1), si%z(2), si%z(3), 2)
         call get_derivatives2(f, x(2))
@@ -141,8 +144,8 @@ module integrator_euler1
         type(symplectic_integrator_data_t), intent(in) :: si
         type(field_can_data_t), intent(inout) :: f
 
-        double precision, intent(in)  :: x(2)
-        double precision, intent(out) :: jac(2, 2)
+        real(dp), intent(in)  :: x(2)
+        real(dp), intent(out) :: jac(2, 2)
 
         jac(1,1) = f%d2pth(1)*(f%pth - si%pthold) + f%dpth(1)**2 &
         + si%dt*(f%d2H(2)*f%dpth(1) + f%dH(2)*f%d2pth(1) - f%d2H(1)*f%dpth(2) - f%dH(1)*f%d2pth(2))
@@ -158,7 +161,7 @@ module integrator_euler1
 
     subroutine extrapolate_field(f, x, xlast)
         type(field_can_data_t), intent(inout) :: f
-        double precision, dimension(2), intent(in) :: x, xlast
+        real(dp), dimension(2), intent(in) :: x, xlast
 
         f%pth = f%pth + f%dpth(1)*(x(1)-xlast(1)) + f%dpth(4)*(x(2)-xlast(2))
         f%dH(1) = f%dH(1) + f%d2H(1)*(x(1)-xlast(1)) + f%d2H(7)*(x(2)-xlast(2))
