@@ -113,12 +113,11 @@ contains
 
     subroutine test_compute_hcan
         use canonical, only: compute_hcan, compute_bmod, &
-            generate_regular_grid, cyl_to_cov, spl_lam
+            generate_regular_grid, cyl_to_cov, spl_lam, Bmod, hcan
         use interpolate, only: destroy_splines_3d
 
         real(dp), dimension(3, n_r, n_z, n_phi) :: B, Bcov, x
-        real(dp), dimension(n_r, n_z, n_phi) :: Bmod
-        real(dp), dimension(2, n_r, n_z, n_phi) :: hcan_expected, hcan_computed
+        real(dp), dimension(3, n_r, n_z, n_phi) :: hcan_expected
 
         call print_test("test_compute_hcan")
 
@@ -129,12 +128,13 @@ contains
         call cyl_to_cov(x, Bcov)
 
         call compute_Bmod(B, Bmod)
-        hcan_expected(1,:,:,:) = Bcov(2,:,:,:)/Bmod
-        hcan_expected(2,:,:,:) = Bcov(3,:,:,:)/Bmod
+        hcan_expected(1,:,:,:) = Bcov(1,:,:,:)/Bmod
+        hcan_expected(2,:,:,:) = Bcov(2,:,:,:)/Bmod
+        hcan_expected(3,:,:,:) = Bcov(3,:,:,:)/Bmod
 
         call construct_zero_spline(spl_lam)
-        call compute_hcan(B, Bmod, hcan_computed)
-        if (any(abs(hcan_computed - hcan_expected) > eps)) then
+        call compute_hcan(B)
+        if (any(abs(hcan - hcan_expected) > eps)) then
             call print_fail
             print *, "should match for identical transformation"
             error stop

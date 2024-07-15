@@ -8,7 +8,7 @@ program test_magfie
     evaluate_splines_3d, evaluate_splines_3d_der2, destroy_splines_3d
     use canonical, only: init_canonical, init_transformation, twopi, &
         init_canonical_field_components, init_splines_with_psi, &
-        spl_lam, spl_chi, spl_A1, spl_A2, spl_A3, spl_R_of_xc, spl_Aphi_of_xc
+        spl_lam, spl_chi, spl_A2, spl_A3, spl_R_of_xc, spl_Aphi_of_xc
 
     implicit none
     save
@@ -228,7 +228,7 @@ contains
         integer, parameter :: n_r_test=49, n_phi_test=63, n_z_test=74
 
         real(dp), dimension(:,:,:), allocatable :: lam_test, chi_test
-        real(dp), dimension(:,:,:), allocatable :: A1_test, A2_test, A3_test
+        real(dp), dimension(:,:,:), allocatable :: A2_test, A3_test
         real(dp), dimension(:,:,:,:), allocatable :: dlam_test, dchi_test
         real(dp), dimension(3) :: x
         real(dp) :: dummy(6)
@@ -237,7 +237,6 @@ contains
 
         allocate(lam_test(n_r_test, n_phi_test, n_z_test))
         allocate(chi_test(n_r_test, n_phi_test, n_z_test))
-        allocate(A1_test(n_r_test, n_phi_test, n_z_test))
         allocate(A2_test(n_r_test, n_phi_test, n_z_test))
         allocate(A3_test(n_r_test, n_phi_test, n_z_test))
         allocate(dlam_test(3, n_r_test, n_phi_test, n_z_test))
@@ -253,7 +252,6 @@ contains
                         lam_test(i_r, i_phi, i_z), dlam_test(:, i_r, i_phi, i_z), dummy)
                     call evaluate_splines_3d_der2(spl_chi, x, &
                         chi_test(i_r, i_phi, i_z), dchi_test(:, i_r, i_phi, i_z), dummy)
-                    call evaluate_splines_3d(spl_A1, x, A1_test(i_r, i_phi, i_z))
                     call evaluate_splines_3d(spl_A2, x, A2_test(i_r, i_phi, i_z))
                     call evaluate_splines_3d(spl_A3, x, A3_test(i_r, i_phi, i_z))
                 end do
@@ -293,10 +291,6 @@ contains
             write(outfile_unit, *) dchi_test(3,:,:,:)
         close(outfile_unit)
 
-
-        open(newunit=outfile_unit, file="A1_spl.out")
-            write(outfile_unit, *) A1_test
-        close(outfile_unit)
         open(newunit=outfile_unit, file="A2_spl.out")
             write(outfile_unit, *) A2_test
         close(outfile_unit)
@@ -308,7 +302,7 @@ contains
             write(outfile_unit, *) R_of_xc
         close(outfile_unit)
 
-        deallocate(lam_test, chi_test, A1_test, A2_test, A3_test)
+        deallocate(lam_test, chi_test, A2_test, A3_test)
     end subroutine test_splines
 
 end program test_magfie

@@ -11,6 +11,7 @@ SOURCES := magfie.f90 \
 	magfie_test.f90 \
 	magfie_tok.f90 \
 	magfie_factory.f90 \
+	psi_transform.f90 \
 	canonical.f90 \
 	field_can_base.f90 \
 	field_can_test.f90 \

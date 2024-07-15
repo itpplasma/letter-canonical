@@ -25,7 +25,7 @@ module canonical
 
     ! For splines
     real(dp) :: x_min(3), x_max(3)
-    integer, parameter :: order(3) = [3, 3, 3]
+    integer, parameter :: order(3) = [5, 5, 5]
     logical, parameter :: periodic(3) = [.False., .True., .False.]
 
     ! For splining lambda (difference between canonical and cylindrical angle)
@@ -33,14 +33,19 @@ module canonical
     type(SplineData3D) :: spl_lam, spl_chi
 
     ! For splining covariant vector potential, h=B/Bmod and Bmod
-    type(SplineData3D) :: spl_Bmod, spl_A1, spl_A2, spl_A3, spl_h2, spl_h3
+    type(SplineData3D) :: spl_Bmod, spl_A2, spl_A3, spl_h2, spl_h3
 
     class(FieldType), allocatable :: magfie_type
 
     ! For splining psi
     real(dp) :: psi_min, psi_max
-    real(dp), dimension(:,:,:), allocatable :: psi_of_x, R_of_xc
+    real(dp), dimension(:,:,:), allocatable :: psi_of_x, Bmod
+    real(dp), dimension(:,:,:,:), allocatable :: hcan, Acan
     real(dp), dimension(:), allocatable :: psi_grid
+
+    real(dp), dimension(:,:,:), allocatable :: R_of_xc, &
+        Aph_of_xc, hph_of_xc, hth_of_xc, Bmod_of_xc
+
     type(SplineData3D) :: spl_R_of_xc, spl_Aphi_of_xc
 
 contains
@@ -173,9 +178,6 @@ contains
         use magfie_test, only: AMPL
 
         real(dp), dimension(:,:,:,:), allocatable :: xcan, xcyl, B, Acyl
-        real(dp), dimension(:,:,:,:), allocatable :: hcan, Acan
-        real(dp), dimension(:,:,:), allocatable :: Bmod
-
 
         allocate(xcan(3,n_r,n_phi,n_z), xcyl(3,n_r,n_phi,n_z))
         allocate(B(3,n_r,n_phi,n_z), Acyl(3,n_r,n_phi,n_z))
@@ -184,23 +186,21 @@ contains
         call can_to_cyl(xcan, xcyl)
         call get_physical_field(xcyl, B, Acyl)
 
-        allocate(Bmod(n_r,n_phi,n_z), hcan(2,n_r,n_phi,n_z))
+        allocate(Bmod(n_r,n_phi,n_z))
         call compute_Bmod(B, Bmod)
-        call compute_hcan(B, Bmod, hcan)
         call construct_splines_3d(x_min, x_max, Bmod, order, periodic, spl_Bmod)
-        call construct_splines_3d(x_min, x_max, hcan(1,:,:,:), order, periodic, spl_h2)
-        call construct_splines_3d(x_min, x_max, hcan(2,:,:,:), order, periodic, spl_h3)
-        deallocate(hcan, Bmod)
+
+        allocate(hcan(3,n_r,n_phi,n_z))
+        call compute_hcan(B)
+        call construct_splines_3d(x_min, x_max, hcan(2,:,:,:), order, periodic, spl_h2)
+        call construct_splines_3d(x_min, x_max, hcan(3,:,:,:), order, periodic, spl_h3)
 
         allocate(Acan(3,n_r,n_phi,n_z))
         call compute_Acan(Acyl, Acan)
         call construct_splines_3d(x_min, x_max, &
-            Acan(1,:,:,:), [4, 5, 5], periodic, spl_A1)
+            Acan(2,:,:,:), [5, 5, 5], periodic, spl_A2)
         call construct_splines_3d(x_min, x_max, &
-            Acan(2,:,:,:), [5, 4, 5], periodic, spl_A2)
-        call construct_splines_3d(x_min, x_max, &
-            Acan(3,:,:,:), [5, 5, 4], periodic, spl_A3)
-        deallocate(Acan)
+            Acan(3,:,:,:), [5, 5, 5], periodic, spl_A3)
 
         deallocate(Acyl, B, xcyl, xcan)
 
@@ -208,20 +208,28 @@ contains
 
 
     subroutine init_splines_with_psi
-        real(dp), dimension(:,:,:), allocatable :: Aphi_of_xc
+        use psi_transform, only: grid_R_to_psi
         real(dp) :: x(3)
         integer :: i_r, i_phi, i_z, debug_unit
 
         call init_psi_grid()
-        call init_R_of_xc()
+
+        allocate( &
+            R_of_xc(n_r, n_phi, n_z), &
+            Aph_of_xc(n_r, n_phi, n_z), &
+            hph_of_xc(n_r, n_phi, n_z), &
+            hth_of_xc(n_r, n_phi, n_z), &
+            Bmod_of_xc(n_r, n_phi, n_z) &
+        )
+
+        call grid_R_to_psi(n_r, n_phi, n_z, psi_of_x, &
+            R_of_xc, Aph_of_xc, hph_of_xc, hth_of_xc, Bmod_of_xc)
 
         x_min = [rmin, 0.d0, zmin]
         x_max = [rmax, twopi, zmax]
 
         call construct_splines_3d([psi_min, 0.0d0, zmin], [psi_max, twopi, zmax], &
             R_of_xc, order, periodic, spl_R_of_xc)
-
-        allocate(Aphi_of_xc(n_r, n_phi, n_z))
 
         !$omp parallel private(i_r, i_phi, i_z, x)
         !$omp do
@@ -230,7 +238,7 @@ contains
                 do i_r = 1, n_r
                     x = get_grid_point(i_r, i_phi, i_z)
                     x(1) = R_of_xc(i_r, i_phi, i_z)
-                    call evaluate_splines_3d(spl_A2, x, Aphi_of_xc(i_r, i_phi, i_z))
+                    call evaluate_splines_3d(spl_A2, x, Aph_of_xc(i_r, i_phi, i_z))
                 end do
             end do
         end do
@@ -238,11 +246,11 @@ contains
         !$omp end parallel
 
         call construct_splines_3d([psi_min, 0.0d0, zmin], [psi_max, twopi, zmax], &
-            Aphi_of_xc, order, periodic, spl_Aphi_of_xc)
+        Aph_of_xc, order, periodic, spl_Aphi_of_xc)
 
         if (debug) then
-            open(newunit=debug_unit, file="Aphi_of_xc.out")
-            write(debug_unit, *) Aphi_of_xc
+            open(newunit=debug_unit, file="Aph_of_xc.out")
+            write(debug_unit, *) Aph_of_xc
             close(debug_unit)
         end if
 
@@ -277,14 +285,12 @@ contains
     end subroutine init_psi_grid
 
 
-    subroutine init_R_of_xc
+    subroutine init_R_of_xc_newton
         real(dp), parameter :: tol = 1d-13
         integer, parameter :: counter_max = 32
 
         real(dp) :: x(3), psi, dpsi(3), d2psi(6)
         integer :: i_r, i_phi, i_z, counter
-
-        allocate(R_of_xc(n_r, n_phi, n_z))
 
         !$omp parallel private(i_r, i_phi, i_z, x, psi, dpsi, d2psi, counter)
         !$omp do
@@ -313,7 +319,7 @@ contains
         end do
         !$omp end do
         !$omp end parallel
-    end subroutine init_R_of_xc
+    end subroutine init_R_of_xc_newton
 
 
     subroutine evaluate_afield_can(x, A1, dA1, d2A1, A2, dA2, d2A2, A3, dA3, d2A3)
@@ -323,7 +329,9 @@ contains
         real(dp), intent(out) :: A1, A2, A3, dA1(3), dA2(3), dA3(3), &
                                 d2A1(6), d2A2(6), d2A3(6)
 
-        call evaluate_splines_3d_der2(spl_A1, x, A1, dA1, d2A1)
+        A1 = 0.0d0
+        dA1 = 0.0d0
+        d2A1 = 0.0d0
         call evaluate_splines_3d_der2(spl_A2, x, A2, dA2, d2A2)
         call evaluate_splines_3d_der2(spl_A3, x, A3, dA3, d2A3)
 
@@ -438,10 +446,8 @@ contains
     end subroutine
 
 
-    subroutine compute_hcan(Bcyl, Bmod, hcan)
+    subroutine compute_hcan(Bcyl)
         real(dp), dimension(:,:,:,:), intent(in) :: Bcyl   ! physical components
-        real(dp), dimension(:,:,:), intent(in) :: Bmod
-        real(dp), dimension(:,:,:,:), intent(inout) :: hcan  ! covariant
 
         integer :: i_r, i_phi, i_z
         real(dp) :: x(3)
@@ -461,8 +467,9 @@ contains
                     B2can = Bphicov*(1.0d0 + dlam(2))
                     B3can = BZcov + Bphicov*dlam(3)
 
-                    hcan(1, i_r, i_phi, i_z) = B2can/Bmod(i_r, i_phi, i_z)
-                    hcan(2, i_r, i_phi, i_z) = B3can/Bmod(i_r, i_phi, i_z)
+                    hcan(1, i_r, i_phi, i_z) = B1can/Bmod(i_r, i_phi, i_z)
+                    hcan(2, i_r, i_phi, i_z) = B2can/Bmod(i_r, i_phi, i_z)
+                    hcan(3, i_r, i_phi, i_z) = B3can/Bmod(i_r, i_phi, i_z)
                 enddo
             enddo
         enddo
