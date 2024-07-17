@@ -19,7 +19,7 @@ Z = data[:,1]
 phi = data[:,2]
 H = data[:,4]
 
-plt.plot(R, Z, '-', label='Forward Euler')
+plt.plot(R, Z, '.', label='Forward Euler')
 plt.xlim(75, 250)
 plt.ylim(-60, 60)
 

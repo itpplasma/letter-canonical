@@ -73,8 +73,8 @@ module integrator_euler1
             x(1) = si%z(1)
             x(2) = si%z(4)
 
-            !call newton1(si, self%field, f, x, maxit, xlast, ierr)
-            call picard1(si, self%field, f, x, maxit, xlast, ierr)
+            call newton1(si, self%field, f, x, maxit, xlast, ierr)
+            !call picard1(si, self%field, f, x, maxit, xlast, ierr)
             if (ierr /= 0) return
 
             if (x(1) < 0.0) then
@@ -89,7 +89,7 @@ module integrator_euler1
             call self%field%evaluate(f, si%z(1), si%z(2), si%z(3), 2)
             call get_derivatives2(f, si%z(4))
 
-            write(6602,*) si%z(1), si%z(2), si%z(3), si%z(4), si%dt*f%dH(1)/f%dpth(1)
+            !write(6602,*) si%z(1), si%z(2), si%z(3), si%z(4), si%dt*f%dH(1)/f%dpth(1)
             si%z(2) = si%z(2) + si%dt*f%dH(1)/f%dpth(1)
             si%z(3) = si%z(3) + si%dt*(f%vpar - f%dH(1)/f%dpth(1)*f%hth)/f%hph
 

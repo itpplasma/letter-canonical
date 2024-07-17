@@ -65,8 +65,8 @@ program main
     print *, 'vpar0 = ', vpar0
     print *, 'z0 = ', z0
 
-    integ = symplectic_integrator_euler1_t(field)
-    call integrator_init(si, field, f, z0, dt=1.0d1, ntau=10, rtol=1d-10)
+    integ = symplectic_integrator_rk45_t(field)
+    call integrator_init(si, field, f, z0, dt=1.0d-1, ntau=1, rtol=1d-10)
 
     allocate(out(5,nt))
 
@@ -75,12 +75,14 @@ program main
     out(1:4,1) = z0
     out(5,1) = f%H
     starttime = omp_get_wtime()
+    nmax = nt
     do kt = 2, nt
         ierr = 0
         call integ%timestep(si, f, ierr)
         if (.not. ierr==0) then
             print *, si%z
             nmax = kt-1
+            print *, 'nmax = ', nmax
             exit
         endif
         out(1:4,kt) = si%z

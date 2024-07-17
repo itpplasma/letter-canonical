@@ -3,7 +3,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 
 # Load data
-data = np.loadtxt('../euler1.out')
+data = np.loadtxt('../orbit.out')
 
 # Plot
 R0 = 1.0
