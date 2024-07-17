@@ -19,17 +19,14 @@ module psi_transform
 !        integer,  intent(in) :: n_psi
 ! in case n_psi is different from n_r, n_r should be replaced
 ! with n_psi in the above declaration of output arrays
-! ***** These should be the output variables:
         real(dp), intent(out) :: psimin, psimax, h_psi
-! ***** For the moment they are all local:
         integer  :: n_psi
-!        real(dp) :: psimin, psimax, h_psi
 !
         integer, parameter  :: nder = 0 !(no derivatives)
 ! ***** This should be the input variable:
 !        integer, intent(in) :: nplagr
 ! ***** For the moment it is a local parameter:
-        integer, parameter :: nplagr = 4 !(4 points - cubic polynomial)
+        integer, parameter :: nplagr = 6 !(4 points - cubic polynomial, 6: quintic)
 !
         logical :: reverse
         integer :: i_R, i_psi, ibeg, iend, nshift
