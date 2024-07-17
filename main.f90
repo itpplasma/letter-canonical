@@ -50,7 +50,7 @@ program main
     ! Initial conditions
     z0(1) = 163d0   ! r
     z0(2) = -27.5d0 ! z
-    z0(3) = 0.0d0  ! phi
+    z0(3) = -2.0d0*3.1415d0  ! phi
     vpar0 = 0.8d0  ! parallel velocity
 
     field = field_can_cyl_t()
