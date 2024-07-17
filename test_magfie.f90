@@ -8,7 +8,7 @@ program test_magfie
     evaluate_splines_3d, evaluate_splines_3d_der2, destroy_splines_3d
     use canonical, only: init_canonical, init_transformation, twopi, &
         init_canonical_field_components, init_splines_with_psi, &
-        spl_lam, spl_chi, spl_A2, spl_A3, spl_R_of_xc, spl_Aphi_of_xc
+        spl_lam, spl_A3, spl_R_of_xc, spl_Aphi_of_xc
 
     implicit none
     save
@@ -223,7 +223,7 @@ contains
 
 
     subroutine test_splines
-        use canonical, only: R_of_xc
+        use canonical
 
         integer, parameter :: n_r_test=49, n_phi_test=63, n_z_test=74
 
@@ -298,8 +298,15 @@ contains
             write(outfile_unit, *) A3_test
         close(outfile_unit)
 
+        print *, "psi_min = ", psi_min, "psi_max = ", psi_max
+        print *, "h_psi = ", h_psi, (psi_max-psi_min)/dble(n_R-1)
+
         open(newunit=outfile_unit, file="R_of_xc.out")
             write(outfile_unit, *) R_of_xc
+        close(outfile_unit)
+
+        open(newunit=outfile_unit, file="Aph_of_xc.out")
+        write(outfile_unit, *) Aph_of_xc
         close(outfile_unit)
 
         deallocate(lam_test, chi_test, A2_test, A3_test)

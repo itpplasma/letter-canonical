@@ -210,7 +210,7 @@ contains
     subroutine init_splines_with_psi
         use psi_transform, only: grid_R_to_psi
         real(dp) :: x(3)
-        integer :: i_r, i_phi, i_z, debug_unit
+        integer :: i_r, i_phi, i_z
 
         call init_psi_grid()
 
@@ -222,7 +222,7 @@ contains
             Bmod_of_xc(n_r, n_phi, n_z) &
         )
 
-        call grid_R_to_psi(n_r, n_phi, n_z, &
+        call grid_R_to_psi(n_r, n_phi, n_z, rmin, rmax, &
             psi_of_x, Acan(2,:,:,:), hcan(2,:,:,:), hcan(3,:,:,:), Bmod, &
             R_of_xc, Aph_of_xc, hph_of_xc, hth_of_xc, Bmod_of_xc, &
             psi_min, psi_max, h_psi)
@@ -249,14 +249,6 @@ contains
 
         call construct_splines_3d([psi_min, 0.0d0, zmin], [psi_max, twopi, zmax], &
         Aph_of_xc, order, periodic, spl_Aphi_of_xc)
-
-        print *, "h_psi = ", h_psi, (psi_max-psi_min)/dble(n_R-1)
-
-        if (debug) then
-            open(newunit=debug_unit, file="Aph_of_xc.out")
-            write(debug_unit, *) Aph_of_xc
-            close(debug_unit)
-        end if
 
     end subroutine init_splines_with_psi
 

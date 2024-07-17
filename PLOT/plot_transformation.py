@@ -51,7 +51,10 @@ doplot(data, "A3_spl")
 
 # %%
 data = np.loadtxt("../R_of_xc.out").reshape(shape)
-doplot(data, "R_of_xc")
+doplot(data, "R_of_xc", rname="psi")
+# %%
+data = np.loadtxt("../Aph_of_xc.out").reshape(shape)
+doplot(data, "Aph_of_xc", rname="psi")
 
 plt.show()
 

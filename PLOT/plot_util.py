@@ -38,6 +38,14 @@ def doplot(data, title, rname="R"):
     except:
         pass
 
+    try:
+        plt.figure()
+        plt.plot(data[30, 30, :])
+        plt.xlabel(rname)
+        plt.title(title)
+    except:
+        pass
+
 def doplot3d(data, title, rname="R"):
     import plotly.graph_objects as go
 

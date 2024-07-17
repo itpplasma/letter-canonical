@@ -1,15 +1,18 @@
 module psi_transform
     use, intrinsic :: iso_fortran_env, only: dp => real64
+    use binsrc_sub
+    use plag_coeff_sub
     implicit none
 
     contains
 
-    subroutine grid_R_to_psi( n_r, n_phi, n_z, &
+    subroutine grid_R_to_psi( n_r, n_phi, n_z, rmin, rmax, &
         psi_of_x, Aph_of_x, hph_of_x, hth_of_x, Bmod_of_x, &
         R_of_xc, Aph_of_xc, hph_of_xc, hth_of_xc, Bmod_of_xc, &
         psimin, psimax, h_psi)
 
         integer, intent(in) :: n_r, n_phi, n_z
+        real(dp), intent(in) :: rmin, rmax
         real(dp), dimension(n_r, n_phi, n_z), intent(in) :: &
           psi_of_x, Aph_of_x, hph_of_x, hth_of_x, Bmod_of_x
         real(dp), dimension(n_r, n_phi, n_z), intent(out) :: &
@@ -32,11 +35,15 @@ module psi_transform
         integer :: i_R, i_psi, ibeg, iend, nshift
         integer :: i_Z, i_phi
         real(dp) :: psi_fix
-        real(dp), dimension(:),   allocatable :: xp, psi_loc
+        real(dp), dimension(:),   allocatable :: xp, psi_loc, R
         real(dp), dimension(:,:), allocatable :: coef
 !
-        allocate(xp(nplagr),coef(0:nder,nplagr),psi_loc(n_R))
+        allocate(xp(nplagr),coef(0:nder,nplagr),psi_loc(n_R),R(n_R))
         nshift = nplagr/2
+
+        do i_R = 1, n_R
+          R(i_R) = rmin + dble(i_R-1)*(rmax-rmin)/dble(n_R-1)
+        enddo
 !
 ! Equidistant grid in psi:
 !
@@ -84,13 +91,13 @@ module psi_transform
               if(reverse) then
                 ibeg = n_R - ibeg +1
                 iend = n_R - iend +1
-                R_of_xc(i_psi, i_phi, i_Z) = sum(coef(0,:)*psi_of_x(ibeg:iend:-1, i_phi, i_Z))
+                R_of_xc(i_psi, i_phi, i_Z) = sum(coef(0,:)*R(ibeg:iend:-1))
                 Aph_of_xc(i_psi, i_phi, i_Z) = sum(coef(0,:)*Aph_of_x(ibeg:iend:-1, i_phi, i_Z))
                 hph_of_xc(i_psi, i_phi, i_Z) = sum(coef(0,:)*hph_of_x(ibeg:iend:-1, i_phi, i_Z))
                 hth_of_xc(i_psi, i_phi, i_Z) = sum(coef(0,:)*hth_of_x(ibeg:iend:-1, i_phi, i_Z))
                 Bmod_of_xc(i_psi, i_phi, i_Z) = sum(coef(0,:)*Bmod_of_x(ibeg:iend:-1, i_phi, i_Z))
               else
-                R_of_xc(i_psi, i_phi, i_Z) = sum(coef(0,:)*psi_of_x(ibeg:iend, i_phi, i_Z))
+                R_of_xc(i_psi, i_phi, i_Z) = sum(coef(0,:)*R(ibeg:iend))
                 Aph_of_xc(i_psi, i_phi, i_Z) = sum(coef(0,:)*Aph_of_x(ibeg:iend, i_phi, i_Z))
                 hph_of_xc(i_psi, i_phi, i_Z) = sum(coef(0,:)*hph_of_x(ibeg:iend, i_phi, i_Z))
                 hth_of_xc(i_psi, i_phi, i_Z) = sum(coef(0,:)*hth_of_x(ibeg:iend, i_phi, i_Z))
