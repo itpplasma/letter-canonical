@@ -27,7 +27,7 @@ OBJECTS := $(SOURCES:.f90=.o)
 OBJECTS := $(addprefix OBJS/, $(OBJECTS))
 
 LIBNEO_SOURCES := libneo_kinds.f90 math_constants.f90 spl_three_to_five.f90 \
-	odeint_rkf45.f90 contrib/rkf45.f90 interpolate.f90
+	odeint_rkf45.f90 contrib/rkf45.f90 interpolate.f90 binsrc.f90 plag_coeff.f90
 LIBNEO_SOURCES := $(addprefix ../libneo/src/, $(LIBNEO_SOURCES))
 
 MAGFIE_SOURCES := spline5_RZ.f90 \

@@ -21,7 +21,7 @@ module canonical
 
     ! Number and spacing of grid points
     integer :: n_r, n_phi, n_z
-    real(dp) :: h_r, h_phi, h_z
+    real(dp) :: h_r, h_phi, h_z, h_psi
 
     ! For splines
     real(dp) :: x_min(3), x_max(3)
@@ -222,8 +222,10 @@ contains
             Bmod_of_xc(n_r, n_phi, n_z) &
         )
 
-        call grid_R_to_psi(n_r, n_phi, n_z, psi_of_x, &
-            R_of_xc, Aph_of_xc, hph_of_xc, hth_of_xc, Bmod_of_xc)
+        call grid_R_to_psi(n_r, n_phi, n_z, &
+            psi_of_x, Acan(2,:,:,:), hcan(2,:,:,:), hcan(3,:,:,:), Bmod, &
+            R_of_xc, Aph_of_xc, hph_of_xc, hth_of_xc, Bmod_of_xc, &
+            psi_min, psi_max, h_psi)
 
         x_min = [rmin, 0.d0, zmin]
         x_max = [rmax, twopi, zmax]
@@ -247,6 +249,8 @@ contains
 
         call construct_splines_3d([psi_min, 0.0d0, zmin], [psi_max, twopi, zmax], &
         Aph_of_xc, order, periodic, spl_Aphi_of_xc)
+
+        print *, "h_psi = ", h_psi, (psi_max-psi_min)/dble(n_R-1)
 
         if (debug) then
             open(newunit=debug_unit, file="Aph_of_xc.out")
@@ -275,9 +279,6 @@ contains
         end do
         !$omp end do
         !$omp end parallel
-
-        psi_min = minval(psi_of_x)
-        psi_max = maxval(psi_of_x)
 
         do i_r = 1, n_r
             psi_grid(i_r) = psi_min + (psi_max - psi_min) * (i_r - 1) / (n_r - 1)
