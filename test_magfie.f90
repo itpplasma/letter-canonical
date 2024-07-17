@@ -59,7 +59,7 @@ program test_magfie
 contains
 
     subroutine test_psi
-        use canonical, only: psi_of_x, psi_grid
+        use canonical, only: psi_of_x, psi_grid, psi_inner, psi_outer, dpsi_dR_positive
         real(dp), dimension(3) :: x
         real(dp) :: psi
         integer :: i_r, i_phi, i_z
@@ -77,13 +77,18 @@ contains
         print *, "psi_of_x(i_r, i_phi, i_z) = ", psi_of_x(i_r, i_phi, i_z)
         print *, "psi_linspace(i_r) = ", psi_grid(i_r)
 
-        deallocate(psi_of_x)
+        print *, "psi_inner = ", psi_inner, "psi_outer = ", psi_outer
+        print *, "h_psi = ", (psi_outer-psi_inner)/dble(n_R-1)
+        print *, "dpsi_dR_positive = ", dpsi_dR_positive
+
+        call write_out("psi_of_x.out", psi_of_x)
+
     end subroutine test_psi
 
     subroutine test_integration
         real(dp), parameter :: tol = 1.0d-10
         real(dp), parameter :: dt = 5.75d-3*twopi
-        integer, parameter :: nt = 30000
+        integer, parameter :: nt = 3000
         integer, parameter :: n_flux = 15
 
         call test_integration_noncan(tol, dt, nt, n_flux)
@@ -258,58 +263,36 @@ contains
             end do
         end do
 
-        open(newunit=outfile_unit, file="lam_spl.out")
-            write(outfile_unit, *) lam_test
-        close(outfile_unit)
+        call write_out("lam_spl.out", lam_test)
+        call write_out("dlamdr_spl.out", dlam_test(1,:,:,:))
+        call write_out("dlamdp_spl.out", dlam_test(2,:,:,:))
+        call write_out("dlamdz_spl.out", dlam_test(3,:,:,:))
 
-        open(newunit=outfile_unit, file="dlamdr_spl.out")
-            write(outfile_unit, *) dlam_test(1,:,:,:)
-        close(outfile_unit)
+        call write_out("chi_spl.out", chi_test)
 
-        open(newunit=outfile_unit, file="dlamdz_spl.out")
-            write(outfile_unit, *) dlam_test(2,:,:,:)
-        close(outfile_unit)
-
-        open(newunit=outfile_unit, file="dlamdp_spl.out")
-            write(outfile_unit, *) dlam_test(3,:,:,:)
-        close(outfile_unit)
-
-
-        open(newunit=outfile_unit, file="chi_spl.out")
-            write(outfile_unit, *) chi_test
-        close(outfile_unit)
-
-        open(newunit=outfile_unit, file="dchidr_spl.out")
-            write(outfile_unit, *) dchi_test(1,:,:,:)
-        close(outfile_unit)
-
-        open(newunit=outfile_unit, file="dchidz_spl.out")
-            write(outfile_unit, *) dchi_test(2,:,:,:)
-        close(outfile_unit)
-
-        open(newunit=outfile_unit, file="dchidp_spl.out")
-            write(outfile_unit, *) dchi_test(3,:,:,:)
-        close(outfile_unit)
-
-        open(newunit=outfile_unit, file="A2_spl.out")
-            write(outfile_unit, *) A2_test
-        close(outfile_unit)
-        open(newunit=outfile_unit, file="A3_spl.out")
-            write(outfile_unit, *) A3_test
-        close(outfile_unit)
-
-        print *, "psi_min = ", psi_min, "psi_max = ", psi_max
-        print *, "h_psi = ", h_psi, (psi_max-psi_min)/dble(n_R-1)
-
-        open(newunit=outfile_unit, file="R_of_xc.out")
-            write(outfile_unit, *) R_of_xc
-        close(outfile_unit)
-
-        open(newunit=outfile_unit, file="Aph_of_xc.out")
-        write(outfile_unit, *) Aph_of_xc
-        close(outfile_unit)
+        call write_out("dchidr_spl.out", dchi_test(1,:,:,:))
+        call write_out("dchidp_spl.out", dchi_test(2,:,:,:))
+        call write_out("dchidz_spl.out", dchi_test(3,:,:,:))
+        call write_out("A2_spl.out", A2_test)
+        call write_out("A3_spl.out", A3_test)
 
         deallocate(lam_test, chi_test, A2_test, A3_test)
+
+        call write_out("R_of_xc.out", R_of_xc)
+        call write_out("Aph_of_xc.out", Aph_of_xc)
+        call write_out("hph_of_xc.out", hph_of_xc)
+        call write_out("hth_of_xc.out", hth_of_xc)
+        call write_out("Bmod_of_xc.out", Bmod_of_xc)
+
     end subroutine test_splines
+
+    subroutine write_out(filename, data)
+        character(len=*), intent(in) :: filename
+        real(dp), dimension(:,:,:), intent(in) :: data
+
+        open(newunit=outfile_unit, file=filename)
+            write(outfile_unit, *) data
+        close(outfile_unit)
+    end subroutine write_out
 
 end program test_magfie

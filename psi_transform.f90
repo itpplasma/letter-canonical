@@ -6,13 +6,12 @@ module psi_transform
 
     contains
 
-    subroutine grid_R_to_psi( n_r, n_phi, n_z, rmin, rmax, &
+    subroutine grid_R_to_psi( n_r, n_phi, n_z, rmin, rmax, psi_inner, psi_outer, &
         psi_of_x, Aph_of_x, hph_of_x, hth_of_x, Bmod_of_x, &
-        R_of_xc, Aph_of_xc, hph_of_xc, hth_of_xc, Bmod_of_xc, &
-        psimin, psimax, h_psi)
+        R_of_xc, Aph_of_xc, hph_of_xc, hth_of_xc, Bmod_of_xc)
 
         integer, intent(in) :: n_r, n_phi, n_z
-        real(dp), intent(in) :: rmin, rmax
+        real(dp), intent(in) :: rmin, rmax, psi_inner, psi_outer
         real(dp), dimension(n_r, n_phi, n_z), intent(in) :: &
           psi_of_x, Aph_of_x, hph_of_x, hth_of_x, Bmod_of_x
         real(dp), dimension(n_r, n_phi, n_z), intent(out) :: &
@@ -22,7 +21,7 @@ module psi_transform
 !        integer,  intent(in) :: n_psi
 ! in case n_psi is different from n_r, n_r should be replaced
 ! with n_psi in the above declaration of output arrays
-        real(dp), intent(out) :: psimin, psimax, h_psi
+        real(dp) :: h_psi
         integer  :: n_psi
 !
         integer, parameter  :: nder = 0 !(no derivatives)
@@ -51,18 +50,13 @@ module psi_transform
 !
         i_phi = n_phi/2
         i_Z = n_Z/2
-! Here we use the "safe side" approach (new grid is fully within the old grid).
-! For the risky approach (old grid within the new grid) exchange "minval" and "maxval".
         if(psi_of_x(n_R,i_phi,i_Z).gt.psi_of_x(1,i_phi,i_Z)) then
           reverse = .false.
-          psimin = maxval(psi_of_x(1,:,:))
-          psimax = minval(psi_of_x(n_R,:,:))
         else
           reverse = .true.
-          psimin = maxval(psi_of_x(n_R,:,:))
-          psimax = minval(psi_of_x(1,:,:))
         endif
-        h_psi=(psimax-psimin)/dble(n_psi-1)
+
+        h_psi=(psi_outer-psi_inner)/dble(n_psi-1)
 !
         do i_phi = 1,n_phi
           do i_Z = 1,n_Z
@@ -72,7 +66,7 @@ module psi_transform
               psi_loc = psi_of_x(:, i_phi, i_Z)
             endif
             do i_psi = 1,n_psi
-              psi_fix = psimin+h_psi*dble(i_psi-1)
+              psi_fix = psi_inner+h_psi*dble(i_psi-1)
 !
               call binsrc(psi_loc,1,n_R,psi_fix,i_R)
 !

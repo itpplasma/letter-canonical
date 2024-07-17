@@ -38,10 +38,11 @@ module canonical
     class(FieldType), allocatable :: magfie_type
 
     ! For splining psi
-    real(dp) :: psi_min, psi_max
+    real(dp) :: psi_inner, psi_outer
     real(dp), dimension(:,:,:), allocatable :: psi_of_x, Bmod
     real(dp), dimension(:,:,:,:), allocatable :: hcan, Acan
     real(dp), dimension(:), allocatable :: psi_grid
+    logical :: dpsi_dR_positive
 
     real(dp), dimension(:,:,:), allocatable :: R_of_xc, &
         Aph_of_xc, hph_of_xc, hth_of_xc, Bmod_of_xc
@@ -212,8 +213,6 @@ contains
         real(dp) :: x(3)
         integer :: i_r, i_phi, i_z
 
-        call init_psi_grid()
-
         allocate( &
             R_of_xc(n_r, n_phi, n_z), &
             Aph_of_xc(n_r, n_phi, n_z), &
@@ -222,15 +221,16 @@ contains
             Bmod_of_xc(n_r, n_phi, n_z) &
         )
 
-        call grid_R_to_psi(n_r, n_phi, n_z, rmin, rmax, &
+        call init_psi_grid()
+
+        call grid_R_to_psi(n_r, n_phi, n_z, rmin, rmax, psi_inner, psi_outer, &
             psi_of_x, Acan(2,:,:,:), hcan(2,:,:,:), hcan(3,:,:,:), Bmod, &
-            R_of_xc, Aph_of_xc, hph_of_xc, hth_of_xc, Bmod_of_xc, &
-            psi_min, psi_max, h_psi)
+            R_of_xc, Aph_of_xc, hph_of_xc, hth_of_xc, Bmod_of_xc)
 
         x_min = [rmin, 0.d0, zmin]
         x_max = [rmax, twopi, zmax]
 
-        call construct_splines_3d([psi_min, 0.0d0, zmin], [psi_max, twopi, zmax], &
+        call construct_splines_3d([psi_inner, 0.0d0, zmin], [psi_outer, twopi, zmax], &
             R_of_xc, order, periodic, spl_R_of_xc)
 
         !$omp parallel private(i_r, i_phi, i_z, x)
@@ -247,7 +247,7 @@ contains
         !$omp end do
         !$omp end parallel
 
-        call construct_splines_3d([psi_min, 0.0d0, zmin], [psi_max, twopi, zmax], &
+        call construct_splines_3d([psi_inner, 0.0d0, zmin], [psi_outer, twopi, zmax], &
         Aph_of_xc, order, periodic, spl_Aphi_of_xc)
 
     end subroutine init_splines_with_psi
@@ -272,8 +272,21 @@ contains
         !$omp end do
         !$omp end parallel
 
+        ! Here we use the "safe side" approach (new grid is fully within the old grid).
+        ! For the risky approach (old grid within the new grid) exchange
+        ! "minval" and "maxval".
+        if(psi_of_x(n_r, n_phi/2, n_z/2) > psi_of_x(1, n_phi/2, n_z/2)) then
+            dpsi_dR_positive = .true.
+            psi_inner = maxval(psi_of_x(1,:,:))
+            psi_outer = minval(psi_of_x(n_r,:,:))
+        else
+            dpsi_dR_positive = .false.
+            psi_inner = maxval(psi_of_x(n_r,:,:))
+            psi_outer = minval(psi_of_x(1,:,:))
+        endif
+
         do i_r = 1, n_r
-            psi_grid(i_r) = psi_min + (psi_max - psi_min) * (i_r - 1) / (n_r - 1)
+            psi_grid(i_r) = psi_inner + (psi_outer - psi_inner) * (i_r - 1) / (n_r - 1)
         end do
     end subroutine init_psi_grid
 

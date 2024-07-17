@@ -30,16 +30,16 @@ module integrator_euler1
         real(dp), dimension(n) :: x, xlast
         integer :: ktau
 
-        real(dp) :: x1min, x1max, x2min, x2max, fvec(2)
-        integer :: nR, nZ, i, j
+        ! real(dp) :: x1min, x1max, x2min, x2max, fvec(2)
+        ! integer :: nR, nZ, i, j
 
-        nR = 100
-        nZ = 100
+        ! nR = 100
+        ! nZ = 100
 
-        x1min = 163d0
-        x1max = 164d0
-        x2min = -28d0
-        x2max = -27d0
+        ! x1min = 163d0
+        ! x1max = 164d0
+        ! x2min = -28d0
+        ! x2max = -27d0
 
         ! si%z(1) = 163.65101623987172d0
         ! si%z(2) = -27.595344619263866d0

@@ -19,13 +19,13 @@ Z = data[:,1]
 phi = data[:,2]
 H = data[:,4]
 
-plt.plot(R, Z, '.', label='Forward Euler')
+plt.plot(R, Z, '-')
 plt.xlim(75, 250)
 plt.ylim(-60, 60)
 
 # %%
 plt.figure()
-plt.plot(H[2:], '-', label='Forward Euler')
+plt.plot(H[2:], '-')
 plt.xlabel("Timestep")
 plt.ylabel("Hamiltonian H")
 plt.ylim(H[2:-1].min()*0.999, H[2:-1].max()*1.001)

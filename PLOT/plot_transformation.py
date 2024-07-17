@@ -50,11 +50,24 @@ data = np.loadtxt("../A3_spl.out").reshape(shape_spl)
 doplot(data, "A3_spl")
 
 # %%
+data = np.loadtxt("../psi_of_x.out").reshape(shape)
+doplot(data, "psi_of_x")
+
+# %%
 data = np.loadtxt("../R_of_xc.out").reshape(shape)
 doplot(data, "R_of_xc", rname="psi")
 # %%
 data = np.loadtxt("../Aph_of_xc.out").reshape(shape)
 doplot(data, "Aph_of_xc", rname="psi")
+# %%
+data = np.loadtxt("../hph_of_xc.out").reshape(shape)
+doplot(data, "hph_of_xc", rname="psi")
+# %%
+data = np.loadtxt("../hth_of_xc.out").reshape(shape)
+doplot(data, "hth_of_xc", rname="psi")
+# %%
+data = np.loadtxt("../Bmod_of_xc.out").reshape(shape)
+doplot(data, "Bmod_of_xc", rname="psi")
 
 plt.show()
 
