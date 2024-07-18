@@ -16,6 +16,7 @@ SOURCES := magfie.f90 \
 	field_can_base.f90 \
 	field_can_test.f90 \
 	field_can_cyl.f90 \
+	field_can_new.f90 \
 	field_can.f90 \
 	integrator_base.f90 \
 	integrator_rk45.f90 \

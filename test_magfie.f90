@@ -19,8 +19,8 @@ program test_magfie
     class(FieldType), allocatable :: field_type
 
     ! Configuration in letter_canonical.in
-    character(16) :: magfie_type
-    namelist /letter_canonical/ magfie_type
+    character(16) :: magfie_type, integrator_type
+    namelist /letter_canonical/ magfie_type, integrator_type
 
     ! Workaround, otherwise not initialized without perturbation field
     rmin = 75.d0

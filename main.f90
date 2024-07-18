@@ -5,7 +5,7 @@ program main
     use magfie_factory, only: magfie_type_from_string
     use canonical, only: twopi, init_canonical, init_transformation, &
         init_canonical_field_components
-    use field_can
+    use field_can, only: field_can_t, field_can_cyl_t, field_can_new_t
     use integrator
 
     implicit none
@@ -60,7 +60,7 @@ program main
     z0(3) = -2.0d0*3.1415d0  ! phi
     vpar0 = 0.8d0  ! parallel velocity
 
-    field = field_can_cyl_t()
+    field = field_can_new_t()
     call field_can_init(f, mu, c*m/qe, vpar0)
     call field%evaluate(f, z0(1), z0(2), z0(3), 2)
 
