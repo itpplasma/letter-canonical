@@ -382,6 +382,25 @@ Metric determinant
 
 \end_inset
 
+
+\begin_inset Formula 
+\begin{align}
+\sqrt{g_{\c}} & =R\left(\difp R{\psi_{\c}}\left(1+\difp{\lambda}{\varphi_{\c}}\right)-\difp R{\varphi_{\c}}\difp{\lambda}{\psi_{\c}}\right)\\
+ & =R\left(\difp R{\psi_{\c}}\left(1+\difp{\lambda(\psi_{c})}{\varphi_{\c}}-\difp R{\varphi_{\c}}\difp{\lambda}R\right)\right)\\
+ & =R\difp R{\psi_{\c}}\left(1+\difp{\lambda(R,\varphi_{c},Z_{c})}{\varphi_{\c}}\right)\\
+ & =R\left(\difp{\psi_{\c}(R,\varphi_{c},Z_{c})}R\right)^{-1}\left(1+\difp{\lambda(R,\varphi_{c},Z_{c})}{\varphi_{\c}}\right)
+\end{align}
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+....OLD
+\end_layout
+
+\begin_layout Standard
 From cylindrical coordinates
 \begin_inset Formula 
 \begin{equation}
