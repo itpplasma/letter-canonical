@@ -11,21 +11,21 @@ module integrator
 
     contains
 
-    function create_integrator(integrator_type, field)
+    function create_integrator(integrator_type, field) result(integ)
         character(*), intent(in) :: integrator_type
         class(field_can_t), allocatable :: field
-        class(symplectic_integrator_t), allocatable :: create_integrator
+        class(symplectic_integrator_t), allocatable :: integ
 
         select case(integrator_type)
-        case("euler0")
-            create_integrator = symplectic_integrator_euler0_t(field)
-        case("euler1")
-            create_integrator = symplectic_integrator_euler1_t(field)
-        case("rk45")
-            create_integrator = symplectic_integrator_rk45_t(field)
-        case default
-            print *, "create_integrator: Unknown integrator type ", integrator_type
-            error stop
+            case("euler0")
+                integ = symplectic_integrator_euler0_t(field)
+            case("euler1")
+                integ = symplectic_integrator_euler1_t(field)
+            case("rk45")
+                integ = symplectic_integrator_rk45_t(field)
+            case default
+                print *, "create_integrator: Unknown integrator type ", integrator_type
+                error stop
         end select
     end function create_integrator
 

@@ -72,7 +72,7 @@ program main
     print *, 'vpar0 = ', vpar0
     print *, 'z0 = ', z0
 
-    integ = create_integrator(integrator_type, field)
+    integ = create_integrator(trim(integrator_type), field)
     call integrator_init(si, field, f, z0, dt=1.0d-3, ntau=1, rtol=1d-8)
 
     allocate(out(5,nt))
