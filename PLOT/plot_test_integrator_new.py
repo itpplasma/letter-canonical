@@ -2,15 +2,23 @@
 import numpy as np
 import matplotlib.pyplot as plt
 
+shape = (75, 64, 100)  # (Z, phi, R)
+
+zmin = -150
+zmax = 147
+psimin = 12710026
+psimax = 16377747
+
+RR, ZZ = np.meshgrid(np.linspace(psimin, psimax, shape[2]),
+    np.linspace(zmin, zmax, shape[0]))
+
 #RZ plane plot of field
 plt.figure()
-# data = np.loadtxt("../fort.100")
-# plt.plot(data[:, 0], data[:, 2], 'b,')
-# data = np.loadtxt("../fort.101")
-# plt.plot(data[:, 0], data[:, 2], 'r,')
-# plt.xlabel('R [cm]')
-# plt.ylabel('Z [cm]')
-# plt.axis('equal')
+
+data = np.loadtxt("../Aph_of_xc.out").reshape(shape)
+plt.contour(RR, ZZ, data[:, 1, :])
+plt.xlabel("psi")
+plt.ylabel("Z")
 
 # Load data
 data = np.loadtxt('../orbit.out')
@@ -20,9 +28,8 @@ phi = data[:,2]
 H = data[:,4]
 
 plt.plot(R, Z, '.')
-#plt.xlim(75, 250)
-plt.xlim(12710026, 16377747)
-plt.ylim(-60, 60)
+plt.xlim(psimin, psimax)
+plt.ylim(zmin, zmax)
 
 # %%
 plt.figure()

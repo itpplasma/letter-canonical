@@ -58,14 +58,14 @@ program main
     call init_splines_with_psi
 
     ! Initial conditions
-    !z0(1) = 15000000d0 ! psi tok
-    z0(1) = -5.5d0 ! psi test
+    z0(1) = 15000000d0 ! psi tok
+    !z0(1) = -5.5d0 ! psi test
     !z0(1) = 173d0   ! r
     z0(2) = 27.5d0 ! z
     z0(3) = -2.0d0*3.1415d0  ! phi
     vpar0 = 0.8d0  ! parallel velocity
 
-    field = field_can_cyl_t()
+    field = field_can_new_t()
     call field_can_init(f, mu, c*m/qe, vpar0)
     call field%evaluate(f, z0(1), z0(2), z0(3), 2)
 
@@ -78,7 +78,7 @@ program main
     print *, 'z0 = ', z0
 
     integ = create_integrator(trim(integrator_type), field)
-    call integrator_init(si, field, f, z0, dt=1.0d0, ntau=1, rtol=1d-8)
+    call integrator_init(si, field, f, z0, dt=1.0d-2, ntau=1, rtol=1d-8)
 
     allocate(out(5,nt))
 
