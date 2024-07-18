@@ -5,7 +5,7 @@ program main
     use magfie_factory, only: magfie_type_from_string
     use canonical, only: twopi, init_canonical, init_transformation, &
         init_canonical_field_components
-    use field_can_cyl
+    use field_can
     use integrator
 
     implicit none
@@ -16,7 +16,7 @@ program main
     real(dp), parameter :: qe = 1d5, m = 1d0, c = 1d0, mu = 0d0 !1d-5
 
     class(FieldType), allocatable :: field_type
-    class(field_can_cyl_t), allocatable :: field
+    class(field_can_t), allocatable :: field
     type(field_can_data_t) :: f
     class(symplectic_integrator_t), allocatable :: integ
     type(symplectic_integrator_data_t) :: si
@@ -28,8 +28,8 @@ program main
     integer :: kt, ierr, nmax
 
     ! Configuration in letter_canonical.in
-    character(16) :: magfie_type
-    namelist /letter_canonical/ magfie_type
+    character(16) :: magfie_type, integrator_type
+    namelist /letter_canonical/ magfie_type, integrator_type
 
     nt = 8000
 
@@ -72,7 +72,7 @@ program main
     print *, 'vpar0 = ', vpar0
     print *, 'z0 = ', z0
 
-    integ = symplectic_integrator_rk45_t(field)
+    integ = create_integrator(integrator_type, field)
     call integrator_init(si, field, f, z0, dt=1.0d-3, ntau=1, rtol=1d-8)
 
     allocate(out(5,nt))
