@@ -47,7 +47,8 @@ module canonical
     real(dp), dimension(:,:,:), allocatable :: R_of_xc, &
         Aph_of_xc, hph_of_xc, hth_of_xc, Bmod_of_xc
 
-    type(SplineData3D) :: spl_R_of_xc, spl_Aphi_of_xc
+    type(SplineData3D) :: spl_R_of_xc, &
+        spl_Aphi_of_xc, spl_hph_of_xc, spl_hth_of_xc, spl_Bmod_of_xc
 
 contains
 
@@ -248,7 +249,13 @@ contains
         !$omp end parallel
 
         call construct_splines_3d([psi_inner, 0.0d0, zmin], [psi_outer, twopi, zmax], &
-        Aph_of_xc, order, periodic, spl_Aphi_of_xc)
+            Aph_of_xc, order, periodic, spl_Aphi_of_xc)
+        call construct_splines_3d([psi_inner, 0.0d0, zmin], [psi_outer, twopi, zmax], &
+            hph_of_xc, order, periodic, spl_hph_of_xc)
+        call construct_splines_3d([psi_inner, 0.0d0, zmin], [psi_outer, twopi, zmax], &
+            hth_of_xc, order, periodic, spl_hth_of_xc)
+        call construct_splines_3d([psi_inner, 0.0d0, zmin], [psi_outer, twopi, zmax], &
+            Bmod_of_xc, order, periodic, spl_Bmod_of_xc)
 
     end subroutine init_splines_with_psi
 

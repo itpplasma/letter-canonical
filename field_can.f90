@@ -3,6 +3,7 @@ module field_can
   use field_can_base
   use field_can_test
   use field_can_cyl
+  use field_can_new
 
   implicit none
 
