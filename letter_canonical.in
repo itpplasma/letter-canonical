@@ -1,0 +1,3 @@
+&letter_canonical
+    magfie_type = "tok"  ! "test" or "tok"
+/

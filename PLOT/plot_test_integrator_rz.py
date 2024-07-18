@@ -2,7 +2,7 @@
 import numpy as np
 import matplotlib.pyplot as plt
 
-# RZ plane plot of field
+#RZ plane plot of field
 plt.figure()
 data = np.loadtxt("../fort.100")
 plt.plot(data[:, 0], data[:, 2], 'b,')
@@ -19,7 +19,7 @@ Z = data[:,1]
 phi = data[:,2]
 H = data[:,4]
 
-plt.plot(R, Z, '-')
+plt.plot(R, Z, '.')
 plt.xlim(75, 250)
 plt.ylim(-60, 60)
 

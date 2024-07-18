@@ -2,7 +2,7 @@ program main
     use, intrinsic :: iso_fortran_env, only: dp => real64
     use omp_lib
     use magfie, only: FieldType
-    use magfie_tok, only: TokFieldType
+    use magfie_factory, only: magfie_type_from_string
     use canonical, only: twopi, init_canonical, init_transformation, &
         init_canonical_field_components
     use field_can_cyl
@@ -13,7 +13,7 @@ program main
     integer, parameter :: n_r=100, n_phi=64, n_z=75
     integer :: nt
     character(*), parameter :: outname = "orbit.out"
-    real(dp), parameter :: qe = 1d0, m = 1d0, c = 1d0, mu = 1d-5
+    real(dp), parameter :: qe = 1d5, m = 1d0, c = 1d0, mu = 0d0 !1d-5
 
     class(FieldType), allocatable :: field_type
     class(field_can_cyl_t), allocatable :: field
@@ -27,6 +27,10 @@ program main
 
     integer :: kt, ierr, nmax
 
+    ! Configuration in letter_canonical.in
+    character(16) :: magfie_type
+    namelist /letter_canonical/ magfie_type
+
     nt = 8000
 
     ! Workaround, otherwise not initialized without perturbation field
@@ -35,7 +39,10 @@ program main
     zmin = -150.d0
     zmax = 147.38193979933115d0
 
-    field_type = TokFieldType()
+    open(unit=10, file='letter_canonical.in', status='old', action='read')
+    read(10, nml=letter_canonical)
+    close(10)
+    field_type = magfie_type_from_string(trim(magfie_type))
 
     print *, "init_canonical ..."
     call init_canonical(n_r, n_phi, n_z, [rmin, 0.0d0, zmin], &
@@ -48,8 +55,8 @@ program main
     call init_canonical_field_components
 
     ! Initial conditions
-    z0(1) = 163d0   ! r
-    z0(2) = -27.5d0 ! z
+    z0(1) = 173d0   ! r
+    z0(2) = 27.5d0 ! z
     z0(3) = -2.0d0*3.1415d0  ! phi
     vpar0 = 0.8d0  ! parallel velocity
 
@@ -66,7 +73,7 @@ program main
     print *, 'z0 = ', z0
 
     integ = symplectic_integrator_rk45_t(field)
-    call integrator_init(si, field, f, z0, dt=1.0d-1, ntau=1, rtol=1d-10)
+    call integrator_init(si, field, f, z0, dt=1.0d-3, ntau=1, rtol=1d-8)
 
     allocate(out(5,nt))
 

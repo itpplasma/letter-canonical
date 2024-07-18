@@ -5,6 +5,9 @@
 		},
 		{
 			"path": "../SIMPLE"
+		},
+		{
+			"path": "../libneo"
 		}
 	],
 	"settings": {}
