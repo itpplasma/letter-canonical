@@ -4,3 +4,6 @@ all: Aph_of_xc.out
 
 Aph_of_xc.out: field_divB0.inp ../test_magfie.x
 	../test_magfie.x
+
+clean:
+	rm -f *.out fort.*
