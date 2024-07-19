@@ -1,5 +1,6 @@
 program test_magfie
     use, intrinsic :: iso_fortran_env, only: dp => real64
+    use odeint_sub, only: odeint_allroutines
     use magfie_factory, only: magfie_type_from_string
     use magfie, only: FieldType
     use interpolate, only: SplineData3D, construct_splines_3d, &

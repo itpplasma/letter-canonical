@@ -7,6 +7,7 @@ program test_orbit
     init_canonical_field_components, init_splines_with_psi
   use field_can, only: field_can_t, field_can_cyl_t, field_can_new_t
   use integrator
+  use odeint_sub
 
   implicit none
 
@@ -72,9 +73,9 @@ program test_orbit
   nmax = nt
   do kt = 2, nt
     tau1 = 0d0
-    tau2 = 1d-3
+    tau2 = 1d0
     z(:,kt) = z(:,kt-1)
-    call odeint_allroutines(z, 5, tau1, tau2, 1d-8, velo_can)
+    call odeint_allroutines(z(:,kt), 5, tau1, tau2, 1d-8, velo_can)
   end do
   endtime = omp_get_wtime()
   print *, trim(outname), endtime-starttime
@@ -214,6 +215,8 @@ contains
     !      vz(5)=coala/(alambd+dsign(1.d-32,alambd))*(vz(4)/p-0.5d0*blodot)
     vz(5)=-(0.5d0*coala/hpstar)*(sum(hstar*derphi)/p                 &
       + p*sum(hstar*bder)/gamma+alambd*sum(a_phi*bder))
+
+    print *, vz
 
   end subroutine velo_can
 

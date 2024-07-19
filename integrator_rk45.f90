@@ -1,5 +1,6 @@
 module integrator_rk45
     use, intrinsic :: iso_fortran_env, only: dp => real64
+    use odeint_sub, only: odeint_allroutines
     use integrator_base, only: symplectic_integrator_t, symplectic_integrator_data_t
     use field_can, only: field_can_t, field_can_data_t, get_derivatives2
 
