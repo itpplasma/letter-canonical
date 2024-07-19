@@ -49,10 +49,13 @@ MAGFIE_SOURCES := $(addprefix ../libneo/src/magfie/, $(MAGFIE_SOURCES))
 SIMPLE_SOURCES := binsrc.f90 plag_coeff.f90
 SIMPLE_SOURCES := $(addprefix ../SIMPLE/SRC/, $(SIMPLE_SOURCES))
 
-all: letter_canonical.x test_integrator.x \
+all: letter_canonical.x test_orbit.x test_integrator.x \
 	test_field_can.x test_magfie.x test.x test_large.x test_biotsavart.x
 
 letter_canonical.x: libfield.so libcanonical.so main.f90
+	$(FC) $(FFLAGS) -o $@ $^ -lfield -lcanonical
+
+test_orbit.x: libfield.so libcanonical.so test_orbit.f90
 	$(FC) $(FFLAGS) -o $@ $^ -lfield -lcanonical
 
 test_integrator.x: libfield.so libcanonical.so test_integrator.f90

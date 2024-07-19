@@ -60,32 +60,15 @@ program test_orbit
     ! Initial conditions
     z0(1) = 15000000d0 ! psi tok
     !z0(1) = -5.5d0 ! psi test
-    !z0(1) = 173d0   ! r
     z0(2) = 27.5d0 ! z
     z0(3) = -2.0d0*3.1415d0  ! phi
-    vpar0 = 0.8d0  ! parallel velocity
+    z0(4) = 0.8d0  ! parallel velocity
 
-    field = field_can_new_t()
-    call field_can_init(f, mu, c*m/qe, vpar0)
-    call field%evaluate(f, z0(1), z0(2), z0(3), 2)
-
-    z0(4) = vpar0*f%hph + f%Aph/f%ro0  ! p_phi
-    call get_derivatives2(f, z0(4))
-    print *, 'f%hph = ', f%hph
-    print *, 'f%Aph = ', f%Aph
-    print *, 'f%ro0 = ', f%ro0
-    print *, 'vpar0 = ', vpar0
-    print *, 'z0 = ', z0
-
-    integ = create_integrator(trim(integrator_type), field)
-    call integrator_init(si, field, f, z0, dt=1.0d-2, ntau=1, rtol=1d-8)
-
-    allocate(out(5,nt))
+    allocate(out(4,nt))
 
     out=0d0
 
     out(1:4,1) = z0
-    out(5,1) = f%H
     starttime = omp_get_wtime()
     nmax = nt
     do kt = 2, nt
@@ -98,7 +81,6 @@ program test_orbit
             exit
         endif
         out(1:4,kt) = si%z
-        out(5,kt) = f%H
     end do
     endtime = omp_get_wtime()
     print *, trim(outname), endtime-starttime
@@ -145,14 +127,14 @@ program test_orbit
 
     logical :: fullset
     integer :: mode_secders
-    double precision :: bmod,sqrtg
-    double precision :: r,vartheta_c,varphi_c,                                           &
+    real(dp) :: bmod,dbmod(3),d2bmod(6),sqrtg
+    real(dp) :: r,vartheta_c,varphi_c,                                           &
                         dA_phi_dr,dA_theta_dr,d2A_phi_dr2,                               &
                         sqg_c,dsqg_c_dr,dsqg_c_dt,dsqg_c_dp,                             &
                         B_vartheta_c,dB_vartheta_c_dr,dB_vartheta_c_dt,dB_vartheta_c_dp, &
                         B_varphi_c,dB_varphi_c_dr,dB_varphi_c_dt,dB_varphi_c_dp
-    double precision :: Bctr_vartheta,Bctr_varphi,bmod2
-    double precision, dimension(3) :: x,bder,hcovar,hctrvr,hcurl
+    real(dp) :: Bctr_vartheta,Bctr_varphi,bmod2
+    real(dp), dimension(3) :: x,bder,hcovar,hctrvr,hcurl
 
     integer, parameter :: reorder(3) = [1, 3, 2]  ! dr, dph, dth -> dr, dth, dph
     integer, parameter :: reorder2(6) = [1, 3, 2, 6, 5, 4]
@@ -160,59 +142,64 @@ program test_orbit
     ! drdr, drdth, drdph, dthdth, dthdph, dphdph
 
     real(dp) :: a, da(3), d2a(6)
-  !
+
     r=x(1)
     vartheta_c=x(2)
     varphi_c=x(3)
-  !
+
     fullset=.false.
     mode_secders=0
 
-    call evaluate_splines_3d_der2(spl_Aphi_of_xc, x(reorder), a, da, d2a)
-
-    dA_phi_dr = a(1)
-    d2A_phi_dr2 = d2a(1)
-
     dA_theta_dr = 1.0d0
 
-    call evaluate_splines_3d_der2(spl_Bmod_of_xc, x(reorder), bmod, da, d2a)
+    call evaluate_splines_3d_der2(spl_Aphi_of_xc, x(reorder), a, da, d2a)
 
-    call evaluate_splines_3d_der2(spl_hph_of_xc, x(reorder), a, da, d2a)
+    dA_phi_dr = a
+    d2A_phi_dr2 = d2a(1)
 
+    call evaluate_splines_3d_der2(spl_Bmod_of_xc, x(reorder), bmod, dbmod, d2bmod)
+    bmod2 = bmod**2
+
+    hcovar(1)=0.d0
 
     call evaluate_splines_3d_der2(spl_hth_of_xc, x(reorder), a, da, d2a)
 
-    B_vartheta_c = a(2)*bmod
-    d
+    hcovar(2) = a
+    B_vartheta_c = a*bmod
+    dB_vartheta_c_dr = da(1)*bmod+a*dbmod(1)
+    dB_vartheta_c_dt = da(2)*bmod+a*dbmod(2)
+    dB_vartheta_c_dp = da(3)*bmod+a*dbmod(3)
 
-  !
+    call evaluate_splines_3d_der2(spl_hph_of_xc, x(reorder), a, da, d2a)
+    hcovar(3) = a
+    B_varphi_c = a*bmod
+    dB_varphi_c_dr = da(1)*bmod+a*dbmod(1)
+    dB_varphi_c_dt = da(2)*bmod+a*dbmod(2)
+    dB_varphi_c_dp = da(3)*bmod+a*dbmod(3)
+
     sqg_c=r  ! TODO: actual sqrtg, not just rough estimate
+    dsqg_c_dr=1.0d0
+    dsqg_c_dt=0.0d0
+    dsqg_c_dp=0.0d0
+
     sqrtg=sqg_c
-  !
 
     Bctr_vartheta=-dA_phi_dr/sqg_c
     Bctr_varphi=dA_theta_dr/sqg_c
-  !
-    bmod2=Bctr_vartheta*B_vartheta_c+Bctr_varphi*B_varphi_c
-    bmod=sqrt(bmod2)
-  !
+
     bder(1)=0.5d0*((dA_theta_dr*dB_varphi_c_dr-dA_phi_dr*dB_vartheta_c_dr-d2A_phi_dr2*B_vartheta_c) &
            /bmod2-dsqg_c_dr)/sqg_c
     bder(2)=0.5d0*((dA_theta_dr*dB_varphi_c_dt-dA_phi_dr*dB_vartheta_c_dt)/bmod2-dsqg_c_dt)/sqg_c
     bder(3)=0.5d0*((dA_theta_dr*dB_varphi_c_dp-dA_phi_dr*dB_vartheta_c_dp)/bmod2-dsqg_c_dp)/sqg_c
-  !
-    hcovar(1)=0.d0
-    hcovar(2)=B_vartheta_c/bmod
-    hcovar(3)=B_varphi_c/bmod
-  !
+
     hctrvr(1)=0.d0
     hctrvr(2)=Bctr_vartheta/bmod
     hctrvr(3)=Bctr_varphi/bmod
-  !
+
     hcurl(1)=((dB_varphi_c_dt-dB_vartheta_c_dp)/bmod-bder(2)*hcovar(3)+bder(3)*hcovar(2))/sqg_c
     hcurl(2)=(-dB_varphi_c_dr/bmod+bder(1)*hcovar(3))/sqg_c
     hcurl(3)=(dB_vartheta_c_dr/bmod-bder(1)*hcovar(2))/sqg_c
-  !
+
     end subroutine magfie_can
 
 end program test_orbit
