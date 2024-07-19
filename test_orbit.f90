@@ -154,12 +154,6 @@ contains
 
 
     call magfie_can(x,bmod,sqrtg,bder,hcovar,hctrvr,hcurl)
-! print *, 'bmod: ', bmod
-! print *, 'sqrtg: ', sqrtg
-! print *, 'bder: ', bder
-! print *, 'hcovar: ', hcovar
-! print *, 'hctrvr: ', hctrvr
-! print *, 'hcurl: ', hcurl
 
     ! in elefie: x(i)   - space coords (input, see above)
     !            derphi - derivatives of the dimensionless electric potential
