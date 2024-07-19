@@ -32,7 +32,7 @@ program main
     real(dp) :: z0(4), starttime, endtime, dt = 1.0d0, rtol = 1d-13
     real(dp), allocatable :: out(:, :)
 
-    integer :: kt, ierr, nmax
+    integer :: kt, ierr
 
     ! Configuration in letter_canonical.in
     character(16) :: magfie_type = "tok"
@@ -61,39 +61,15 @@ program main
 
     call init_field_can
     call set_initial_conditions
+    call init_integrator
 
-    integ = create_integrator(trim(integrator_type), field)
-    call integrator_init(si, field, f, z0, dt, 1, rtol)
-
-    allocate(out(5,nt))
-
-    out=0d0
-
-    out(1:4,1) = z0
-    out(5,1) = f%H
     starttime = omp_get_wtime()
-    nmax = nt
-    do kt = 2, nt
-        ierr = 0
-        call integ%timestep(si, f, ierr)
-        if (.not. ierr==0) then
-            print *, si%z
-            nmax = kt-1
-            print *, 'nmax = ', nmax
-            exit
-        endif
-        out(1:4,kt) = si%z
-        out(5,kt) = f%H
-    end do
+    call trace_orbit
     endtime = omp_get_wtime()
+
     print *, trim(outname), endtime-starttime
 
-    open(unit=20, file=outname, action='write', recl=4096)
-    do kt = 1, nmax
-        write(20,*) out(:,kt)
-    end do
-    close(20)
-    deallocate(out)
+    call write_output
 
 contains
 
@@ -123,6 +99,36 @@ contains
         z0(2) = th0    ! Z
         z0(3) = phi0   ! varphi_c
         z0(4) = vpar0*f%hph + f%Aph/f%ro0  ! p_phi
+
+        allocate(out(5,nt))
+
+        out=0d0
+
+        out(1:4,1) = z0
+        out(5,1) = f%H
     end subroutine set_initial_conditions
+
+    subroutine init_integrator
+        integ = create_integrator(trim(integrator_type), field)
+        call integrator_init(si, field, f, z0, dt, 1, rtol)
+    end subroutine init_integrator
+
+    subroutine trace_orbit
+        do kt = 2, nt
+            ierr = 0
+            call integ%timestep(si, f, ierr)
+            if (.not. ierr==0) error stop
+            out(1:4,kt) = si%z
+            out(5,kt) = f%H
+        end do
+    end subroutine trace_orbit
+
+    subroutine write_output
+        open(unit=20, file=outname, action='write', recl=4096)
+        do kt = 1, nt
+            write(20,*) out(:,kt)
+        end do
+        close(20)
+    end subroutine write_output
 
 end program main
