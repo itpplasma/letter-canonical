@@ -18,7 +18,7 @@ program test_orbit
   class(FieldType), allocatable :: field_type
 
   real(dp) :: rmin, rmax, zmin, zmax
-  real(dp) :: z0(5), starttime, endtime
+  real(dp) :: z0(5), starttime, endtime, tau1, tau2
   real(dp), allocatable :: z(:, :)
 
   integer :: kt, nmax
@@ -71,8 +71,10 @@ program test_orbit
   starttime = omp_get_wtime()
   nmax = nt
   do kt = 2, nt
+    tau1 = 0d0
+    tau2 = 1d-3
     z(:,kt) = z(:,kt-1)
-    call odeint_allroutines(z, 5, 0d0, 1d-3, 1d-8, velo_can)
+    call odeint_allroutines(z, 5, tau1, tau2, 1d-8, velo_can)
   end do
   endtime = omp_get_wtime()
   print *, trim(outname), endtime-starttime
