@@ -12,7 +12,6 @@ program main
 
     integer, parameter :: n_r=100, n_phi=64, n_z=75
     integer :: nt
-    character(*), parameter :: outname = "orbit.out"
     real(dp), parameter :: ro0 = 1d0*20000d0  ! 1cm Larmor radius at 20000 Gauss
     real(dp), parameter :: mu = 0d0 !1d-5
 
@@ -29,8 +28,10 @@ program main
     integer :: kt, ierr, nmax
 
     ! Configuration in letter_canonical.in
-    character(16) :: magfie_type, integrator_type
-    namelist /letter_canonical/ magfie_type, integrator_type
+    character(16) :: magfie_type = "tok"
+    character(16) :: integrator_type = "euler1"
+    character(1024) :: outname = "orbit.out"
+    namelist /letter_canonical/ magfie_type, integrator_type, outname
 
     nt = 8000
 
