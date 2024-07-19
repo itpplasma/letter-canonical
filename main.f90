@@ -3,7 +3,7 @@ program main
     use omp_lib
     use magfie, only: FieldType
     use magfie_factory, only: magfie_type_from_string
-    use magfie_tok, only: input_file_tok => input_file
+    use magfie_tok, only: input_file_tok_ => input_file
     use canonical, only: twopi, init_canonical, init_transformation, &
         init_canonical_field_components, init_splines_with_psi
     use field_can, only: field_can_t, field_can_cyl_t, field_can_new_t
@@ -12,6 +12,7 @@ program main
     implicit none
 
     character(1024) :: input_file = "letter_canonical.in"
+    character(1024) :: input_file_tok = "field_divB0.inp"
 
     integer, parameter :: n_r=100, n_phi=64, n_z=75
     integer :: nt = 80000
@@ -91,6 +92,8 @@ contains
         open(newunit=iunit, file=input_file, status='old')
         read(iunit, nml=letter_canonical)
         close(iunit)
+
+        input_file_tok_ = trim(input_file_tok)
     end subroutine read_input_file
 
     subroutine init_field_can
