@@ -5,6 +5,7 @@ module magfie_tok
     implicit none
 
     complex(8), parameter :: imun = dcmplx(0.0d0, 1.0d0)
+    character(len=1024) :: input_file = 'field_divB0.inp'
 
     type, extends(FieldType) :: TokFieldType
         type(FourierPerturbation), allocatable :: perturbations(:)
@@ -34,7 +35,7 @@ module magfie_tok
         class(TokFieldType), intent(in) :: self
 
         if (icall < 1) then
-            call read_field_input
+            call read_field_input(input_file)
             print *, 'Perturbation field', ipert, 'Ampl', ampl
             call init_stretch_coords
             icall = 1

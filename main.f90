@@ -3,6 +3,7 @@ program main
     use omp_lib
     use magfie, only: FieldType
     use magfie_factory, only: magfie_type_from_string
+    use magfie_tok, only: input_file_tok => input_file
     use canonical, only: twopi, init_canonical, init_transformation, &
         init_canonical_field_components, init_splines_with_psi
     use field_can, only: field_can_t, field_can_cyl_t, field_can_new_t
@@ -10,10 +11,12 @@ program main
 
     implicit none
 
+    character(1024) :: input_file = "letter_canonical.in"
+
     integer, parameter :: n_r=100, n_phi=64, n_z=75
-    integer :: nt
-    real(dp), parameter :: ro0 = 1d0*20000d0  ! 1cm Larmor radius at 20000 Gauss
-    real(dp), parameter :: mu = 0d0 !1d-5
+    integer :: nt = 8000
+    real(dp) :: ro0 = 1d0*20000d0  ! 1cm Larmor radius at 20000 Gauss
+    real(dp) :: mu = 0d0 !1d-5
 
     class(FieldType), allocatable :: field_type
     class(field_can_t), allocatable :: field
@@ -22,7 +25,11 @@ program main
     type(symplectic_integrator_data_t) :: si
 
     real(dp) :: rmin, rmax, zmin, zmax
-    real(dp) :: z0(4), vpar0, starttime, endtime
+    real(dp) :: psi0 = 15000000d0
+    real(dp) :: phi0 = 0d0
+    real(dp) :: th0 = 27.5d0
+    real(dp) :: vpar0 = 1.0d0
+    real(dp) :: z0(4), starttime, endtime, dt = 1.0d0, rtol = 1d-13
     real(dp), allocatable :: out(:, :)
 
     integer :: kt, ierr, nmax
@@ -31,19 +38,12 @@ program main
     character(16) :: magfie_type = "tok"
     character(16) :: integrator_type = "euler1"
     character(1024) :: outname = "orbit.out"
-    namelist /letter_canonical/ magfie_type, integrator_type, outname
+    namelist /letter_canonical/ magfie_type, integrator_type, outname, input_file_tok, &
+        ro0, mu, nt, dt, rtol, psi0, phi0, th0, vpar0
 
-    nt = 8000
+    call set_bounding_box
+    call read_input_file
 
-    ! Workaround, otherwise not initialized without perturbation field
-    rmin = 75.d0
-    rmax = 264.42281879194627d0
-    zmin = -150.d0
-    zmax = 147.38193979933115d0
-
-    open(unit=10, file='letter_canonical.in', status='old', action='read')
-    read(10, nml=letter_canonical)
-    close(10)
     field_type = magfie_type_from_string(trim(magfie_type))
 
     print *, "init_canonical ..."
@@ -59,28 +59,11 @@ program main
     print *, "init_splines_with_psi ..."
     call init_splines_with_psi
 
-    ! Initial conditions
-    z0(1) = 15000000d0 ! psi tok
-    !z0(1) = -5.5d0 ! psi test
-    !z0(1) = 173d0   ! r
-    z0(2) = 27.5d0 ! z
-    z0(3) = -2.0d0*3.1415d0  ! phi
-    vpar0 = 0.8d0  ! parallel velocity
-
-    field = field_can_new_t()
-    call field_can_init(f, mu, ro0, vpar0)
-    call field%evaluate(f, z0(1), z0(2), z0(3), 2)
-
-    z0(4) = vpar0*f%hph + f%Aph/f%ro0  ! p_phi
-    call get_derivatives2(f, z0(4))
-    print *, 'f%hph = ', f%hph
-    print *, 'f%Aph = ', f%Aph
-    print *, 'f%ro0 = ', f%ro0
-    print *, 'vpar0 = ', vpar0
-    print *, 'z0 = ', z0
+    call init_field_can
+    call set_initial_conditions
 
     integ = create_integrator(trim(integrator_type), field)
-    call integrator_init(si, field, f, z0, dt=1.0d0, ntau=1, rtol=1d-8)
+    call integrator_init(si, field, f, z0, dt, 1, rtol)
 
     allocate(out(5,nt))
 
@@ -111,5 +94,35 @@ program main
     end do
     close(20)
     deallocate(out)
+
+contains
+
+    subroutine set_bounding_box
+    ! Workaround, otherwise not initialized without perturbation field
+        rmin = 75.d0
+        rmax = 264.42281879194627d0
+        zmin = -150.d0
+        zmax = 147.38193979933115d0
+    end subroutine set_bounding_box
+
+    subroutine read_input_file
+        integer :: iunit
+        open(newunit=iunit, file=input_file, status='old')
+        read(iunit, nml=letter_canonical)
+        close(iunit)
+    end subroutine read_input_file
+
+    subroutine init_field_can
+        field = field_can_new_t()
+        call field_can_init(f, mu, ro0, vpar0)
+        call field%evaluate(f, psi0, th0, phi0, 2)
+    end subroutine init_field_can
+
+    subroutine set_initial_conditions
+        z0(1) = psi0   ! psi_c
+        z0(2) = th0    ! Z
+        z0(3) = phi0   ! varphi_c
+        z0(4) = vpar0*f%hph + f%Aph/f%ro0  ! p_phi
+    end subroutine set_initial_conditions
 
 end program main
