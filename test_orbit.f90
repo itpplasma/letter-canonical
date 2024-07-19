@@ -14,7 +14,6 @@ program test_orbit
   integer, parameter :: n_r=100, n_phi=64, n_z=75
   integer :: nt
   character(*), parameter :: outname = "orbit.out"
-  real(dp), parameter :: qe = 1d5, m = 1d0, c = 1d0, mu = 0d0 !1d-5
 
   class(FieldType), allocatable :: field_type
 
@@ -28,7 +27,7 @@ program test_orbit
   character(16) :: magfie_type, integrator_type
   namelist /letter_canonical/ magfie_type, integrator_type
 
-  real(dp) :: rmu=1d5, ro0=c*m/qe
+  real(dp) :: rmu=1d5, ro0=20000d0*1d0  ! 20000 Gauss, 1cm Larmor radius
 
   nt = 8000
 
@@ -62,7 +61,7 @@ program test_orbit
   z0(2) = 27.5d0 ! z
   z0(3) = -2.0d0*3.1415d0  ! phi
   z0(4) = 1.0d0  ! normalized momentum
-  z0(5) = 0.0d0  ! normalized pitch angle
+  z0(5) = 0.5d0  ! normalized pitch angle
 
   allocate(z(5,nt))
 
@@ -155,6 +154,12 @@ contains
 
 
     call magfie_can(x,bmod,sqrtg,bder,hcovar,hctrvr,hcurl)
+! print *, 'bmod: ', bmod
+! print *, 'sqrtg: ', sqrtg
+! print *, 'bder: ', bder
+! print *, 'hcovar: ', hcovar
+! print *, 'hctrvr: ', hctrvr
+! print *, 'hcurl: ', hcurl
 
     ! in elefie: x(i)   - space coords (input, see above)
     !            derphi - derivatives of the dimensionless electric potential
@@ -216,8 +221,6 @@ contains
     vz(5)=-(0.5d0*coala/hpstar)*(sum(hstar*derphi)/p                 &
       + p*sum(hstar*bder)/gamma+alambd*sum(a_phi*bder))
 
-    print *, vz
-
   end subroutine velo_can
 
 !ccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
@@ -251,80 +254,42 @@ contains
     use interpolate, only: evaluate_splines_3d_der2
     use canonical, only: spl_Aphi_of_xc, spl_hph_of_xc, spl_hth_of_xc, spl_Bmod_of_xc
 
-    logical :: fullset
-    integer :: mode_secders
-    real(dp) :: bmod,dbmod(3),d2bmod(6),sqrtg
-    real(dp) :: r,vartheta_c,varphi_c,                                           &
-      dA_phi_dr,dA_theta_dr,d2A_phi_dr2,                               &
-      sqg_c,dsqg_c_dr,dsqg_c_dt,dsqg_c_dp,                             &
-      B_vartheta_c,dB_vartheta_c_dr,dB_vartheta_c_dt,dB_vartheta_c_dp, &
-      B_varphi_c,dB_varphi_c_dr,dB_varphi_c_dt,dB_varphi_c_dp
-    real(dp) :: Bctr_vartheta,Bctr_varphi,bmod2
-    real(dp), dimension(3) :: x,bder,hcovar,hctrvr,hcurl
+    real(dp), intent(in) :: x(3)
 
-    integer, parameter :: reorder(3) = [1, 3, 2]  ! dr, dph, dth -> dr, dth, dph
-    integer, parameter :: reorder2(6) = [1, 3, 2, 6, 5, 4]
-    ! drdr, drdph, drdth, dphdph, dphdth, dthdth ->
-    ! drdr, drdth, drdph, dthdth, dthdph, dphdph
+    real(dp), intent(out) :: bmod, sqrtg
+    real(dp), dimension(3), intent(out) :: bder, hcovar, hctrvr, hcurl
 
-    real(dp) :: a, da(3), d2a(6)
+    integer, parameter :: reorder(3) = [1, 3, 2]  ! r, ph, th -> r, th, ph
 
-    r=x(1)
-    vartheta_c=x(2)
-    varphi_c=x(3)
+    real(dp) :: aph, hph, hth, sqrtg_bmod
+    real(dp), dimension(3) :: daph, dhph, dhth, dbmod
+    real(dp), dimension(6) :: dummy
 
-    fullset=.false.
-    mode_secders=0
+    call evaluate_splines_3d_der2(spl_Aphi_of_xc, x(reorder), aph, daph, dummy)
+    call evaluate_splines_3d_der2(spl_Bmod_of_xc, x(reorder), bmod, dbmod, dummy)
+    call evaluate_splines_3d_der2(spl_hth_of_xc, x(reorder), hth, dhth, dummy)
+    call evaluate_splines_3d_der2(spl_hph_of_xc, x(reorder), hph, dhph, dummy)
 
-    dA_theta_dr = 1.0d0
+    daph = daph(reorder)
+    dbmod = dbmod(reorder)
+    dhth = dhth(reorder)
+    dhph = dhph(reorder)
 
-    call evaluate_splines_3d_der2(spl_Aphi_of_xc, x(reorder), a, da, d2a)
+    sqrtg_bmod = hph - hth*daph(1)
+    sqrtg = sqrtg_bmod/bmod
+    bder = dbmod/bmod
 
-    dA_phi_dr = a
-    d2A_phi_dr2 = d2a(1)
+    hcovar(1) = 0.d0
+    hcovar(2) = hth
+    hcovar(3) = hph
 
-    call evaluate_splines_3d_der2(spl_Bmod_of_xc, x(reorder), bmod, dbmod, d2bmod)
-    bmod2 = bmod**2
+    hctrvr(1) = daph(2)/sqrtg_bmod
+    hctrvr(2) = -daph(1)/sqrtg_bmod
+    hctrvr(3) = 1.d0/sqrtg_bmod
 
-    hcovar(1)=0.d0
-
-    call evaluate_splines_3d_der2(spl_hth_of_xc, x(reorder), a, da, d2a)
-
-    hcovar(2) = a
-    B_vartheta_c = a*bmod
-    dB_vartheta_c_dr = da(1)*bmod+a*dbmod(1)
-    dB_vartheta_c_dt = da(2)*bmod+a*dbmod(2)
-    dB_vartheta_c_dp = da(3)*bmod+a*dbmod(3)
-
-    call evaluate_splines_3d_der2(spl_hph_of_xc, x(reorder), a, da, d2a)
-    hcovar(3) = a
-    B_varphi_c = a*bmod
-    dB_varphi_c_dr = da(1)*bmod+a*dbmod(1)
-    dB_varphi_c_dt = da(2)*bmod+a*dbmod(2)
-    dB_varphi_c_dp = da(3)*bmod+a*dbmod(3)
-
-    sqg_c=r  ! TODO: actual sqrtg, not just rough estimate
-    dsqg_c_dr=1.0d0
-    dsqg_c_dt=0.0d0
-    dsqg_c_dp=0.0d0
-
-    sqrtg=sqg_c
-
-    Bctr_vartheta=-dA_phi_dr/sqg_c
-    Bctr_varphi=dA_theta_dr/sqg_c
-
-    bder(1)=0.5d0*((dA_theta_dr*dB_varphi_c_dr-dA_phi_dr*dB_vartheta_c_dr-d2A_phi_dr2*B_vartheta_c) &
-      /bmod2-dsqg_c_dr)/sqg_c
-    bder(2)=0.5d0*((dA_theta_dr*dB_varphi_c_dt-dA_phi_dr*dB_vartheta_c_dt)/bmod2-dsqg_c_dt)/sqg_c
-    bder(3)=0.5d0*((dA_theta_dr*dB_varphi_c_dp-dA_phi_dr*dB_vartheta_c_dp)/bmod2-dsqg_c_dp)/sqg_c
-
-    hctrvr(1)=0.d0
-    hctrvr(2)=Bctr_vartheta/bmod
-    hctrvr(3)=Bctr_varphi/bmod
-
-    hcurl(1)=((dB_varphi_c_dt-dB_vartheta_c_dp)/bmod-bder(2)*hcovar(3)+bder(3)*hcovar(2))/sqg_c
-    hcurl(2)=(-dB_varphi_c_dr/bmod+bder(1)*hcovar(3))/sqg_c
-    hcurl(3)=(dB_vartheta_c_dr/bmod-bder(1)*hcovar(2))/sqg_c
+    hcurl(1) = (dhph(2) - dhth(3))/sqrtg
+    hcurl(2) = -dhph(1)/sqrtg
+    hcurl(3) = dhth(1)/sqrtg
 
   end subroutine magfie_can
 

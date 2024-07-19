@@ -27,7 +27,7 @@ Z = data[:,1]
 phi = data[:,2]
 H = data[:,4]
 
-plt.plot(R, Z, '.')
+plt.plot(R, Z, '-')
 plt.xlim(psimin, psimax)
 plt.ylim(zmin, zmax)
 
