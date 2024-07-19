@@ -13,7 +13,8 @@ program main
     integer, parameter :: n_r=100, n_phi=64, n_z=75
     integer :: nt
     character(*), parameter :: outname = "orbit.out"
-    real(dp), parameter :: qe = 1d5, m = 1d0, c = 1d0, mu = 0d0 !1d-5
+    real(dp), parameter :: ro0 = 1d0*20000d0  ! 1cm Larmor radius at 20000 Gauss
+    real(dp), parameter :: mu = 0d0 !1d-5
 
     class(FieldType), allocatable :: field_type
     class(field_can_t), allocatable :: field
@@ -66,7 +67,7 @@ program main
     vpar0 = 0.8d0  ! parallel velocity
 
     field = field_can_new_t()
-    call field_can_init(f, mu, c*m/qe, vpar0)
+    call field_can_init(f, mu, ro0, vpar0)
     call field%evaluate(f, z0(1), z0(2), z0(3), 2)
 
     z0(4) = vpar0*f%hph + f%Aph/f%ro0  ! p_phi
@@ -78,7 +79,7 @@ program main
     print *, 'z0 = ', z0
 
     integ = create_integrator(trim(integrator_type), field)
-    call integrator_init(si, field, f, z0, dt=1.0d-2, ntau=1, rtol=1d-8)
+    call integrator_init(si, field, f, z0, dt=1.0d0, ntau=1, rtol=1d-8)
 
     allocate(out(5,nt))
 

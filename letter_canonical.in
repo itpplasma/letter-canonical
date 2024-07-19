@@ -1,4 +1,4 @@
 &letter_canonical
     magfie_type = "tok",         ! test, tok
-    integrator_type = "rk45",  ! euler0, euler1, rk45
+    integrator_type = "euler1",  ! euler0, euler1, rk45
 /
