@@ -1,0 +1,5 @@
+&letter_canonical
+    magfie_type = "tok",         ! test, tok
+    input_file_tok = "field_divB0_rmp.inp",
+    integrator_type = "euler1",  ! euler0, euler1, rk45
+/

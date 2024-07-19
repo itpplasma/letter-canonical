@@ -14,7 +14,7 @@ program main
     character(1024) :: input_file = "letter_canonical.in"
 
     integer, parameter :: n_r=100, n_phi=64, n_z=75
-    integer :: nt = 8000
+    integer :: nt = 80000
     real(dp) :: ro0 = 1d0*20000d0  ! 1cm Larmor radius at 20000 Gauss
     real(dp) :: mu = 0d0 !1d-5
 
@@ -32,7 +32,7 @@ program main
     real(dp) :: z0(4), starttime, endtime, dt = 1.0d0, rtol = 1d-13
     real(dp), allocatable :: out(:, :)
 
-    integer :: kt, ierr
+    integer, parameter :: nplagr=4, nder=0
 
     ! Configuration in letter_canonical.in
     character(16) :: magfie_type = "tok"
@@ -42,6 +42,11 @@ program main
         ro0, mu, nt, dt, rtol, psi0, phi0, th0, vpar0
 
     call set_bounding_box
+
+    if (command_argument_count() > 0) then
+        call get_command_argument(1, input_file)
+    end if
+
     call read_input_file
 
     field_type = magfie_type_from_string(trim(magfie_type))
@@ -114,16 +119,60 @@ contains
     end subroutine init_integrator
 
     subroutine trace_orbit
+        integer :: kt, ierr
+        logical :: cut = .false.
+        real(dp) :: zcut(4)
         do kt = 2, nt
             ierr = 0
             call integ%timestep(si, f, ierr)
             if (.not. ierr==0) error stop
-            out(1:4,kt) = si%z
-            out(5,kt) = f%H
+            out(1:4, kt) = si%z
+            out(5, kt) = f%H
+            if (kt > nplagr/2) then
+                cut = detect_cut(out, kt, zcut)
+            end if
+            if (cut) then
+                write(666,*) zcut
+            end if
         end do
     end subroutine trace_orbit
 
+    function detect_cut(z, kt, zcut) result(cut)
+        use plag_coeff_sub, only: plag_coeff
+
+        real(dp), intent(in) :: z(:,:)
+        integer, intent(in) :: kt
+        real(dp), intent(out) :: zcut(4)
+        logical :: cut
+
+
+        real(dp) :: fper = twopi
+        real(dp) :: coef(0:nder,nplagr)
+        integer :: iper, kper_prev, kper, i
+
+        iper = nplagr/2+1
+        kper_prev=int(z(3, kt - nplagr/2)/fper)
+
+        cut = .true.
+        do i = kt - nplagr/2 + 1, kt
+            kper = int(z(3, i)/fper)
+            if (kper == kper_prev) then
+                cut = .false.
+                exit
+            end if
+        end do
+
+        if (.not. cut) return
+
+        print *, kper*fper, z(3, (kt-nplagr+1):kt)
+        call plag_coeff(nplagr, nder, kper*fper, z(3, (kt-nplagr+1):kt), coef)
+        zcut = matmul(z(:, (kt-nplagr+1):kt), coef(0,:))
+
+    end function detect_cut
+
     subroutine write_output
+        integer :: kt
+
         open(unit=20, file=outname, action='write', recl=4096)
         do kt = 1, nt
             write(20,*) out(:,kt)
