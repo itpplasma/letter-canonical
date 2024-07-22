@@ -16,7 +16,7 @@ RR, ZZ = np.meshgrid(np.linspace(psimin, psimax, shape[2]),
 plt.figure()
 
 data = np.loadtxt("../Aph_of_xc.out").reshape(shape)
-plt.contour(RR, ZZ, data[:, 1, :])
+plt.contour(RR, ZZ, data[:, 1, :], levels=20)
 plt.xlabel("psi")
 plt.ylabel("Z")
 

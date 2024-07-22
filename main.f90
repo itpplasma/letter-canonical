@@ -28,7 +28,7 @@ program main
     real(dp) :: rmin, rmax, zmin, zmax
     real(dp) :: psi0 = 15000000d0
     real(dp) :: phi0 = 0d0
-    real(dp) :: th0 = 27.5d0
+    real(dp) :: th0 = -40.0d0
     real(dp) :: vpar0 = 1.0d0
     real(dp) :: z0(4), starttime, endtime, dt = 1.0d0, rtol = 1d-13
     real(dp), allocatable :: out(:, :)
@@ -38,8 +38,8 @@ program main
     ! Configuration in letter_canonical.in
     character(16) :: magfie_type = "tok"
     character(16) :: integrator_type = "euler1"
-    character(1024) :: outname = "orbit.out"
-    namelist /letter_canonical/ magfie_type, integrator_type, outname, input_file_tok, &
+    character(1024) :: outfile = "orbit.out"
+    namelist /letter_canonical/ magfie_type, integrator_type, outfile, input_file_tok, &
         ro0, mu, nt, dt, rtol, psi0, phi0, th0, vpar0
 
     call set_bounding_box
@@ -73,7 +73,7 @@ program main
     call trace_orbit
     endtime = omp_get_wtime()
 
-    print *, trim(outname), endtime-starttime
+    print *, trim(outfile), endtime-starttime
 
     call write_output
 
@@ -176,7 +176,7 @@ contains
     subroutine write_output
         integer :: kt
 
-        open(unit=20, file=outname, action='write', recl=4096)
+        open(unit=20, file=outfile, action='write', recl=4096)
         do kt = 1, nt
             write(20,*) out(:,kt)
         end do

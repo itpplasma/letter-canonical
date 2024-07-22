@@ -1,7 +1,4 @@
 &letter_canonical
     magfie_type = "tok",         ! test, tok
-    input_file_tok = "field_divB0_rmp.inp",
     integrator_type = "rk45",  ! euler0, euler1, rk45
-    rtol = 1d-8,
-    outfile = "orbit_rmp.out"
 /
