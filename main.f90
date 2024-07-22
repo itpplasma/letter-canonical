@@ -30,7 +30,7 @@ program main
     real(dp) :: phi0 = 0d0
     real(dp) :: th0 = -40.0d0
     real(dp) :: vpar0 = 1.0d0
-    real(dp) :: z0(4), starttime, endtime, dt = 1.0d0, rtol = 1d-13
+    real(dp) :: z0(4), starttime, endtime, dt = 1.0d0, tol = 1d-13
     real(dp), allocatable :: out(:, :)
 
     integer, parameter :: nplagr=4, nder=0
@@ -39,8 +39,8 @@ program main
     character(16) :: magfie_type = "tok"
     character(16) :: integrator_type = "euler1"
     character(1024) :: outfile = "orbit.out"
-    namelist /letter_canonical/ magfie_type, integrator_type, outfile, input_file_tok, &
-        ro0, mu, nt, dt, rtol, psi0, phi0, th0, vpar0
+    namelist /letter_canonical/ magfie_type, integrator_type, tol, outfile, &
+        input_file_tok, ro0, mu, nt, dt, psi0, phi0, th0, vpar0
 
     call set_bounding_box
 
@@ -118,7 +118,7 @@ contains
 
     subroutine init_integrator
         integ = create_integrator(trim(integrator_type), field)
-        call integrator_init(si, field, f, z0, dt, 1, rtol)
+        call integrator_init(si, field, f, z0, dt, 1, tol)
     end subroutine init_integrator
 
     subroutine trace_orbit

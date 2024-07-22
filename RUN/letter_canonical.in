@@ -1,6 +1,6 @@
 &letter_canonical
     magfie_type = "tok",         ! test, tok
-    integrator_type = "rk45",  ! euler0, euler1, rk45
-    rtol = 1d-8,
-    outfile = "orbit.out"
+    integrator_type = "rk45",    ! euler0, euler1, rk45
+    !tol = 1d-8,
+    !outfile = "orbit.out"
 /

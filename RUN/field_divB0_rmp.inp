@@ -6,7 +6,7 @@
 4                                 icftype      ! type of coil file
 '../DATA/g_file_for_test'         gfile        ! equilibrium file
 '../DATA/field_small.dat'         pfile        ! coil        file
-'../DATA/convexwall.dat'          convexfile   ! convex file for stretchcoords
+'../DATA/convexwall_inside_rmp_coils.dat'          convexfile   ! convex file for stretchcoords
 ''                                fluxdatapath ! directory with data in flux coord.
 0                                 window size for filtering of psi array over R
 0                                 window size for filtering of psi array over Z
