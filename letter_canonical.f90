@@ -5,6 +5,8 @@ module letter_canonical
 
     integer :: error_code_ = 0
 
+    real(dp) :: rmin, rmax, zmin, zmax
+
     class(integrator_t), allocatable :: integ
 
     abstract interface
@@ -16,7 +18,26 @@ module letter_canonical
 
 contains
 
-    subroutine init()
+    subroutine init(field_type, integrator_type)
+        character(*), intent(in) :: field_type  ! test, tok
+        character(*), intent(in) :: integrator_type
+        ! Cylindrical coordinates: rk45_cyl
+        ! Canonical coordinates with vpar as variable: rk45_can
+        ! Canonical coordinates with pphi as variable:
+        !    Non-symplectic: expl_euler, rk45_pphi
+        !    Symplectic: expl_impl_euler
+
+        select case(field_type)
+            case("test")
+                call throw_error("trace_orbit: test field not yet implemented")
+                return
+            case("tok")
+                call init_tok
+            case default
+                call throw_error("init: Unknown field type", 1)
+                return
+        end select
+
     end subroutine init
 
     subroutine trace_orbit(z0, dtau, ntau, nskip, z_out, callback)
@@ -26,18 +47,16 @@ contains
         real(dp), intent(inout) :: z_out(:, :)
         procedure(callback_type), optional :: callback
 
-        integer :: kt, nt, ierr
+        integer :: kt, ierr
         real(dp) :: z(5)
 
-        nt = ntau/nskip
-
-        if (.not. size(z_out, 2) == nt) then
+        if (.not. size(z_out, 2) == ntau/nskip) then
             call throw_error("trace_orbit: z_out has wrong size")
             return
         end if
 
         z_out(:, 1) = z0
-        do kt = 2, nt
+        do kt = 2, ntau
             call integ%timestep(z, dtau, ierr)
             if (ierr /= 0) then
                 call throw_error("trace_orbit: error in timestep", ierr)
