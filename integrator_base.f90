@@ -4,6 +4,23 @@ module integrator_base
 
     implicit none
 
+    type, abstract :: integrator_t
+        contains
+        procedure(timestep), deferred :: timestep
+    end type integrator_t
+
+
+    abstract interface
+        subroutine timestep(self, z, dtau, ierr)
+            import integrator_t, dp
+            class(integrator_t), intent(in) :: self
+            real(dp), intent(inout) :: z(:)
+            real(dp), intent(in) :: dtau
+            integer, intent(out) :: ierr
+        end subroutine timestep
+    end interface
+
+
     type :: symplectic_integrator_data_t
         real(dp) :: atol
         real(dp) :: rtol
@@ -19,19 +36,19 @@ module integrator_base
     end type symplectic_integrator_data_t
 
     type, abstract :: symplectic_integrator_t
-    contains
-        procedure(timestep), deferred :: timestep
+        contains
+        procedure(symplectic_timestep), deferred :: timestep
     end type symplectic_integrator_t
 
     abstract interface
-        subroutine timestep(self, si, f, ierr)
+        subroutine symplectic_timestep(self, si, f, ierr)
             import symplectic_integrator_t, symplectic_integrator_data_t, &
                 field_can_data_t
             class(symplectic_integrator_t), intent(in) :: self
             type(symplectic_integrator_data_t), intent(inout) :: si
             type(field_can_data_t), intent(inout) :: f
             integer, intent(out) :: ierr
-        end subroutine timestep
+        end subroutine symplectic_timestep
     end interface
 
 end module integrator_base
