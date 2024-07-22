@@ -28,7 +28,7 @@ program main
     real(dp) :: rmin, rmax, zmin, zmax
     real(dp) :: psi0 = 15000000d0
     real(dp) :: phi0 = 0d0
-    real(dp) :: th0 = -40.0d0
+    real(dp) :: th0 = -76.5d0
     real(dp) :: vpar0 = 1.0d0
     real(dp) :: z0(4), starttime, endtime, dt = 1.0d0, tol = 1d-13
     real(dp), allocatable :: out(:, :)
@@ -174,11 +174,16 @@ contains
     end function detect_cut
 
     subroutine write_output
+        use interpolate, only: evaluate_splines_3d
+        use canonical, only: spl_R_of_xc
+
         integer :: kt
+        real(dp) :: R
 
         open(unit=20, file=outfile, action='write', recl=4096)
         do kt = 1, nt
-            write(20,*) out(:,kt)
+            call evaluate_splines_3d(spl_R_of_xc, out(1:3,kt), R)
+            write(20,*) out(:,kt), R
         end do
         close(20)
     end subroutine write_output

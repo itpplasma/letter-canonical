@@ -16,7 +16,7 @@ RR, ZZ = np.meshgrid(np.linspace(psimin, psimax, shape[2]),
 plt.figure()
 
 data = np.loadtxt("../Aph_of_xc.out").reshape(shape)
-plt.contour(RR, ZZ, data[:, 1, :], levels=20)
+plt.contour(RR, ZZ, data[:, 1, :], levels=19)
 plt.xlabel("psi")
 plt.ylabel("Z")
 
@@ -28,8 +28,8 @@ phi = data[:,2]
 H = data[:,4]
 
 plt.plot(R, Z, '-')
-plt.xlim(psimin, psimax)
-plt.ylim(zmin, zmax)
+plt.xlim(1.35e7, 1.59e7)
+plt.ylim(-110, 100)
 
 # %%
 plt.figure()

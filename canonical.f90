@@ -299,6 +299,14 @@ contains
     end subroutine init_psi_grid
 
 
+    subroutine evaluate_psi(x, psi)
+        real(dp), intent(in) :: x(3)
+        real(dp), intent(out) :: psi
+
+        call evaluate_splines_3d(spl_A3, x, psi)
+    end subroutine evaluate_psi
+
+
     subroutine init_R_of_xc_newton
         real(dp), parameter :: tol = 1d-13
         integer, parameter :: counter_max = 32

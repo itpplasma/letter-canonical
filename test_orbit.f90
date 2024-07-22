@@ -58,10 +58,10 @@ program test_orbit
   ! Initial conditions
   z0(1) = 15000000d0 ! psi tok
   !z0(1) = -5.5d0 ! psi test
-  z0(2) = -40.0d0 ! z
+  z0(2) = -76.5d0 ! z
   z0(3) = -2.0d0*3.1415d0  ! phi
   z0(4) = 1.0d0  ! normalized momentum
-  z0(5) = 0.8d0  ! normalized pitch parameter
+  z0(5) = 0.0d0  ! normalized pitch parameter
 
   allocate(z(5,nt))
 
