@@ -1,7 +1,7 @@
 program test_field_can
     use, intrinsic :: iso_fortran_env, only: dp => real64
-    use magfie, only: FieldType
-    use magfie_tok, only: TokFieldType
+    use magfie, only: field_t
+    use magfie_tok, only: Tokfield_t
     use canonical, only: twopi, init_canonical, init_transformation, &
         init_canonical_field_components
 
@@ -19,7 +19,7 @@ program test_field_can
     real(dp) :: rmin, rmax, zmin, zmax
     !complex(8) :: pert
 
-    class(FieldType), allocatable :: field_type
+    class(field_t), allocatable :: field_type
 
     ! Workaround, otherwise not initialized without perturbation field
     rmin = 75.d0
@@ -27,7 +27,7 @@ program test_field_can
     zmin = -150.d0
     zmax = 147.38193979933115d0
 
-    field_type = TokFieldType()
+    field_type = Tokfield_t()
 
     print *, "init_canonical ..."
     call init_canonical(n_r, n_phi, n_z, [rmin, 0.0d0, zmin], &

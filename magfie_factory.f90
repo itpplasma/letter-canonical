@@ -9,13 +9,13 @@ module magfie_factory
 
     function magfie_type_from_string(magfie_type) result(magfie_instance)
         character(*), intent(in) :: magfie_type
-        class(FieldType), allocatable :: magfie_instance
+        class(field_t), allocatable :: magfie_instance
 
         select case(magfie_type)
         case("test")
-            magfie_instance = TestFieldType()
+            magfie_instance = Testfield_t()
         case("tok")
-            magfie_instance = TokFieldType()
+            magfie_instance = Tokfield_t()
         case default
             print *, "magfie_factory: Unknown magfie type"
             error stop

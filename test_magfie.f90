@@ -2,7 +2,7 @@ program test_magfie
     use, intrinsic :: iso_fortran_env, only: dp => real64
     use odeint_sub, only: odeint_allroutines
     use magfie_factory, only: magfie_type_from_string
-    use magfie, only: FieldType
+    use magfie, only: field_t
     use interpolate, only: SplineData3D, construct_splines_3d, &
     evaluate_splines_3d, evaluate_splines_3d_der2, destroy_splines_3d
     use canonical, only: init_canonical, init_transformation, twopi, &
@@ -17,7 +17,7 @@ program test_magfie
     real(dp) :: rmin, rmax, zmin, zmax
     !complex(8) :: pert
 
-    class(FieldType), allocatable :: field_type
+    class(field_t), allocatable :: field_type
 
     ! Configuration in letter_canonical.in
     character(16) :: magfie_type, integrator_type
@@ -34,8 +34,8 @@ program test_magfie
     close(10)
     field_type = magfie_type_from_string(trim(magfie_type))
 
-    !field_type = TokFieldType()
-    !field_type = TestFieldType()
+    !field_type = Tokfield_t()
+    !field_type = Testfield_t()
     ! pert = dcmplx(2.0d3, 2.0d3)
     ! call field_type%add_perturbation(3, -2, [pert, pert, pert])
     ! call field_type%add_perturbation(3, 2, [pert, pert, pert])

@@ -1,7 +1,7 @@
 program main
     use, intrinsic :: iso_fortran_env, only: dp => real64
     use omp_lib
-    use magfie, only: FieldType
+    use magfie, only: field_t
     use magfie_factory, only: magfie_type_from_string
     use magfie_tok, only: input_file_tok_ => input_file
     use canonical, only: twopi, init_canonical, init_transformation, &
@@ -19,7 +19,7 @@ program main
     real(dp) :: ro0 = 1d0*20000d0  ! 1cm Larmor radius at 20000 Gauss
     real(dp) :: mu = 0d0 !1d-5
 
-    class(FieldType), allocatable :: field_type
+    class(field_t), allocatable :: field_type
     class(field_can_t), allocatable :: field
     type(field_can_data_t) :: f
     class(symplectic_integrator_t), allocatable :: integ

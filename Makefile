@@ -29,7 +29,7 @@ OBJECTS := $(SOURCES:.f90=.o)
 OBJECTS := $(addprefix OBJS/, $(OBJECTS))
 
 LIBNEO_SOURCES := libneo_kinds.f90 math_constants.f90 spl_three_to_five.f90 \
-	odeint_rkf45.f90 contrib/rkf45.f90 interpolate.f90
+	odeint_rkf45.f90 contrib/rkf45.f90 interpolate.f90 binsrc.f90 plag_coeff.f90
 LIBNEO_SOURCES := $(addprefix ../libneo/src/, $(LIBNEO_SOURCES))
 
 MAGFIE_SOURCES := spline5_RZ.f90 \
@@ -46,9 +46,6 @@ MAGFIE_SOURCES := spline5_RZ.f90 \
 	bdivfree_mod.f90 \
 	bdivfree.f90
 MAGFIE_SOURCES := $(addprefix ../libneo/src/magfie/, $(MAGFIE_SOURCES))
-
-SIMPLE_SOURCES := binsrc.f90 plag_coeff.f90
-SIMPLE_SOURCES := $(addprefix ../SIMPLE/SRC/, $(SIMPLE_SOURCES))
 
 all: letter_canonical.x test_orbit_sympl.x test_orbit.x test_integrator.x \
 	test_field_can.x test_magfie.x test.x test_large.x test_biotsavart.x
@@ -89,7 +86,7 @@ libcanonical.so: libfield.so $(OBJECTS)
 OBJS/%.o: %.f90
 	$(FC) $(FFLAGS) -c $< -o $@
 
-libfield.so: $(LIBNEO_SOURCES) $(MAGFIE_SOURCES) $(SIMPLE_SOURCES)
+libfield.so: $(LIBNEO_SOURCES) $(MAGFIE_SOURCES)
 	$(FC) $(FFLAGS) -shared -o $@ $^
 
 clean_objects:

@@ -1,13 +1,13 @@
 module magfie_tok
     use, intrinsic :: iso_fortran_env, only: dp => real64
-    use magfie, only: FieldType
+    use magfie, only: field_t
 
     implicit none
 
     complex(8), parameter :: imun = dcmplx(0.0d0, 1.0d0)
     character(len=1024) :: input_file = 'field_divB0.inp'
 
-    type, extends(FieldType) :: TokFieldType
+    type, extends(field_t) :: Tokfield_t
         type(FourierPerturbation), allocatable :: perturbations(:)
         contains
             procedure :: init_magfie
@@ -15,7 +15,7 @@ module magfie_tok
             procedure :: compute_abfield
 
             procedure :: add_perturbation
-    end type TokFieldType
+    end type Tokfield_t
 
     type :: FourierPerturbation
         integer :: mpol
@@ -32,7 +32,7 @@ module magfie_tok
         use libneo_kinds, only : real_kind
         use field_sub, only : read_field_input
 
-        class(TokFieldType), intent(in) :: self
+        class(Tokfield_t), intent(in) :: self
 
         if (icall < 1) then
             call read_field_input(input_file)
@@ -51,7 +51,7 @@ module magfie_tok
 
 
     subroutine compute_abfield(self, R, phi, Z, AR, Aphi, AZ, BR, Bphi, BZ)
-        class(TokFieldType), intent(in) :: self
+        class(Tokfield_t), intent(in) :: self
         real(dp), intent(in) :: R, phi, Z
         real(dp), intent(out) :: AR, Aphi, AZ, BR, Bphi, BZ
 
@@ -66,7 +66,7 @@ module magfie_tok
 
 
     subroutine compute_bfield(self, R, phi, Z, BR, Bphi, BZ)
-        class(TokFieldType), intent(in) :: self
+        class(Tokfield_t), intent(in) :: self
         real(dp), intent(in) :: R, phi, Z
         real(dp), intent(out) :: BR, Bphi, BZ
 
@@ -80,7 +80,7 @@ module magfie_tok
 
 
     subroutine perturb_afield(self, R, phi, Z, AR, Aphi, AZ)
-        class(TokFieldType), intent(in) :: self
+        class(Tokfield_t), intent(in) :: self
         real(dp), intent(in) :: R, phi, Z
         real(dp), intent(out) :: AR, Aphi, AZ
 
@@ -112,7 +112,7 @@ module magfie_tok
 
 
     subroutine perturb_bfield(self, R, phi, Z, BR, Bphi, BZ)
-        class(TokFieldType), intent(in) :: self
+        class(Tokfield_t), intent(in) :: self
         real(dp), intent(in) :: R, phi, Z
         real(dp), intent(inout) :: BR, Bphi, BZ
 
@@ -151,7 +151,7 @@ module magfie_tok
 
 
     subroutine add_perturbation(self, mpol, ntor, Amn)
-        class(TokFieldType), intent(inout) :: self
+        class(Tokfield_t), intent(inout) :: self
         integer, intent(in) :: mpol, ntor
         complex(8), intent(in) :: Amn(3)
 

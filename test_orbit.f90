@@ -1,7 +1,7 @@
 program test_orbit
   use, intrinsic :: iso_fortran_env, only: dp => real64
   use omp_lib
-  use magfie, only: FieldType
+  use magfie, only: field_t
   use magfie_factory, only: magfie_type_from_string
   use canonical, only: twopi, init_canonical, init_transformation, &
     init_canonical_field_components, init_splines_with_psi
@@ -15,7 +15,7 @@ program test_orbit
   integer :: nt
   character(*), parameter :: outname = "orbit.out"
 
-  class(FieldType), allocatable :: field_type
+  class(field_t), allocatable :: field_type
 
   real(dp) :: rmin, rmax, zmin, zmax
   real(dp) :: z0(5), starttime, endtime, tau1, tau2

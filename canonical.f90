@@ -1,7 +1,7 @@
 module canonical
     use, intrinsic :: iso_fortran_env, only: dp => real64
     use odeint_sub, only: odeint_allroutines
-    use magfie, only: FieldType
+    use magfie, only: field_t
     use interpolate, only: SplineData3D, construct_splines_3d, &
         evaluate_splines_3d, evaluate_splines_3d_der2
 
@@ -36,7 +36,7 @@ module canonical
     ! For splining covariant vector potential, h=B/Bmod and Bmod
     type(SplineData3D) :: spl_Bmod, spl_A2, spl_A3, spl_h2, spl_h3
 
-    class(FieldType), allocatable :: magfie_type
+    class(field_t), allocatable :: magfie_type
 
     ! For splining psi
     real(dp) :: psi_inner, psi_outer
@@ -58,7 +58,7 @@ contains
 
         integer, intent(in) :: n_r_, n_phi_, n_z_  ! Number of grid points
         real(dp), intent(in) :: xmin(3), xmax(3)
-        class(FieldType), intent(in) :: magfie_type_
+        class(field_t), intent(in) :: magfie_type_
 
         magfie_type = magfie_type_
         call magfie_type%init_magfie()

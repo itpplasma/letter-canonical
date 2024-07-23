@@ -18,8 +18,10 @@ module letter_canonical
 
 contains
 
-    subroutine init(field_type, integrator_type)
-        character(*), intent(in) :: field_type  ! test, tok
+    subroutine init(field_input_file, integrator_type)
+        use magfie_tok, only: input_file
+
+        character(*), intent(in) :: field_input_file
         character(*), intent(in) :: integrator_type
         ! Cylindrical coordinates: rk45_cyl
         ! Canonical coordinates with vpar as variable: rk45_can
@@ -27,16 +29,8 @@ contains
         !    Non-symplectic: expl_euler, rk45_pphi
         !    Symplectic: expl_impl_euler
 
-        select case(field_type)
-            case("test")
-                call throw_error("trace_orbit: test field not yet implemented")
-                return
-            case("tok")
-                call init_tok
-            case default
-                call throw_error("init: Unknown field type", 1)
-                return
-        end select
+        input_file = field_input_file
+        call set_bounding_box
 
     end subroutine init
 
@@ -68,6 +62,15 @@ contains
             end if
         end do
     end subroutine trace_orbit
+
+
+    subroutine set_bounding_box
+        ! Workaround, otherwise not initialized without perturbation field
+        rmin = 75.d0
+        rmax = 264.42281879194627d0
+        zmin = -150.d0
+        zmax = 147.38193979933115d0
+    end subroutine set_bounding_box
 
 
     subroutine throw_error(msg, error_code)
