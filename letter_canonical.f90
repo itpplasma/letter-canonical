@@ -1,8 +1,10 @@
 module letter_canonical
     use, intrinsic :: iso_fortran_env, only: dp => real64
     use magfie_tok, only: tok_field_t
-    use integrator, only: integrator_t, rk45_cyl_integrator_t
-    use canonical, only: init_canonical, twopi
+    use integrator, only: integrator_t, rk45_cyl_integrator_t, rk45_can_integrator_t
+    use canonical, only: init_canonical, init_transformation, &
+        init_canonical_field_components, init_splines_with_psi, &
+        can_psi_to_cyl, cyl_to_can_psi, twopi
     implicit none
 
     integer, parameter :: MAX_PATH_LENGTH = 1024
@@ -56,6 +58,11 @@ contains
             output_prefix = "letter_canonical"
         end if
 
+        if (magfie_type /= "tok") then
+            call throw_error("init: magfie_type must be 'tok'")
+            return
+        end if
+
         print *, "init: main output is ", trim(output_prefix) // ".out"
 
         field = tok_field_t()
@@ -66,11 +73,15 @@ contains
         if (spatial_coordinates == "cyl") then
             print *, "init: using cylindrical coordinates"
             call init_integrator_cyl
-        else if (spatial_coordinates == "can") then
-            print *, "init: using canonical coordinates"
+            return
+        else if (spatial_coordinates == "cyl_can") then
+            print *, "init: using canonical cylindrical coordinates"
             print *, "init_canonical ..."
-            call init_canonical( n_r, n_phi, n_z, &
+            call init_canonical(n_r, n_phi, n_z, &
                 [rmin, 0.0d0, zmin], [rmax, twopi, zmax], field)
+            call init_transformation
+            call init_canonical_field_components
+            call init_splines_with_psi
         end if
 
         call init_integrator_can
@@ -121,9 +132,8 @@ contains
 
 
     subroutine init_integrator_can
-
         if (velocity_coordinate == "vpar" .and. integrator_type == "rk45") then
-            ! TODO: integ = rk45_can_vpar_integrator_t()
+            integ = rk45_can_integrator_t(rmu, ro0, 1d-8)
         else if (&
             velocity_coordinate == "pphi" .and. integrator_type=="expl_impl_euler") then
             ! TODO: integ = expl_impl_euler_integrator_t()
@@ -144,8 +154,9 @@ contains
 
         allocate(z_out(5, ntau/nskip))
 
-        z = z0
-        z_out(:, 1) = z0
+        call to_internal_coordinates(z0, z)
+        print *, z
+        z_out(:, 1) = z
         do kt = 2, ntau
             call integ%timestep(z, dtau, ierr)
             if (ierr /= 0) then
@@ -160,15 +171,67 @@ contains
     end subroutine trace_orbit
 
 
+    subroutine to_internal_coordinates(z, z_internal)
+        real(dp), intent(in) :: z(5)
+        real(dp), intent(out) :: z_internal(5)
+
+        real(dp) :: x(3)
+
+        if (spatial_coordinates == "cyl") then
+            z_internal(1:3) = z(1:3)
+        else if (spatial_coordinates == "cyl_can") then
+            call cyl_to_can_psi(z(1:3), x)
+            z_internal(1:3) = x([1,3,2])  ! swap phi and theta order
+        else
+            call throw_error("to_internal_coordinates: " // integ_error_message())
+            return
+        end if
+
+        if (velocity_coordinate == "vpar") then
+            z_internal(4:5) = z(4:5)
+        else
+            call throw_error("to_internal_coordinates: " // integ_error_message())
+            return
+        end if
+    end subroutine to_internal_coordinates
+
+
+    subroutine from_internal_coordinates(z_internal, z)
+        real(dp), intent(in) :: z_internal(5)
+        real(dp), intent(out) :: z(5)
+
+        real(dp) :: x(3)
+
+        if (spatial_coordinates == "cyl") then
+            z(1:3) = z_internal(1:3)
+        else if (spatial_coordinates == "cyl_can") then
+            call can_psi_to_cyl(z_internal(1:3), x)
+            z(1:3) = x([1,3,2])  ! swap phi and theta order
+        else
+            call throw_error("from_internal_coordinates: " // integ_error_message())
+            return
+        end if
+
+        if (velocity_coordinate == "vpar") then
+            z(4:5) = z_internal(4:5)
+        else
+            call throw_error("from_internal_coordinates: " // integ_error_message())
+            return
+        end if
+    end subroutine from_internal_coordinates
+
+
     subroutine write_output(z_out)
         real(dp), intent(in) :: z_out(:, :)
+        real(dp) :: z(5)
         integer :: kt, iunit
         character(MAX_PATH_LENGTH) :: outname
 
         outname = trim(output_prefix) // ".out"
         open(newunit=iunit, file=outname)
         do kt = 1, size(z_out, 2)
-            write(iunit, *) z_out(:, kt)
+            call from_internal_coordinates(z_out(:, kt), z)
+            write(iunit, *) z
         end do
         close(iunit)
     end subroutine write_output

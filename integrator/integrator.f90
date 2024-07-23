@@ -7,6 +7,7 @@ module integrator
     use integrator_euler1
     use integrator_rk45
     use rk45_cyl_integrator
+    use rk45_can_integrator
 
     implicit none
 

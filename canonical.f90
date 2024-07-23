@@ -511,6 +511,33 @@ contains
     end subroutine cyl_to_cov
 
 
+    subroutine cyl_to_can_psi(xcyl, xcan)
+        real(dp), intent(in) :: xcyl(3)
+        real(dp), intent(out) :: xcan(3)
+
+        print *, "WARNING cyl_to_can_psi: TODO implement phi transformation"
+
+        call evaluate_splines_3d(spl_A3, xcyl, xcan(1))
+
+        xcan(2) = xcyl(2)
+        xcan(3) = xcyl(3)
+    end subroutine cyl_to_can_psi
+
+
+    subroutine can_psi_to_cyl(xcan, xcyl)
+        real(dp), intent(in) :: xcan(3)
+        real(dp), intent(out) :: xcyl(3)
+
+        real(dp) :: lam
+
+        call evaluate_splines_3d(spl_R_of_xc, xcan, xcyl(1))
+        call evaluate_splines_3d(spl_lam, [xcyl(1), xcan(2), xcan(3)], lam)
+
+        xcyl(2) = xcan(2) + lam
+        xcyl(3) = xcan(3)
+    end subroutine can_psi_to_cyl
+
+
     pure subroutine generate_regular_grid(x)
         real(dp), intent(inout) :: x(:,:,:,:)
 

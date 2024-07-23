@@ -20,20 +20,24 @@ data = np.loadtxt("../A2_spl.out").reshape(shape_spl)
 plt.contour(RR, ZZ, data[:, 1, :], levels=19)
 plt.xlabel("R")
 plt.ylabel("Z")
-
+#%%
 
 # Load data
-data = np.loadtxt('../letter_canonical.out')
+data = np.loadtxt('../rk45_can.out')
 R = data[:,0]
 phi = data[:,1]
 Z = data[:,2]
 p = data[:,3]
 vpar_norm = data[:,4]
 
-plt.plot(R, Z, '-')
+plt.plot(R, Z, ',')
 #plt.xlim(1.35e7, 1.59e7)
 #plt.ylim(-110, 100)
 
+data = np.loadtxt('../rk45_cyl.out')
+Rcyl = data[:,0]
+Zcyl = data[:,2]
+plt.plot(Rcyl, Zcyl, ',')
 # %%
 plt.figure()
 plt.plot(vpar_norm, '-')
@@ -43,6 +47,7 @@ plt.ylabel("Parallel velocity")
 # %%
 plt.figure()
 plt.plot(R)
+plt.plot(Rcyl)
 plt.xlabel("Timestep")
 plt.ylabel("R(t)")
 
@@ -55,6 +60,7 @@ plt.ylabel("phi(t)")
 # %%
 plt.figure()
 plt.plot(Z)
+plt.plot(Zcyl)
 plt.xlabel("Timestep")
 plt.ylabel("Z(t)")
 # %%
