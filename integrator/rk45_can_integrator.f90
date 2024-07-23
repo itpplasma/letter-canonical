@@ -61,7 +61,7 @@ module rk45_can_integrator
     !                     bder             - covariant components of (grad B)/Bmod
     !                     hcovar           - covariant components of B/Bmod
     !                     hctrvr           - contravariant components of B/Bmod
-    !                     hcurl            - contravariant components of (curl B)/Bmod
+    !                     hcurl            - contravariant components of curl (B/Bmod)
 
         use interpolate, only: evaluate_splines_3d_der2
         use canonical, only: spl_Aphi_of_xc, spl_hph_of_xc, spl_hth_of_xc, spl_Bmod_of_xc

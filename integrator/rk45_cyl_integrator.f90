@@ -82,7 +82,7 @@ module rk45_cyl_integrator
     !                     bder             - covariant components of (grad B)/Bmod
     !                     hcovar           - covariant components of B/Bmod
     !                     hctrvr           - contravariant components of B/Bmod
-    !                     hcurl            - contravariant components of (curl B)/Bmod
+    !                     hcurl            - contravariant components of curl (B/Bmod)
     !
     !  Extra parameters:  field            - procedure of magnetic field backend
 
