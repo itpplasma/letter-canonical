@@ -42,6 +42,9 @@ program test_magfie
     ! call field_type%add_perturbation(5, -2, [pert, pert, pert])
     ! call field_type%add_perturbation(5, 2, [pert, pert, pert])
 
+    print *, "init_magfie ..."
+    call field_type%init_magfie()
+
     print *, "init_canonical ..."
     call init_canonical(n_r, n_phi, n_z, [rmin, 0.0d0, zmin], &
         [rmax, twopi, zmax], field_type)

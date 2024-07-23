@@ -1,4 +1,12 @@
 &letter_canonical
-    magfie_type = "tok",         ! test, tok
-    integrator_type = "euler1",  ! euler0, euler1, rk45
+    magfie_type = "tok",              ! test, tok
+    integrator_type = "rk45"          ! rk45, expl_impl_euler
+/
+
+&integrator_rk45
+    coordinate_system = "cyl",        ! cyl, can
+/
+
+&magfie_tok
+    input_file = "field_divB0.inp"
 /

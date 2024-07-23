@@ -26,7 +26,7 @@ contains
         xmax = [200.0d0, 150.0d0, twopi]
 
         call print_test("Test Setup")
-        call init_canonical(n_r, n_z, n_phi, xmin, xmax, test_field_t())
+        call init_canonical(n_r, n_phi, n_z, xmin, xmax, test_field_t())
         call print_ok
     end subroutine setup
 
@@ -64,7 +64,7 @@ contains
         x_expected = [rmin, zmin, 0.0d0]
         if (any(abs(x_computed - x_expected) > eps)) error stop
 
-        x_computed = get_grid_point(n_r, n_z, n_phi)
+        x_computed = get_grid_point(n_r, n_phi, n_z)
         x_expected = [rmax, zmax, 2.0d0*pi]
         if (any(abs(x_computed - x_expected) > eps)) error stop
 
@@ -75,7 +75,7 @@ contains
     subroutine test_generate_regular_grid
         use canonical, only: generate_regular_grid, pi, rmin, rmax, zmin, zmax
 
-        real(dp) :: grid_computed(3, n_r, n_z, n_phi)
+        real(dp) :: grid_computed(3, n_r, n_phi, n_z)
         real(dp) :: x_computed(3), x_expected(3)
 
         call print_test("test_generate_regular_grid")
@@ -86,7 +86,7 @@ contains
         x_expected = [rmin, zmin, 0.0d0]
         if (any(abs(x_computed - x_expected) > eps)) error stop
 
-        x_computed = grid_computed(:, n_r, n_z, n_phi)
+        x_computed = grid_computed(:, n_r, n_phi, n_z)
         x_expected = [rmax, zmax, 2.0d0*pi]
         if (any(abs(x_computed - x_expected) > eps)) error stop
 
@@ -97,8 +97,8 @@ contains
     subroutine test_compute_Bmod
         use canonical, only: compute_Bmod
 
-        real(dp), dimension(3, n_r, n_z, n_phi) :: B
-        real(dp), dimension(n_r, n_z, n_phi) :: Bmod_computed
+        real(dp), dimension(3, n_r, n_phi, n_z) :: B
+        real(dp), dimension(n_r, n_phi, n_z) :: Bmod_computed
 
         call print_test("test_compute_Bmod")
 
@@ -113,11 +113,12 @@ contains
 
     subroutine test_compute_hcan
         use canonical, only: compute_hcan, compute_bmod, &
-            generate_regular_grid, cyl_to_cov, spl_lam, Bmod, hcan
+            generate_regular_grid, cyl_to_cov, spl_lam
         use interpolate, only: destroy_splines_3d
 
-        real(dp), dimension(3, n_r, n_z, n_phi) :: B, Bcov, x
-        real(dp), dimension(3, n_r, n_z, n_phi) :: hcan_expected
+        real(dp), dimension(3, n_r, n_phi, n_z) :: B, Bcov, x
+        real(dp), dimension(n_r, n_phi, n_z) :: Bmod
+        real(dp), dimension(3, n_r, n_phi, n_z) :: hcan, hcan_expected
 
         call print_test("test_compute_hcan")
 
@@ -133,7 +134,7 @@ contains
         hcan_expected(3,:,:,:) = Bcov(3,:,:,:)/Bmod
 
         call construct_zero_spline(spl_lam)
-        call compute_hcan(B)
+        call compute_hcan(B, hcan)
         if (any(abs(hcan - hcan_expected) > eps)) then
             call print_fail
             print *, "should match for identical transformation"
@@ -150,7 +151,7 @@ contains
         use canonical, only: can_to_cyl, spl_lam, generate_regular_grid, twopi
         use interpolate, only: destroy_splines_3d
 
-        real(dp), dimension(3, n_r, n_z, n_phi) :: xcan, xcyl_computed
+        real(dp), dimension(3, n_r, n_phi, n_z) :: xcan, xcyl_computed
 
         call generate_regular_grid(xcan)
 
@@ -188,7 +189,7 @@ contains
         integer, parameter :: order(3) = [3, 3, 3]
         logical, parameter :: periodic(3) = [.False., .False., .True.]
 
-        real(dp), dimension(n_r, n_z, n_phi) :: zeros
+        real(dp), dimension(n_r, n_phi, n_z) :: zeros
 
         x_min = [rmin, zmin, 0.d0]
         x_max = [rmax, zmax, twopi]
@@ -208,7 +209,7 @@ contains
         integer, parameter :: order(3) = [3, 3, 3]
         logical, parameter :: periodic(3) = [.False., .False., .True.]
 
-        real(dp), dimension(n_r, n_z, n_phi) :: linear
+        real(dp), dimension(n_r, n_phi, n_z) :: linear
 
         x_min = [rmin, zmin, 0.d0]
         x_max = [rmax, zmax, twopi]
@@ -220,14 +221,14 @@ contains
 
 
     subroutine fill_linear(x)
-        real(dp), intent(inout) :: x(n_r, n_z, n_phi)
+        real(dp), intent(inout) :: x(n_r, n_phi, n_z)
 
-        integer :: i_r, i_z, i_phi
+        integer :: i_r, i_phi, i_z
 
-        do i_phi = 1, n_phi
-            do i_z = 1, n_z
+        do i_z = 1, n_z
+            do i_phi = 1, n_phi
                 do i_r = 1, n_r
-                    x(i_r, i_z, i_phi) = &
+                    x(i_r, i_phi, i_z) = &
                         0.23d0*i_r + 0.12d0*i_z + 0.123d0*i_phi + 1.1234d0
                 end do
             end do

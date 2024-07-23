@@ -54,14 +54,12 @@ module canonical
 contains
 
     subroutine init_canonical(n_r_, n_phi_, n_z_, xmin, xmax, magfie_type_)
-        use magfie, only: init_magfie
 
         integer, intent(in) :: n_r_, n_phi_, n_z_  ! Number of grid points
         real(dp), intent(in) :: xmin(3), xmax(3)
         class(field_t), intent(in) :: magfie_type_
 
         magfie_type = magfie_type_
-        call magfie_type%init_magfie()
 
         n_r = n_r_
         n_phi = n_phi_
@@ -194,7 +192,7 @@ contains
         call construct_splines_3d(x_min, x_max, Bmod, order, periodic, spl_Bmod)
 
         allocate(hcan(3,n_r,n_phi,n_z))
-        call compute_hcan(B)
+        call compute_hcan(B, hcan)
         call construct_splines_3d(x_min, x_max, hcan(2,:,:,:), order, periodic, spl_h2)
         call construct_splines_3d(x_min, x_max, hcan(3,:,:,:), order, periodic, spl_h3)
 
@@ -434,8 +432,8 @@ contains
         integer :: i_r, i_phi, i_z
         real(dp) :: lam
 
-        do i_phi=1,n_phi
         do i_z=1,n_z
+        do i_phi=1,n_phi
         do i_r=1,n_r
             call evaluate_splines_3d(spl_lam, xcan(:, i_r, i_phi, i_z), lam)
             xcyl(1, i_r, i_phi, i_z) = xcan(1, i_r, i_phi, i_z)
@@ -454,8 +452,8 @@ contains
 
         integer :: i_r, i_phi, i_z
 
-        do i_phi=1,n_phi
-            do i_z=1,n_z
+        do i_z=1,n_z
+            do i_phi=1,n_phi
                 do i_r=1,n_r
                     Bmod(i_r, i_phi, i_z) = sqrt( &
                         B(1, i_r, i_phi, i_z)**2 + &
@@ -468,12 +466,13 @@ contains
     end subroutine
 
 
-    subroutine compute_hcan(Bcyl)
-        real(dp), dimension(:,:,:,:), intent(in) :: Bcyl   ! physical components
+    subroutine compute_hcan(B, hcan)
+        real(dp), dimension(:,:,:,:), intent(in) :: B     ! physical components
+        real(dp), dimension(:,:,:,:), intent(inout) :: hcan  ! covariant unit components
 
         integer :: i_r, i_phi, i_z
         real(dp) :: x(3)
-        real(dp) :: BRcov, BZcov, Bphicov, B1can, B2can, B3can
+        real(dp) :: BRcov, BZcov, Bphicov, B1can, B2can, B3can, Bmod
         real(dp) :: lam, dlam(3), dummy(6)
 
         do i_z=1,n_z
@@ -481,17 +480,23 @@ contains
                 do i_r=1,n_r
                     x = get_grid_point(i_r, i_phi, i_z)
                     call evaluate_splines_3d_der2(spl_lam, x, lam, dlam, dummy)
-                    BRcov = Bcyl(1, i_r, i_phi, i_z)
-                    Bphicov = Bcyl(2, i_r, i_phi, i_z)*x(1)
-                    BZcov = Bcyl(3, i_r, i_phi, i_z)
+                    BRcov = B(1, i_r, i_phi, i_z)
+                    Bphicov = B(2, i_r, i_phi, i_z)*x(1)
+                    BZcov = B(3, i_r, i_phi, i_z)
 
                     B1can = BRcov + Bphicov*dlam(1)
                     B2can = Bphicov*(1.0d0 + dlam(2))
                     B3can = BZcov + Bphicov*dlam(3)
 
-                    hcan(1, i_r, i_phi, i_z) = B1can/Bmod(i_r, i_phi, i_z)
-                    hcan(2, i_r, i_phi, i_z) = B2can/Bmod(i_r, i_phi, i_z)
-                    hcan(3, i_r, i_phi, i_z) = B3can/Bmod(i_r, i_phi, i_z)
+                    Bmod = sqrt( &
+                        B(1, i_r, i_phi, i_z)**2 + &
+                        B(2, i_r, i_phi, i_z)**2 + &
+                        B(3, i_r, i_phi, i_z)**2 &
+                    )
+
+                    hcan(1, i_r, i_phi, i_z) = B1can/Bmod
+                    hcan(2, i_r, i_phi, i_z) = B2can/Bmod
+                    hcan(3, i_r, i_phi, i_z) = B3can/Bmod
                 enddo
             enddo
         enddo
