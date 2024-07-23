@@ -72,13 +72,14 @@ module rk45_cyl_integrator
 
     !ccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
     subroutine magfie_cyl(x, bmod, sqrtg, bder, hcovar, hctrvr, hcurl, field)
+    !  Computes magnetic field and derivatives with bmod in units of the magnetic code
     !
     !  Input parameters:
     !            formal:  x                - array of cylindrical coordinates R, phi, Z
     !  Output parameters:
-    !            formal:  bmod
-    !                     sqrtg
-    !                     bder
+    !            formal:  bmod             - magnetic field module
+    !                     sqrtg            - metric determinant
+    !                     bder             - covariant components of (grad B)/Bmod
     !                     hcovar           - covariant components of B/Bmod
     !                     hctrvr           - contravariant components of B/Bmod
     !                     hcurl            - contravariant components of (curl B)/Bmod

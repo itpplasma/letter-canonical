@@ -51,30 +51,17 @@ module rk45_can_integrator
     !ccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
     !
     subroutine magfie_can(x,bmod,sqrtg,bder,hcovar,hctrvr,hcurl)
-
-
-        ! Computes magnetic field module in units of the magnetic code  - bmod,
-        ! square root of determinant of the metric tensor               - sqrtg,
-        ! derivatives of the logarythm of the magnetic field module
-        ! over coordinates                                              - bder,
-        ! covariant componets of the unit vector of the magnetic
-        ! field direction                                               - hcovar,
-        ! contravariant components of this vector                       - hctrvr,
-        ! contravariant component of the curl of this vector            - hcurl
-        ! Order of coordinates is the following: x(1)=s (normalized toroidal flux),
-        ! x(2)=vartheta_c (canonical poloidal angle), x(3)=varphi_c (canonical toroidal angle).
-
-        !  Input parameters:
-        !            formal:  x(3)             - array of canonical coordinates
-        !  Output parameters:
-        !            formal:  bmod
-        !                     sqrtg
-        !                     bder(3)          - derivatives of $\log(B)$
-        !                     hcovar(3)        - covariant components of unit vector $\bh$ along $\bB$
-        !                     hctrvr(3)        - contra-variant components of unit vector $\bh$ along $\bB$
-        !                     hcurl(3)         - contra-variant components of curl of $\bh$
-
-        !  Called routines: canonical_field
+    !  Computes magnetic field and derivatives with bmod in units of the magnetic code
+    !
+    !  Input parameters:
+    !            formal:  x                - array of cylindrical coordinates R, phi, Z
+    !  Output parameters:
+    !            formal:  bmod             - magnetic field module
+    !                     sqrtg            - metric determinant
+    !                     bder             - covariant components of (grad B)/Bmod
+    !                     hcovar           - covariant components of B/Bmod
+    !                     hctrvr           - contravariant components of B/Bmod
+    !                     hcurl            - contravariant components of (curl B)/Bmod
 
         use interpolate, only: evaluate_splines_3d_der2
         use canonical, only: spl_Aphi_of_xc, spl_hph_of_xc, spl_hth_of_xc, spl_Bmod_of_xc
