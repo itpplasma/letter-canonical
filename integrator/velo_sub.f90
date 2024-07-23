@@ -4,6 +4,18 @@ module velo_sub
 
     abstract interface
         subroutine magfie_p(x, bmod, sqrtg, bder, hcovar, hctrvr, hcurl)
+        ! Computes magnetic field and derivatives with bmod in units of magnetic code
+        !
+        ! Input parameters:
+        !     x                - array of cylindrical coordinates R, phi, Z
+        ! Output parameters:
+        !     bmod             - magnetic field module
+        !     sqrtg            - metric determinant
+        !     bder             - covariant components of (grad B)/Bmod
+        !     hcovar           - covariant components of B/Bmod
+        !     hctrvr           - contravariant components of B/Bmod
+        !     hcurl            - contravariant components of curl (B/Bmod)
+
             import :: dp
             real(dp), intent(in) :: x(3)
             real(dp), intent(out) :: bmod, sqrtg

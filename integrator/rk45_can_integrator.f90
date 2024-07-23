@@ -54,14 +54,14 @@ module rk45_can_integrator
     !  Computes magnetic field and derivatives with bmod in units of the magnetic code
     !
     !  Input parameters:
-    !            formal:  x                - array of cylindrical coordinates R, phi, Z
+    !            formal:  x               - array of canonicalized coordinates r, th, ph
     !  Output parameters:
-    !            formal:  bmod             - magnetic field module
-    !                     sqrtg            - metric determinant
-    !                     bder             - covariant components of (grad B)/Bmod
-    !                     hcovar           - covariant components of B/Bmod
-    !                     hctrvr           - contravariant components of B/Bmod
-    !                     hcurl            - contravariant components of curl (B/Bmod)
+    !            formal:  bmod            - magnetic field module
+    !                     sqrtg           - metric determinant
+    !                     bder            - covariant components of (grad B)/Bmod
+    !                     hcovar          - covariant components of B/Bmod
+    !                     hctrvr          - contravariant components of B/Bmod
+    !                     hcurl           - contravariant components of curl (B/Bmod)
 
         use interpolate, only: evaluate_splines_3d_der2
         use canonical, only: spl_Aphi_of_xc, spl_hph_of_xc, spl_hth_of_xc, spl_Bmod_of_xc
@@ -71,7 +71,7 @@ module rk45_can_integrator
         real(dp), intent(out) :: bmod, sqrtg
         real(dp), dimension(3), intent(out) :: bder, hcovar, hctrvr, hcurl
 
-        integer, parameter :: reorder(3) = [1, 3, 2]  ! r, ph, th -> r, th, ph
+        integer, parameter :: reorder(3) = [1, 3, 2]  ! r, ph, th <-> r, th, ph
 
         real(dp) :: aph, hph, hth, sqrtg_bmod
         real(dp), dimension(3) :: daph, dhph, dhth, dbmod
