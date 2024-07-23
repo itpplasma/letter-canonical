@@ -12,7 +12,7 @@ program test_large
 contains
 
     subroutine setup
-        use magfie_test, only: Testfield_t
+        use magfie_test, only: test_field_t
         use canonical, only: init_canonical, twopi
 
         real(dp) :: rmin, rmax, zmin, zmax
@@ -23,7 +23,7 @@ contains
         zmin = -150.d0
         zmax = 147.38193979933115d0
         call init_canonical(n_r, n_phi, n_z, [rmin, 0.0d0, zmin], &
-            [rmax, twopi, zmax], Testfield_t())
+            [rmax, twopi, zmax], test_field_t())
         call print_ok
     end subroutine setup
 

@@ -18,7 +18,7 @@ program test
 contains
 
     subroutine setup
-        use magfie_test, only: Testfield_t
+        use magfie_test, only: test_field_t
         use canonical, only: init_canonical, twopi
 
         real(dp) :: xmin(3), xmax(3)
@@ -26,14 +26,14 @@ contains
         xmax = [200.0d0, 150.0d0, twopi]
 
         call print_test("Test Setup")
-        call init_canonical(n_r, n_z, n_phi, xmin, xmax, Testfield_t())
+        call init_canonical(n_r, n_z, n_phi, xmin, xmax, test_field_t())
         call print_ok
     end subroutine setup
 
 
     subroutine test_magfie_factory
         use magfie, only: field_t
-        use magfie_test, only: Testfield_t
+        use magfie_test, only: test_field_t
         use magfie_factory, only: magfie_type_from_string
 
         class(field_t), allocatable :: field_type
@@ -43,7 +43,7 @@ contains
         field_type = magfie_type_from_string("test")
 
         select type (field_type)
-            type is (Testfield_t)
+            type is (test_field_t)
                 call print_ok
             class default
                 call print_fail

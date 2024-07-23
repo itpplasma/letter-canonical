@@ -13,9 +13,9 @@ module magfie_factory
 
         select case(magfie_type)
         case("test")
-            magfie_instance = Testfield_t()
+            magfie_instance = test_field_t()
         case("tok")
-            magfie_instance = Tokfield_t()
+            magfie_instance = tok_field_t()
         case default
             print *, "magfie_factory: Unknown magfie type"
             error stop

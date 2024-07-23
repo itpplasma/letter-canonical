@@ -34,8 +34,8 @@ program test_magfie
     close(10)
     field_type = magfie_type_from_string(trim(magfie_type))
 
-    !field_type = Tokfield_t()
-    !field_type = Testfield_t()
+    !field_type = tok_field_t()
+    !field_type = test_field_t()
     ! pert = dcmplx(2.0d3, 2.0d3)
     ! call field_type%add_perturbation(3, -2, [pert, pert, pert])
     ! call field_type%add_perturbation(3, 2, [pert, pert, pert])

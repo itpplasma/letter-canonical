@@ -1,7 +1,7 @@
 program test_field_can
     use, intrinsic :: iso_fortran_env, only: dp => real64
     use magfie, only: field_t
-    use magfie_tok, only: Tokfield_t
+    use magfie_tok, only: tok_field_t
     use canonical, only: twopi, init_canonical, init_transformation, &
         init_canonical_field_components
 
@@ -27,7 +27,7 @@ program test_field_can
     zmin = -150.d0
     zmax = 147.38193979933115d0
 
-    field_type = Tokfield_t()
+    field_type = tok_field_t()
 
     print *, "init_canonical ..."
     call init_canonical(n_r, n_phi, n_z, [rmin, 0.0d0, zmin], &

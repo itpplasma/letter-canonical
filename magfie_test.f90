@@ -6,21 +6,21 @@ module magfie_test
 
     real(dp), parameter :: AMPL = 1.0d-7, AMPL2 = 2.0d-6
 
-    type, extends(field_t) :: Testfield_t
+    type, extends(field_t) :: test_field_t
         contains
             procedure :: init_magfie
             procedure :: compute_bfield
             procedure :: compute_abfield
-    end type Testfield_t
+    end type test_field_t
 
     contains
 
     subroutine init_magfie(self)
-        class(Testfield_t), intent(in) :: self
+        class(test_field_t), intent(in) :: self
     end subroutine init_magfie
 
     subroutine compute_abfield(self, R, phi, Z, AR, Aphi, AZ, BR, Bphi, BZ)
-        class(Testfield_t), intent(in) :: self
+        class(test_field_t), intent(in) :: self
         real(dp), intent(in) :: R, phi, Z
         real(dp), intent(out) :: AR, Aphi, AZ, BR, Bphi, BZ
 
@@ -32,7 +32,7 @@ module magfie_test
     end subroutine compute_abfield
 
     subroutine compute_bfield(self, R, phi, Z, BR, Bphi, BZ)
-        class(Testfield_t), intent(in) :: self
+        class(test_field_t), intent(in) :: self
         real(dp), intent(in) :: R, phi, Z
         real(dp), intent(out) :: BR, Bphi, BZ
 
