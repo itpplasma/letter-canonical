@@ -1,12 +1,12 @@
-&letter_canonical
-    magfie_type = "tok",              ! test, tok
-    integrator_type = "rk45"          ! rk45, expl_impl_euler
-/
-
-&integrator_rk45
-    coordinate_system = "cyl",        ! cyl, can
-/
-
-&magfie_tok
-    input_file = "field_divB0.inp"
+&config
+    magfie_type = "tok",               ! test, tok, vmec
+    input_file_tok = "field_divB0.inp" ! default: field_divB0.inp
+    output_prefix = "letter_canonical" ! default: letter_canonical
+    spatial_coordinates = "cyl",       ! cyl, cyl_can, flux, flux_can
+    velocity_coordinate = "vpar"       ! vpar, pphi
+    integrator_type = "rk45",          ! rk45, expl_impl_euler
+    rmin = 75.d0,
+    rmax = 264.42281879194627d0,
+    zmin = -150.d0,
+    zmax = 147.38193979933115d0
 /

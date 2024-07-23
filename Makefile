@@ -1,6 +1,6 @@
 FC = gfortran
 #FFLAGS = -g -fPIC -O0 -fopenmp
-FFLAGS = -g -fPIC -O3 -fopenmp -march=native -mtune=native -L. -Wl,-rpath=.
+FFLAGS = -g -fPIC -O3 -fopenmp -march=native -mtune=native -Jinclude -L. -Wl,-rpath=.
 
 FFLAGS += -L. -Wl,-rpath=.
 FFLAGS += -Wall -Wuninitialized -Wno-maybe-uninitialized -Wno-unused-label \
@@ -18,11 +18,12 @@ SOURCES := magfie.f90 \
 	field_can_cyl.f90 \
 	field_can_new.f90 \
 	field_can.f90 \
-	integrator_base.f90 \
-	integrator_rk45.f90 \
-	integrator_euler0.f90 \
-	integrator_euler1.f90 \
-	integrator.f90 \
+	integrator/integrator_base.f90 \
+	integrator/integrator_rk45.f90 \
+	integrator/integrator_euler0.f90 \
+	integrator/integrator_euler1.f90 \
+	integrator/rk45_cyl_integrator.f90 \
+	integrator/integrator.f90 \
 	letter_canonical.f90
 
 OBJECTS := $(SOURCES:.f90=.o)
@@ -93,4 +94,4 @@ clean_objects:
 	rm -f OBJS/*.o *.o
 
 clean:
-	rm -f *.x *.so OBJS/*.o *.o *.mod
+	rm -f *.x *.so OBJS/*.o OBJS/*/*.o include/*.mod fort.* *.out
