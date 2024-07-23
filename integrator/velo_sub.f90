@@ -3,7 +3,7 @@ module velo_sub
 
 
     abstract interface
-        subroutine magfie_p(x,bmod,sqrtg,bder,hcovar,hctrvr,hcurl)
+        subroutine magfie_p(x, bmod, sqrtg, bder, hcovar, hctrvr, hcurl)
             import :: dp
             real(dp), intent(in) :: x(3)
             real(dp), intent(out) :: bmod, sqrtg
@@ -12,7 +12,7 @@ module velo_sub
     end interface
 
     abstract interface
-        subroutine elefie_p(x,derphi)
+        subroutine elefie_p(x, derphi)
             import :: dp
             real(dp), intent(in) :: x(3)
             real(dp), intent(out) :: derphi(3)

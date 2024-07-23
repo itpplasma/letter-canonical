@@ -112,7 +112,7 @@ contains
 
     subroutine init_integrator_cyl
         if (integrator_type == "rk45" .and. velocity_coordinate == "vpar") then
-            integ = rk45_cyl_integrator_t(rmu, ro0)
+            integ = rk45_cyl_integrator_t(rmu, ro0, 1d-8)
         else
             call throw_error("init_integrator_cyl: " // trim(integ_error_message()))
             return

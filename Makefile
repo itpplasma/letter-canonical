@@ -25,6 +25,7 @@ SOURCES := magfie.f90 \
 	integrator/integrator_euler1.f90 \
 	integrator/velo_sub.f90 \
 	integrator/rk45_cyl_integrator.f90 \
+	integrator/rk45_can_integrator.f90 \
 	integrator/integrator.f90 \
 	letter_canonical.f90
 

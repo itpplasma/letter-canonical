@@ -7,7 +7,7 @@ module rk45_cyl_integrator
 
     type, extends(integrator_t) :: rk45_cyl_integrator_t
 
-        real(dp) :: rmu, ro0
+        real(dp) :: rmu, ro0, rtol
 
         contains
 
@@ -37,15 +37,13 @@ module rk45_cyl_integrator
         real(dp), intent(in) :: dtau
         integer, intent(out) :: ierr
 
-        integer, parameter :: ndim = 4
-
         real(dp) :: tstart, tend
 
         ierr = 0
         tstart = 0d0
         tend = dtau
 
-        call odeint_allroutines(z, 5, tstart, tend, 1d-8, ydot)
+        call odeint_allroutines(z, 5, tstart, tend, self%rtol, ydot)
 
         contains
 
