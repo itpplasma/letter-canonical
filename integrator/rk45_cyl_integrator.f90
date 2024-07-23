@@ -39,11 +39,13 @@ module rk45_cyl_integrator
 
         integer, parameter :: ndim = 4
 
-        integer :: ktau
         real(dp) :: tstart, tend
 
         ierr = 0
-        ktau = 0
+        tstart = 0d0
+        tend = dtau
+
+        call odeint_allroutines(z, 5, tstart, tend, 1d-8, ydot)
 
         contains
 

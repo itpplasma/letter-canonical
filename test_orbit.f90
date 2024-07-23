@@ -1,10 +1,11 @@
 program test_orbit
   use, intrinsic :: iso_fortran_env, only: dp => real64
   use omp_lib
+  use interpolate, only: evaluate_splines_3d
   use magfie, only: field_t
   use magfie_factory, only: magfie_type_from_string
   use canonical, only: twopi, init_canonical, init_transformation, &
-    init_canonical_field_components, init_splines_with_psi
+    init_canonical_field_components, init_splines_with_psi, spl_R_of_xc
   use field_can, only: field_can_t, field_can_cyl_t, field_can_new_t
   use integrator
   use odeint_sub
@@ -23,11 +24,11 @@ program test_orbit
 
   integer :: kt, nmax
 
-  ! Configuration in letter_canonical.in
-  character(16) :: magfie_type, integrator_type
-  namelist /letter_canonical/ magfie_type, integrator_type
+  character(16) :: magfie_type="tok"
 
   real(dp) :: rmu=1d5, ro0=20000d0*1d0  ! 20000 Gauss, 1cm Larmor radius
+
+  real(dp) :: R
 
   nt = 8000
 
@@ -37,9 +38,6 @@ program test_orbit
   zmin = -150.d0
   zmax = 147.38193979933115d0
 
-  open(unit=10, file='letter_canonical.in', status='old', action='read')
-  read(10, nml=letter_canonical)
-  close(10)
   field_type = magfie_type_from_string(trim(magfie_type))
 
   print *, "init_magfie ..."
@@ -84,7 +82,8 @@ program test_orbit
 
   open(unit=20, file=outname, action='write', recl=4096)
   do kt = 1, nmax
-    write(20,*) z(:,kt)
+    call evaluate_splines_3d(spl_R_of_xc, z(1:3,kt), R)
+    write(20,*) z(:,kt), R
   end do
   close(20)
   deallocate(z)

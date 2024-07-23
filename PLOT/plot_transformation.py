@@ -40,9 +40,6 @@ data = np.loadtxt("../dchidp_spl.out").reshape(shape_spl)
 doplot(data, "dchi_gauge_dphi_splined")
 
 #%%
-data = np.loadtxt("../A1_spl.out").reshape(shape_spl)
-doplot(data, "A1_spl")
-#%%
 data = np.loadtxt("../A2_spl.out").reshape(shape_spl)
 doplot(data, "A2_spl")
 #%%

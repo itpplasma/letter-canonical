@@ -1,6 +1,6 @@
 FC = gfortran
-#FFLAGS = -g -fPIC -O0 -fopenmp
-FFLAGS = -g -fPIC -O3 -fopenmp -march=native -mtune=native -Jinclude -L. -Wl,-rpath=.
+FFLAGS = -g -fPIC -Og -fopenmp
+#FFLAGS = -g -fPIC -O3 -fopenmp -march=native -mtune=native -Jinclude -L. -Wl,-rpath=.
 
 FFLAGS += -L. -Wl,-rpath=.
 FFLAGS += -Wall -Wuninitialized -Wno-maybe-uninitialized -Wno-unused-label \
@@ -12,6 +12,7 @@ SOURCES := magfie.f90 \
 	magfie_tok.f90 \
 	magfie_factory.f90 \
 	psi_transform.f90 \
+	biotsavart.f90 \
 	canonical.f90 \
 	field_can_base.f90 \
 	field_can_test.f90 \
@@ -76,11 +77,8 @@ test.x: libfield.so libcanonical.so test_util.f90 test.f90
 test_large.x: libfield.so libcanonical.so test_util.f90 test_large.f90
 	$(FC) $(FFLAGS) -o $@ $^ -lfield -lcanonical
 
-test_biotsavart.x: libfield.so libcanonical.so test_biotsavart.f90 test_util.f90 biotsavart.o
+test_biotsavart.x: libfield.so libcanonical.so test_biotsavart.f90 test_util.f90
 	$(FC) $(FFLAGS) -o $@ $^ -lfield -lcanonical
-
-biotsavart.o: biotsavart.f90
-	$(FC) $(FFLAGS) -o $@ -c $^
 
 libcanonical.so: libfield.so $(OBJECTS)
 	$(FC) $(FFLAGS) -shared -o $@ $^ -lfield

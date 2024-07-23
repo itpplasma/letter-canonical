@@ -19,7 +19,10 @@ module letter_canonical
 
     integer :: n_r=100, n_phi=64, n_z=75
 
-    real(dp) :: rmin, rmax, zmin, zmax
+    real(dp) :: rmin = 75.d0, &
+        rmax = 264.42281879194627d0, &
+        zmin = -150.d0, &
+        zmax = 147.38193979933115d0
 
     class(tok_field_t), allocatable :: field
     class(integrator_t), allocatable :: integ
@@ -29,8 +32,6 @@ module letter_canonical
     real(dp) :: dtau=1d0
     integer :: ntau=1000, nskip=1
 
-    real(dp) :: R0, phi0, Z0, vpar0
-
     namelist /config/ magfie_type, integrator_type, input_file_tok, &
         output_prefix, spatial_coordinates, velocity_coordinate, &
         rmin, rmax, zmin, zmax, rmu, ro0, dtau, ntau, nskip
@@ -38,7 +39,7 @@ module letter_canonical
     abstract interface
         subroutine callback_p(z)
             import :: dp
-            real(dp), intent(in) :: z(5)
+            real(dp), intent(in) :: z(:)
         end subroutine callback_p
     end interface
 
@@ -135,17 +136,15 @@ contains
 
     subroutine trace_orbit(z0, z_out, callback)
         real(dp), intent(in) :: z0(5)
-        real(dp), intent(inout) :: z_out(:, :)
+        real(dp), allocatable, intent(out) :: z_out(:, :)
         procedure(callback_p), optional :: callback
 
         integer :: kt, ierr
         real(dp) :: z(5)
 
-        if (.not. size(z_out, 2) == ntau/nskip) then
-            call throw_error("trace_orbit: z_out has wrong size")
-            return
-        end if
+        allocate(z_out(5, ntau/nskip))
 
+        z = z0
         z_out(:, 1) = z0
         do kt = 2, ntau
             call integ%timestep(z, dtau, ierr)
@@ -153,12 +152,26 @@ contains
                 call throw_error("trace_orbit: error in timestep", ierr)
                 return
             end if
-            call callback(z)
+            if (present(callback)) call callback(z)
             if (mod(kt, nskip) == 0) then
                 z_out(:, kt/nskip) = z
             end if
         end do
     end subroutine trace_orbit
+
+
+    subroutine write_output(z_out)
+        real(dp), intent(in) :: z_out(:, :)
+        integer :: kt, iunit
+        character(MAX_PATH_LENGTH) :: outname
+
+        outname = trim(output_prefix) // ".out"
+        open(newunit=iunit, file=outname)
+        do kt = 1, size(z_out, 2)
+            write(iunit, *) z_out(:, kt)
+        end do
+        close(iunit)
+    end subroutine write_output
 
 
     function integ_error_message() result(msg)
