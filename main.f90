@@ -1,6 +1,6 @@
 program main
     use, intrinsic :: iso_fortran_env, only: dp => real64
-    use letter_canonical, only: init, stop_on_error
+    use letter_canonical, only: init, stop_on_error, R0, phi0, Z0, vpar0
 
     implicit none
 

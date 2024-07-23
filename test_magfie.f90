@@ -19,9 +19,7 @@ program test_magfie
 
     class(field_t), allocatable :: field_type
 
-    ! Configuration in letter_canonical.in
-    character(16) :: magfie_type, integrator_type
-    namelist /letter_canonical/ magfie_type, integrator_type
+    character(16) :: magfie_type="tok"
 
     ! Workaround, otherwise not initialized without perturbation field
     rmin = 75.d0
@@ -29,9 +27,6 @@ program test_magfie
     zmin = -150.d0
     zmax = 147.38193979933115d0
 
-    open(unit=10, file='letter_canonical.in', status='old', action='read')
-    read(10, nml=letter_canonical)
-    close(10)
     field_type = magfie_type_from_string(trim(magfie_type))
 
     !field_type = tok_field_t()

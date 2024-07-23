@@ -24,17 +24,22 @@ module letter_canonical
     class(tok_field_t), allocatable :: field
     class(integrator_t), allocatable :: integ
 
-    real(dp) :: dtau
-    integer :: ntau, nskip
+    real(dp) :: rmu=1d8, ro0=20000d0*1d0  ! 20000 Gauss, 1cm Larmor radius
+
+    real(dp) :: dtau=1d0
+    integer :: ntau=1000, nskip=1
+
+    real(dp) :: R0, phi0, Z0, vpar0
 
     namelist /config/ magfie_type, integrator_type, input_file_tok, &
-        output_prefix, spatial_coordinates, velocity_coordinate, rmin, rmax, zmin, zmax
+        output_prefix, spatial_coordinates, velocity_coordinate, &
+        rmin, rmax, zmin, zmax, rmu, ro0, dtau, ntau, nskip
 
     abstract interface
-        subroutine callback_type(z)
+        subroutine callback_p(z)
             import :: dp
             real(dp), intent(in) :: z(5)
-        end subroutine callback_type
+        end subroutine callback_p
     end interface
 
 contains
@@ -106,7 +111,7 @@ contains
 
     subroutine init_integrator_cyl
         if (integrator_type == "rk45" .and. velocity_coordinate == "vpar") then
-            integ = rk45_cyl_integrator_t()
+            integ = rk45_cyl_integrator_t(rmu, ro0)
         else
             call throw_error("init_integrator_cyl: " // trim(integ_error_message()))
             return
@@ -117,10 +122,10 @@ contains
     subroutine init_integrator_can
 
         if (velocity_coordinate == "vpar" .and. integrator_type == "rk45") then
-                ! TODO: integ = rk45_can_vpar_integrator_t()
-        else if (velocity_coordinate == "pphi" .and. &
-                integrator_type == "expl_impl_euler") then
-                ! TODO: integ = expl_impl_euler_integrator_t()
+            ! TODO: integ = rk45_can_vpar_integrator_t()
+        else if (&
+            velocity_coordinate == "pphi" .and. integrator_type=="expl_impl_euler") then
+            ! TODO: integ = expl_impl_euler_integrator_t()
         else
             call throw_error("init_integrator_can: " // trim(integ_error_message()))
             return
@@ -131,7 +136,7 @@ contains
     subroutine trace_orbit(z0, z_out, callback)
         real(dp), intent(in) :: z0(5)
         real(dp), intent(inout) :: z_out(:, :)
-        procedure(callback_type), optional :: callback
+        procedure(callback_p), optional :: callback
 
         integer :: kt, ierr
         real(dp) :: z(5)

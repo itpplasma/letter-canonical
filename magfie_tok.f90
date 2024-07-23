@@ -180,9 +180,11 @@ module magfie_tok
     use libneo_kinds, only : real_kind
     use field_sub
 
-    real(kind=real_kind), intent(in) :: r, z, p
+    real(kind=real_kind), intent(in) :: r, p, z
     real(kind=real_kind), intent(inout) :: Br,Bp,Bz,dBrdR,dBrdp,dBrdZ         &
-                        ,dBpdR,dBpdp,dBpdZ,dBzdR,dBzdp,dBzdZ,Ar,Ap,Az
+                        ,dBpdR,dBpdp,dBpdZ,dBzdR,dBzdp,dBzdZ
+    real(kind=real_kind), intent(inout), optional :: Ar,Ap,Az
+
     real(kind=real_kind) :: rm,zm,Brc,Bpc,Bzc,dBrdRc,dBrdpc,dBrdZc &
                         ,dBpdRc,dBpdpc,dBpdZc,dBzdRc,dBzdpc,dBzdZc,Arc,Apc,Azc
 
@@ -191,16 +193,16 @@ module magfie_tok
     if(iequil.eq.0) then
         call set_zero(Br,Bp,Bz,dBrdR,dBrdp,dBrdZ,   &
                     dBpdR,dBpdp,dBpdZ,dBzdR,dBzdp,dBzdZ)
-        Ar=0.d0
-        Ap=0.d0
-        Az=0.d0
+        if (present(Ar)) Ar=0.d0
+        if (present(Ap)) Ap=0.d0
+        if (present(Az)) Az=0.d0
     else
         call field_eq(rm,p,zm,Br,Bp,Bz,dBrdR,dBrdp,dBrdZ   &
                 ,dBpdR,dBpdp,dBpdZ,dBzdR,dBzdp,dBzdZ)
 
-            Ar=0.d0
-            Ap=psif/r
-            Az=-rtf*btf*log(r)
+            if (present(Ar)) Ar=0.d0
+            if (present(Ap)) Ap=psif/r
+            if (present(Az)) Az=-rtf*btf*log(r)
     end if
 
     if(ipert.gt.0) then
@@ -215,9 +217,9 @@ module magfie_tok
             Brc,Bpc,Bzc,dBrdRc,dBrdpc,dBrdZc,dBpdRc,dBpdpc,dBpdZc,dBzdRc,dBzdpc,  &
             dBzdZc,ampl)
 
-        Ar = Ar + ampl*Arc
-        Ap = Ap + ampl*Apc
-        Az = Az + ampl*Azc
+        if (present(Ar)) Ar = Ar + ampl*Arc
+        if (present(Ap)) Ap = Ap + ampl*Apc
+        if (present(Az)) Az = Az + ampl*Azc
 
     end if
 
