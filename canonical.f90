@@ -85,7 +85,7 @@ contains
         real(dp), intent(inout), dimension(:,:,:) :: lam_phi, chi_gauge
 
         integer, parameter :: ndim=2
-        real(dp), parameter :: relerr=1d-8
+        real(dp), parameter :: relerr=1d-11
 
         real(dp), allocatable :: y(:), dy(:)
         real(dp) :: r1, r2

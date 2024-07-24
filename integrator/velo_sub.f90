@@ -77,7 +77,6 @@ module velo_sub
         real(dp) rmumag,rovsqg,rosqgb,rovbm
         real(dp) a_phi,a_b,a_c,hstar
         real(dp) s_hc,hpstar,phidot,blodot,bra
-        real(dp) pardeb
 
         dimension z(5), vz(5)
         dimension x(3),bder(3),hcovar(3),hctrvr(3),hcurl(3)

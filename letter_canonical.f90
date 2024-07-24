@@ -29,7 +29,7 @@ module letter_canonical
     class(tok_field_t), allocatable :: field
     class(integrator_t), allocatable :: integ
 
-    real(dp) :: rmu=1d8, ro0=20000d0*1d0  ! 20000 Gauss, 1cm Larmor radius
+    real(dp) :: rmu=1d30, ro0=20000d0*2d0  ! 20000 Gauss, 1cm Larmor radius
 
     real(dp) :: dtau=1d0
     integer :: ntau=1000, nskip=1
@@ -133,7 +133,7 @@ contains
 
     subroutine init_integrator_can
         if (velocity_coordinate == "vpar" .and. integrator_type == "rk45") then
-            integ = rk45_can_integrator_t(rmu, ro0, 1d-11)
+            integ = rk45_can_integrator_t(rmu, ro0, 1d-8)
         else if (&
             velocity_coordinate == "pphi" .and. integrator_type=="expl_impl_euler") then
             ! TODO: integ = expl_impl_euler_integrator_t()
@@ -175,6 +175,14 @@ contains
             end if
         end do
     end subroutine trace_orbit
+
+
+    function get_pphi(z) result(pphi)
+        real(dp), intent(in) :: z(5)
+        real(dp) :: pphi
+
+        pphi = z(4)
+    end function get_pphi
 
 
     subroutine to_internal_coordinates(z, z_internal)
