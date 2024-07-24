@@ -79,10 +79,10 @@ module rk45_cyl_integrator
     !  Output parameters:
     !            formal:  bmod             - magnetic field module
     !                     sqrtg            - metric determinant
-    !                     bder             - covariant components of (grad B)/Bmod
-    !                     hcovar           - covariant components of B/Bmod
-    !                     hctrvr           - contravariant components of B/Bmod
-    !                     hcurl            - contravariant components of curl (B/Bmod)
+    !                     bder             - covariant components of (grad B)/B
+    !                     hcovar           - covariant components of \bB/B
+    !                     hctrvr           - contravariant components of \bB/B
+    !                     hcurl            - contravariant components of curl (\bB/B)
     !
     !  Extra parameters:  field            - procedure of magnetic field backend
 
