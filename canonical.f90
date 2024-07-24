@@ -515,12 +515,23 @@ contains
         real(dp), intent(in) :: xcyl(3)
         real(dp), intent(out) :: xcan(3)
 
-        print *, "WARNING cyl_to_can_psi: TODO implement phi transformation"
+        integer, parameter :: MAX_ITER = 100
+        real(dp), parameter :: epserr = 1d-12
+        real(dp) :: delphi
+        real(dp) :: lam, dlam(3), d2lam(6)
+        integer :: i
+
+        xcan = xcyl
+
+        do i=1, MAX_ITER
+            call evaluate_splines_3d_der2(spl_lam, xcan, lam, dlam, d2lam)
+            delphi = (xcyl(2) - xcan(2) - lam)/(1.d0 + dlam(2))
+            xcan(2) = xcan(2) + delphi
+            if(abs(delphi) .lt. epserr) exit
+        enddo
 
         call evaluate_splines_3d(spl_A3, xcyl, xcan(1))
 
-        xcan(2) = xcyl(2)
-        xcan(3) = xcyl(3)
     end subroutine cyl_to_can_psi
 
 

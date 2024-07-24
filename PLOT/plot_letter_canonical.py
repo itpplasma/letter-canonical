@@ -1,4 +1,5 @@
 #%%
+%matplotlib tk
 import numpy as np
 import matplotlib.pyplot as plt
 
@@ -28,39 +29,43 @@ R = data[:,0]
 phi = data[:,1]
 Z = data[:,2]
 p = data[:,3]
-vpar_norm = data[:,4]
+vpar = data[:,4]
 
-plt.plot(R, Z, ',')
+plt.plot(R, Z, '-')
 #plt.xlim(1.35e7, 1.59e7)
 #plt.ylim(-110, 100)
 
 data = np.loadtxt('../rk45_cyl.out')
 Rcyl = data[:,0]
+phicyl = data[:,1]
 Zcyl = data[:,2]
-plt.plot(Rcyl, Zcyl, ',')
+vpar_cyl = data[:,4]
+plt.plot(Rcyl, Zcyl, '--')
 # %%
 plt.figure()
-plt.plot(vpar_norm, '-')
+plt.plot(vpar, '-')
+plt.plot(vpar_cyl, '--')
 plt.xlabel("Timestep")
 plt.ylabel("Parallel velocity")
 
 # %%
 plt.figure()
-plt.plot(R)
-plt.plot(Rcyl)
+plt.plot(R, '-')
+plt.plot(Rcyl, '--')
 plt.xlabel("Timestep")
 plt.ylabel("R(t)")
 
 # %%
 plt.figure()
 plt.plot(phi)
+plt.plot(phicyl)
 plt.xlabel("Timestep")
 plt.ylabel("phi(t)")
 
 # %%
 plt.figure()
-plt.plot(Z)
-plt.plot(Zcyl)
+plt.plot(Z, '-')
+plt.plot(Zcyl, '--')
 plt.xlabel("Timestep")
 plt.ylabel("Z(t)")
 # %%

@@ -19,7 +19,7 @@ module letter_canonical
     character(64) :: spatial_coordinates = "cyl"
     character(64) :: velocity_coordinate = "vpar"
 
-    integer :: n_r=100, n_phi=64, n_z=75
+    integer :: n_r=100, n_phi=8, n_z=150
 
     real(dp) :: rmin = 75.d0, &
         rmax = 264.42281879194627d0, &
@@ -36,7 +36,7 @@ module letter_canonical
 
     namelist /config/ magfie_type, integrator_type, input_file_tok, &
         output_prefix, spatial_coordinates, velocity_coordinate, &
-        rmin, rmax, zmin, zmax, rmu, ro0, dtau, ntau, nskip
+        rmin, rmax, zmin, zmax, rmu, ro0, dtau, ntau, nskip, n_r, n_phi, n_z
 
     abstract interface
         subroutine callback_p(z)
@@ -133,7 +133,7 @@ contains
 
     subroutine init_integrator_can
         if (velocity_coordinate == "vpar" .and. integrator_type == "rk45") then
-            integ = rk45_can_integrator_t(rmu, ro0, 1d-8)
+            integ = rk45_can_integrator_t(rmu, ro0, 1d-11)
         else if (&
             velocity_coordinate == "pphi" .and. integrator_type=="expl_impl_euler") then
             ! TODO: integ = expl_impl_euler_integrator_t()
@@ -150,12 +150,18 @@ contains
         procedure(callback_p), optional :: callback
 
         integer :: kt, ierr
-        real(dp) :: z(5)
+        real(dp) :: z(5), zcheck(5)
 
         allocate(z_out(5, ntau/nskip))
 
         call to_internal_coordinates(z0, z)
+        call from_internal_coordinates(z, zcheck)
+
+        print *, "trace_orbit: z"
+        print *, z0
         print *, z
+        print *, zcheck
+
         z_out(:, 1) = z
         do kt = 2, ntau
             call integ%timestep(z, dtau, ierr)
@@ -200,13 +206,10 @@ contains
         real(dp), intent(in) :: z_internal(5)
         real(dp), intent(out) :: z(5)
 
-        real(dp) :: x(3)
-
         if (spatial_coordinates == "cyl") then
             z(1:3) = z_internal(1:3)
         else if (spatial_coordinates == "cyl_can") then
-            call can_psi_to_cyl(z_internal(1:3), x)
-            z(1:3) = x([1,3,2])  ! swap phi and theta order
+            call can_psi_to_cyl(z_internal([1,3,2]), z(1:3))  ! swap phi and theta order
         else
             call throw_error("from_internal_coordinates: " // integ_error_message())
             return

@@ -67,7 +67,7 @@ contains
     subroutine test_psi
         use canonical, only: psi_of_x, psi_grid, psi_inner, psi_outer, dpsi_dR_positive
         real(dp), dimension(3) :: x
-        real(dp) :: psi
+        real(dp) :: psi, R
         integer :: i_r, i_phi, i_z
 
         i_r = 50
@@ -88,6 +88,10 @@ contains
         print *, "dpsi_dR_positive = ", dpsi_dR_positive
 
         call write_out("psi_of_x.out", psi_of_x)
+
+        call evaluate_splines_3d(spl_R_of_xc, [psi, x(2), x(3)], R)
+
+        print *, "test_psi: R = ", x(1), "=", R
 
     end subroutine test_psi
 
