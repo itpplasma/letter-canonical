@@ -27,6 +27,9 @@ SOURCES := magfie.f90 \
 	integrator/rk45_cyl_integrator.f90 \
 	integrator/rk45_can_integrator.f90 \
 	integrator/integrator.f90 \
+	callback/callback_base.f90 \
+	callback/passing_cut_callback.f90 \
+	callback/callback.f90 \
 	letter_canonical.f90
 
 OBJECTS := $(SOURCES:.f90=.o)

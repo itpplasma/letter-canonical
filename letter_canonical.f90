@@ -2,6 +2,7 @@ module letter_canonical
     use, intrinsic :: iso_fortran_env, only: dp => real64
     use magfie_tok, only: tok_field_t
     use integrator, only: integrator_t, rk45_cyl_integrator_t, rk45_can_integrator_t
+    use callback, only: callback_t
     use canonical, only: init_canonical, init_transformation, &
         init_canonical_field_components, init_splines_with_psi, &
         can_psi_to_cyl, cyl_to_can_psi, twopi
@@ -37,13 +38,6 @@ module letter_canonical
     namelist /config/ magfie_type, integrator_type, input_file_tok, &
         output_prefix, spatial_coordinates, velocity_coordinate, &
         rmin, rmax, zmin, zmax, rmu, ro0, dtau, ntau, nskip, n_r, n_phi, n_z
-
-    abstract interface
-        subroutine callback_p(z)
-            import :: dp
-            real(dp), intent(in) :: z(:)
-        end subroutine callback_p
-    end interface
 
 contains
 
@@ -144,12 +138,12 @@ contains
     end subroutine init_integrator_can
 
 
-    subroutine trace_orbit(z0, z_out, callback)
+    subroutine trace_orbit(z0, z_out, callbacks)
         real(dp), intent(in) :: z0(5)
         real(dp), allocatable, intent(out) :: z_out(:, :)
-        procedure(callback_p), optional :: callback
+        class(callback_t), intent(in), optional :: callbacks(:)
 
-        integer :: kt, ierr
+        integer :: i, kt, ierr
         real(dp) :: z(5), zcheck(5)
 
         allocate(z_out(5, ntau/nskip))
@@ -169,7 +163,11 @@ contains
                 call throw_error("trace_orbit: error in timestep", ierr)
                 return
             end if
-            if (present(callback)) call callback(z)
+            if (present(callbacks)) then
+                do i = 1, size(callbacks)
+                    call callbacks(i)%execute(kt*dtau, z)
+                end do
+            end if
             if (mod(kt, nskip) == 0) then
                 z_out(:, kt/nskip) = z
             end if
