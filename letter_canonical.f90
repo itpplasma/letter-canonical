@@ -163,11 +163,11 @@ contains
                 call throw_error("trace_orbit: error in timestep", ierr)
                 return
             end if
-            if (present(callbacks)) then
-                do i = 1, size(callbacks)
-                    call callbacks(i)%execute(kt*dtau, z)
-                end do
-            end if
+            ! if (present(callbacks)) then
+            !     do i = 1, size(callbacks)
+            !         call callbacks(i)%execute(kt*dtau, z)
+            !     end do
+            ! end if
             if (mod(kt, nskip) == 0) then
                 z_out(:, kt/nskip) = z
             end if
