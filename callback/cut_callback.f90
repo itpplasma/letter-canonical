@@ -19,6 +19,7 @@ module cut_callback
         procedure :: execute
         procedure :: is_cut
         procedure :: trigger_event
+        procedure :: values_at_cut
     end type cut_callback_t
 
     interface
@@ -81,16 +82,25 @@ module cut_callback
     end function is_cut
 
 
+    subroutine values_at_cut(self, t, z)
+        class(cut_callback_t), intent(in) :: self
+        real(dp), intent(out) :: t
+        real(dp), intent(out) :: z(:)
+
+        call interpolate_at_cut(self%buffer, t, z)
+    end subroutine values_at_cut
+
+
     subroutine trigger_event(self)
         class(cut_callback_t), intent(inout) :: self
         real(dp) :: t, z(size(self%buffer, 1) - 2)
 
-        call values_at_cut(self%buffer, t, z)
+        call self%values_at_cut(t, z)
         call self%event(t, z)
     end subroutine trigger_event
 
 
-    subroutine values_at_cut(buffer, t, z)
+    subroutine interpolate_at_cut(buffer, t, z)
         use plag_coeff_sub
 
         real(dp), intent(in) :: buffer(:,:)
@@ -103,7 +113,7 @@ module cut_callback
 
         t = dot_product(buffer(1,:), coef(0,:))
         z = matmul(buffer(2:size(buffer, 1)-1,:), coef(0,:))
-    end subroutine values_at_cut
+    end subroutine interpolate_at_cut
 
 
     subroutine shift(buffer)
