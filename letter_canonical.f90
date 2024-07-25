@@ -30,7 +30,7 @@ module letter_canonical
     class(tok_field_t), allocatable :: field
     class(integrator_t), allocatable :: integ
 
-    real(dp) :: rmu=1d30, ro0=20000d0*2d0  ! 20000 Gauss, 1cm Larmor radius
+    real(dp) :: rmu=1d10, ro0=20000d0*2d0  ! 20000 Gauss, 1cm Larmor radius
 
     real(dp) :: dtau=1d0
     integer :: ntau=1000, nskip=1

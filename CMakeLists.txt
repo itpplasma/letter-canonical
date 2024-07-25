@@ -5,11 +5,32 @@ if(NOT CMAKE_BUILD_TYPE)
   set(CMAKE_BUILD_TYPE Release)
 endif()
 
-set(CMAKE_Fortran_FLAGS "-g -fPIC -fopenmp -march=native -mtune=native\
- -Wall -Wuninitialized -Wno-maybe-uninitialized -Wno-unused-label\
- -Wno-unused-dummy-argument -fmax-errors=1")
-set(CMAKE_Fortran_FLAGS_RELEASE "-O3 ${CMAKE_Fortran_FLAGS}")
-set(CMAKE_Fortran_FLAGS_DEBUG "-O0 ${CMAKE_Fortran_FLAGS}")
+# Check whether intel or GNU
+if(CMAKE_Fortran_COMPILER_ID STREQUAL "Intel")
+    set(CMAKE_Fortran_FLAGS " -diag-disable=10448 -g -fPIC -qopenmp -xHost \
+        -warn all,nounused")
+    set(CMAKE_Fortran_FLAGS_RELEASE "-O3 ${CMAKE_Fortran_FLAGS}")
+    set(CMAKE_Fortran_FLAGS_DEBUG "-O0 ${CMAKE_Fortran_FLAGS}")
+    set(CMAKE_Fortran_FLAGS_PROFILE "-O2 -prof-gen -g ${CMAKE_Fortran_FLAGS}")
+    set(CMAKE_Fortran_FLAGS_PROFILE_USE "-O2 -prof-use -g ${CMAKE_Fortran_FLAGS}")
+elseif(CMAKE_Fortran_COMPILER_ID STREQUAL "GNU")
+    set(CMAKE_Fortran_FLAGS "-g -fPIC -fopenmp -march=native -mtune=native \
+        -Wall -Wuninitialized -Wno-maybe-uninitialized -Wno-unused-label \
+        -Wno-unused-dummy-argument -fmax-errors=1")
+    set(CMAKE_Fortran_FLAGS_RELEASE "-O3 ${CMAKE_Fortran_FLAGS}")
+    set(CMAKE_Fortran_FLAGS_DEBUG "-O0 ${CMAKE_Fortran_FLAGS}")
+    set(CMAKE_Fortran_FLAGS_PROFILE "-O2 -fprofile-generate ${CMAKE_Fortran_FLAGS}")
+    set(CMAKE_Fortran_FLAGS_PROFILE_USE "-O2 -fprofile-use ${CMAKE_Fortran_FLAGS}")
+elseif(CMAKE_Fortran_COMPILER_ID STREQUAL "NVHPC")
+    set(CMAKE_Fortran_FLAGS "-g -fPIC -mp -Minform=inform")
+    set(CMAKE_Fortran_FLAGS_RELEASE "-O3 ${CMAKE_Fortran_FLAGS}")
+    set(CMAKE_Fortran_FLAGS_DEBUG "-O0 ${CMAKE_Fortran_FLAGS}")
+    set(CMAKE_Fortran_FLAGS_PROFILE "-O2 -Mprof=func -g ${CMAKE_Fortran_FLAGS}")
+    set(CMAKE_Fortran_FLAGS_PROFILE_USE "-O2 -Mprof=use -g ${CMAKE_Fortran_FLAGS}")
+else()
+    message(FATAL_ERROR "Unsupported compiler: ${CMAKE_Fortran_COMPILER_ID}")
+endif()
+
 
 set(SOURCES
     test_util.f90

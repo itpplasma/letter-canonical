@@ -7,6 +7,12 @@ module magfie_tok
     complex(8), parameter :: imun = dcmplx(0.0d0, 1.0d0)
     character(len=1024) :: input_file = 'field_divB0.inp'
 
+    type :: FourierPerturbation
+        integer :: mpol
+        integer :: ntor
+        complex(8) :: Amn(3)
+    end type FourierPerturbation
+
     type, extends(field_t) :: tok_field_t
         type(FourierPerturbation), allocatable :: perturbations(:)
         contains
@@ -16,12 +22,6 @@ module magfie_tok
 
             procedure :: add_perturbation
     end type tok_field_t
-
-    type :: FourierPerturbation
-        integer :: mpol
-        integer :: ntor
-        complex(8) :: Amn(3)
-    end type FourierPerturbation
 
     contains
 

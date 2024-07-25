@@ -34,7 +34,7 @@ module rk45_cyl_integrator
         real(dp), intent(in) :: dtau
         integer, intent(out) :: ierr
 
-        real(dp) :: tstart, tend
+        real(dp) :: tstart, tend, rmu, ro0
 
         ierr = 0
         tstart = 0d0
@@ -51,7 +51,7 @@ module rk45_cyl_integrator
             real(dp), dimension(5), intent(in) :: y
             real(dp), dimension(5), intent(inout) :: vy
 
-            call velo(tau, y, vy, self%rmu, self%ro0, magfie_cyl_tok)
+            call velo(tau, y, vy, rmu, ro0, magfie_cyl_tok)
 
         end subroutine ydot
     end subroutine timestep

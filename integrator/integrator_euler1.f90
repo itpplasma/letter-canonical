@@ -102,36 +102,37 @@ module integrator_euler1
     !ccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
     !
     subroutine picard1(si, field, f, x, maxit, xlast, ierr)
-        !
-            integer, parameter :: n = 2
+        use, intrinsic :: ieee_arithmetic, only: ieee_is_nan
+        integer, parameter :: n = 2
 
-            type(symplectic_integrator_data_t), intent(inout) :: si
-            class(field_can_t), intent(in) :: field
-            type(field_can_data_t), intent(inout) :: f
-            real(dp), intent(inout) :: x(n)
-            integer, intent(in) :: maxit
-            real(dp), intent(out) :: xlast(n)
-            integer, intent(out) :: ierr
+        type(symplectic_integrator_data_t), intent(inout) :: si
+        class(field_can_t), intent(in) :: field
+        type(field_can_data_t), intent(inout) :: f
+        real(dp), intent(inout) :: x(n)
+        integer, intent(in) :: maxit
+        real(dp), intent(out) :: xlast(n)
+        integer, intent(out) :: ierr
 
-            integer :: kit
+        integer :: kit
 
+        ierr = 0
 
-            do kit = 1, maxit
-                call field%evaluate(f, x(1), si%z(2), si%z(3), 2)
-                call get_derivatives2(f, x(2))
+        do kit = 1, maxit
+            call field%evaluate(f, x(1), si%z(2), si%z(3), 2)
+            call get_derivatives2(f, x(2))
 
-                x(1) = x(1) - 1d-11 *(f%dpth(1)*(f%pth - si%pthold) + si%dt*(f%dH(2)*f%dpth(1) - f%dH(1)*f%dpth(2)))
-                x(2) = si%z(4) - si%dt*(f%dH(3)*f%dpth(1) - f%dH(1)*f%dpth(3))/f%dpth(1)
+            x(1) = x(1) - 1d-11 *(f%dpth(1)*(f%pth - si%pthold) + si%dt*(f%dH(2)*f%dpth(1) - f%dH(1)*f%dpth(2)))
+            x(2) = si%z(4) - si%dt*(f%dH(3)*f%dpth(1) - f%dH(1)*f%dpth(3))/f%dpth(1)
 
-                if(isnan(x(1)) .or. isnan(x(2))) then
-                    print *, 'picard1: nan'
-                    print *, si%z(1), si%z(2), si%z(3), si%z(4)
-                    ierr = 1
-                    return
-                end if
-                !print *, 'picard1: ', x(1), x(2)
+            if(ieee_is_nan(x(1)) .or. ieee_is_nan(x(2))) then
+                print *, 'picard1: nan'
+                print *, si%z(1), si%z(2), si%z(3), si%z(4)
+                ierr = 1
+                return
+            end if
+            !print *, 'picard1: ', x(1), x(2)
 
-            enddo
+        enddo
     end subroutine picard1
 
     !ccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
