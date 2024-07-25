@@ -24,24 +24,7 @@ module expl_impl_euler_integrator
 
         real(dp) :: tstart, tend
 
-        ierr = 0
-        tstart = 0d0
-        tend = dtau
 
-        call odeint_allroutines(z, 5, tstart, tend, self%rtol, ydot)
-
-        contains
-
-        subroutine ydot(tau, y, vy)
-            use velo_sub, only: velo
-
-            real(dp), intent(in) :: tau
-            real(dp), dimension(5), intent(in) :: y
-            real(dp), dimension(5), intent(inout) :: vy
-
-            call velo(tau, y, vy, self%rmu, self%ro0, magfie_can)
-
-        end subroutine ydot
     end subroutine timestep
 
 end module expl_impl_euler_integrator

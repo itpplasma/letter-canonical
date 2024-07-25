@@ -1,11 +1,14 @@
 module letter_canonical
     use, intrinsic :: iso_fortran_env, only: dp => real64
-    use magfie_tok
-    use integrator
-    use callback
+    use magfie_tok, only: tok_field_t
+    use integrator, only: integrator_t, rk45_cyl_integrator_t, rk45_can_integrator_t, &
+        expl_impl_euler_integrator_t
+    use callback, only: callback_pointer_t
     use canonical, only: init_canonical, init_transformation, &
         init_canonical_field_components, init_splines_with_psi, &
         can_psi_to_cyl, cyl_to_can_psi, twopi
+    use field_can, only: field_can_t, field_can_new_t, field_can_data_t
+
     implicit none
 
     integer, parameter :: MAX_PATH_LENGTH = 1024
@@ -28,7 +31,9 @@ module letter_canonical
         zmax = 147.38193979933115d0
 
     class(tok_field_t), allocatable :: field
+    class(field_can_t), allocatable :: field_can_
     class(integrator_t), allocatable :: integ
+    type(field_can_data_t) :: f
 
     real(dp) :: rmu=1d10, ro0=20000d0*2d0  ! 20000 Gauss, 1cm Larmor radius
 
@@ -130,12 +135,22 @@ contains
             integ = rk45_can_integrator_t(rmu, ro0, 1d-8)
         else if (&
             velocity_coordinate == "pphi" .and. integrator_type=="expl_impl_euler") then
-            integ = expl_impl_euler_integrator_t()
+            call init_field_can
+            call set_initial_conditions
+            call init_pphi_integrator
         else
             call throw_error("init_integrator_can: " // trim(integ_error_message()))
             return
         end if
     end subroutine init_integrator_can
+
+
+
+    subroutine init_field_can
+        field_can_ = field_can_new_t()
+        call field_can_init(f, mu, ro0, z0(5))
+        call field_can_%evaluate(f, psi0, th0, phi0, 2)
+    end subroutine init_field_can
 
 
     subroutine trace_orbit(z0, z_out, callbacks)
