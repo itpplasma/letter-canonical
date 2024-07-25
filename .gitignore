@@ -8,3 +8,4 @@ stellarator/coils.c09r00
 *.x
 *.out
 letter_canonical.lyx~
+build
