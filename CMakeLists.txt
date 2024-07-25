@@ -11,12 +11,6 @@ set(CMAKE_Fortran_FLAGS "-g -fPIC -fopenmp -march=native -mtune=native\
 set(CMAKE_Fortran_FLAGS_RELEASE "-O3 ${CMAKE_Fortran_FLAGS}")
 set(CMAKE_Fortran_FLAGS_DEBUG "-O0 ${CMAKE_Fortran_FLAGS}")
 
-# print flags
-message(STATUS "CMAKE_Fortran_FLAGS: ${CMAKE_Fortran_FLAGS}")
-message(STATUS "CMAKE_Fortran_FLAGS_RELEASE: ${CMAKE_Fortran_FLAGS_RELEASE}")
-message(STATUS "CMAKE_Fortran_FLAGS_DEBUG: ${CMAKE_Fortran_FLAGS_DEBUG}")
-
-# Source files
 set(SOURCES
     test_util.f90
     magfie.f90
