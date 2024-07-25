@@ -1,8 +1,8 @@
 module letter_canonical
     use, intrinsic :: iso_fortran_env, only: dp => real64
-    use magfie_tok, only: tok_field_t
-    use integrator, only: integrator_t, rk45_cyl_integrator_t, rk45_can_integrator_t
-    use callback, only: callback_pointer_t
+    use magfie_tok
+    use integrator
+    use callback
     use canonical, only: init_canonical, init_transformation, &
         init_canonical_field_components, init_splines_with_psi, &
         can_psi_to_cyl, cyl_to_can_psi, twopi
@@ -130,7 +130,7 @@ contains
             integ = rk45_can_integrator_t(rmu, ro0, 1d-8)
         else if (&
             velocity_coordinate == "pphi" .and. integrator_type=="expl_impl_euler") then
-            ! TODO: integ = expl_impl_euler_integrator_t()
+            integ = expl_impl_euler_integrator_t()
         else
             call throw_error("init_integrator_can: " // trim(integ_error_message()))
             return
