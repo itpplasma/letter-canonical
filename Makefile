@@ -16,10 +16,13 @@ release: reconfigure
 
 .PHONY: reconfigure
 reconfigure: $(BUILD_DIR)
-	rm -f $(CMAKE_CACHE)
 	cd $(BUILD_DIR) && cmake -G Ninja -DCMAKE_BUILD_TYPE=$(CMAKE_BUILD_TYPE) ..
 	touch $(CMAKE_CACHE)
 	$(MAKE) ninja
+
+$(CMAKE_CACHE):
+	cd $(BUILD_DIR) && cmake -G Ninja -DCMAKE_BUILD_TYPE=$(CMAKE_BUILD_TYPE) ..
+	touch $(CMAKE_CACHE)
 
 $(BUILD_DIR):
 	mkdir -p $(BUILD_DIR)
@@ -28,7 +31,7 @@ $(BUILD_DIR):
 ninja: $(BUILD_NINJA)
 	cd $(BUILD_DIR) && ninja
 
-$(BUILD_NINJA): $(CMAKE_CACHE)
+$(BUILD_NINJA): $(CMAKE_CACHE) | $(BUILD_DIR)
 
 .PHONY: clean
 clean:
