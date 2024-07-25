@@ -6,15 +6,13 @@ CMAKE_BUILD_TYPE ?= release
 .PHONY: all
 all: ninja
 
-.PHONY: release debug profile
-release: CMAKE_BUILD_TYPE=release
-release: reconfigure
+.PHONY: debug release
 
-debug: CMAKE_BUILD_TYPE=debug
+debug: CMAKE_BUILD_TYPE=Debug
 debug: reconfigure
 
-profile: CMAKE_BUILD_TYPE=profile
-profile: reconfigure
+release: CMAKE_BUILD_TYPE=Release
+release: reconfigure
 
 .PHONY: reconfigure
 reconfigure: $(BUILD_DIR)
