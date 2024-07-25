@@ -52,6 +52,7 @@ program main
     contains
 
     function zero_crossed_phi(t, z) result(distance)
+        real(dp) :: distance
         real(dp), intent(in) :: t, z(:)
         distance = -modulo(z(2), twopi) + 0.5d0*twopi
     end function zero_crossed_phi
