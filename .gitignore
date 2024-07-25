@@ -11,3 +11,4 @@ letter_canonical.lyx~
 build
 cachegrind.out.*
 callgrind.out.*
+gmon.out
