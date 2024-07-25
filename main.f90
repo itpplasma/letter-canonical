@@ -2,7 +2,8 @@ program main
     use, intrinsic :: iso_fortran_env, only: dp => real64
     use canonical, only: twopi
     use callback, only: callback_pointer_t, cut_callback_t
-    use letter_canonical, only: init, stop_on_error, trace_orbit, write_output
+    use letter_canonical, only: init, stop_on_error, trace_orbit, write_output, &
+        from_internal_coordinates
 
     implicit none
 
@@ -52,15 +53,12 @@ program main
 
     function zero_crossed_phi(t, z) result(distance)
         real(dp), intent(in) :: t, z(:)
-        real(dp) :: distance
-
         distance = -modulo(z(2), twopi) + 0.5d0*twopi
     end function zero_crossed_phi
 
 
     subroutine print_state(t, z)
         real(dp), intent(in) :: t, z(:)
-
         write(999, *) t, z
     end subroutine print_state
 

@@ -144,17 +144,11 @@ contains
         class(callback_pointer_t), intent(inout), optional :: callbacks(:)
 
         integer :: i, kt, ierr
-        real(dp) :: z(5), zcheck(5)
+        real(dp) :: z(5), zcyl(5)
 
         allocate(z_out(5, ntau/nskip))
 
         call to_internal_coordinates(z0, z)
-        call from_internal_coordinates(z, zcheck)
-
-        print *, "trace_orbit: z"
-        print *, z0
-        print *, z
-        print *, zcheck
 
         z_out(:, 1) = z
         do kt = 2, ntau
@@ -163,11 +157,12 @@ contains
                 call throw_error("trace_orbit: error in timestep", ierr)
                 return
             end if
-            ! if (present(callbacks)) then
-            !     do i = 1, size(callbacks)
-            !         call callbacks(i)%execute(kt*dtau, z)
-            !     end do
-            ! end if
+            if (present(callbacks)) then
+                do i = 1, size(callbacks)
+                    call to_internal_coordinates(z, zcyl)
+                    call callbacks(i)%execute(kt*dtau, zcyl)
+                end do
+            end if
             if (mod(kt, nskip) == 0) then
                 z_out(:, kt/nskip) = z
             end if
