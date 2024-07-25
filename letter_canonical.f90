@@ -2,7 +2,7 @@ module letter_canonical
     use, intrinsic :: iso_fortran_env, only: dp => real64
     use magfie_tok, only: tok_field_t
     use integrator, only: integrator_t, rk45_cyl_integrator_t, rk45_can_integrator_t
-    use callback, only: callback_t
+    use callback, only: callback_pointer_t
     use canonical, only: init_canonical, init_transformation, &
         init_canonical_field_components, init_splines_with_psi, &
         can_psi_to_cyl, cyl_to_can_psi, twopi
@@ -92,7 +92,7 @@ contains
         character(*), intent(in) :: input_file
         integer :: iunit
 
-        open(newunit=iunit, file=input_file)
+        open(newunit=iunit, file=input_file, status="old")
         read(iunit, nml=config)
         close(iunit)
     end subroutine read_input_file
@@ -141,7 +141,7 @@ contains
     subroutine trace_orbit(z0, z_out, callbacks)
         real(dp), intent(in) :: z0(5)
         real(dp), allocatable, intent(out) :: z_out(:, :)
-        class(callback_t), intent(in), optional :: callbacks(:)
+        class(callback_pointer_t), intent(inout), optional :: callbacks(:)
 
         integer :: i, kt, ierr
         real(dp) :: z(5), zcheck(5)

@@ -1,6 +1,6 @@
 program main
     use, intrinsic :: iso_fortran_env, only: dp => real64
-    use callback, only: callback_t, passing_cut_callback_t
+    use callback, only: callback_pointer_t, cut_callback_t
     use letter_canonical, only: init, stop_on_error, trace_orbit, write_output
 
     implicit none
@@ -12,10 +12,7 @@ program main
 
     real(dp), allocatable :: z_out(:,:)
 
-    class(callback_t), allocatable :: callbacks(:)
-
-    allocate(passing_cut_callback_t :: callbacks(1))
-    allocate(passing_cut_callback_t :: callbacks(2))
+    class(callback_pointer_t), allocatable :: callbacks(:)
 
     call print_usage
 
@@ -36,6 +33,9 @@ program main
 
     call init(input_file)
     call stop_on_error
+
+    allocate(callbacks(1))
+    allocate(cut_callback_t :: callbacks(1)%item)
 
     call trace_orbit([R0, phi0, Z0, 1d0, vpar0], z_out, callbacks)
     call stop_on_error

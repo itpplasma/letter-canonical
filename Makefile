@@ -1,6 +1,6 @@
 FC = gfortran
-FFLAGS = -g -fPIC -Og -fopenmp
-#FFLAGS = -g -fPIC -O3 -fopenmp -march=native -mtune=native -Jinclude -L. -Wl,-rpath=.
+#FFLAGS = -g -fPIC -Og -fopenmp
+FFLAGS = -g -fPIC -O3 -fopenmp -march=native -mtune=native -Jinclude -L. -Wl,-rpath=.
 
 FFLAGS += -L. -Wl,-rpath=.
 FFLAGS += -Wall -Wuninitialized -Wno-maybe-uninitialized -Wno-unused-label \
@@ -28,7 +28,7 @@ SOURCES := magfie.f90 \
 	integrator/rk45_can_integrator.f90 \
 	integrator/integrator.f90 \
 	callback/callback_base.f90 \
-	callback/passing_cut_callback.f90 \
+	callback/cut_callback.f90 \
 	callback/callback.f90 \
 	letter_canonical.f90
 
@@ -54,8 +54,12 @@ MAGFIE_SOURCES := spline5_RZ.f90 \
 	bdivfree.f90
 MAGFIE_SOURCES := $(addprefix ../libneo/src/magfie/, $(MAGFIE_SOURCES))
 
-all: letter_canonical.x test_orbit_sympl.x test_orbit.x test_integrator.x \
-	test_field_can.x test_magfie.x test.x test_large.x test_biotsavart.x
+all: letter_canonical.x test_orbit_sympl.x test_orbit.x test_callback.x \
+    test_integrator.x test_field_can.x test_magfie.x test.x test_large.x \
+	test_biotsavart.x
+
+test: test_callback.x
+	./test_callback.x
 
 letter_canonical.x: libfield.so libcanonical.so main.f90
 	$(FC) $(FFLAGS) -o $@ $^ -lfield -lcanonical
@@ -64,6 +68,9 @@ test_orbit_sympl.x: libfield.so libcanonical.so test_orbit_sympl.f90
 	$(FC) $(FFLAGS) -o $@ $^ -lfield -lcanonical
 
 test_orbit.x: libfield.so libcanonical.so test_orbit.f90
+	$(FC) $(FFLAGS) -o $@ $^ -lfield -lcanonical
+
+test_callback.x: libfield.so libcanonical.so test_callback.f90
 	$(FC) $(FFLAGS) -o $@ $^ -lfield -lcanonical
 
 test_integrator.x: libfield.so libcanonical.so test_integrator.f90

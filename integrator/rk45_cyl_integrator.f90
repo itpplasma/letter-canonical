@@ -6,12 +6,9 @@ module rk45_cyl_integrator
     implicit none
 
     type, extends(integrator_t) :: rk45_cyl_integrator_t
-
         real(dp) :: rmu, ro0, rtol
-
         contains
-
-        procedure :: timestep => timestep
+        procedure :: timestep
     end type rk45_cyl_integrator_t
 
     abstract interface
