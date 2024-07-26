@@ -39,6 +39,8 @@ module rk45_cyl_integrator
         ierr = 0
         tstart = 0d0
         tend = dtau
+        rmu = self%rmu
+        ro0 = self%ro0
 
         call odeint_allroutines(z, 5, tstart, tend, self%rtol, ydot)
 
