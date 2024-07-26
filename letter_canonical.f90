@@ -184,8 +184,8 @@ contains
                 return
             end if
             if (present(callbacks)) then
+                call from_internal_coordinates(z, zcyl)
                 do i = 1, size(callbacks)
-                    call to_internal_coordinates(z, zcyl)
                     call callbacks(i)%execute(kt*dtau, zcyl)
                 end do
             end if
@@ -279,6 +279,13 @@ contains
         do kt = 1, size(z_out, 2)
             call from_internal_coordinates(z_out(:, kt), z)
             write(iunit, *) z
+        end do
+        close(iunit)
+
+        outname = trim(output_prefix) // "_internal.out"
+        open(newunit=iunit, file=outname)
+        do kt = 1, size(z_out, 2)
+            write(iunit, *) z_out(:, kt)
         end do
         close(iunit)
     end subroutine write_output
