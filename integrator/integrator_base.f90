@@ -13,7 +13,7 @@ module integrator_base
     abstract interface
         subroutine timestep(self, z, dtau, ierr)
             import integrator_t, dp
-            class(integrator_t), intent(in) :: self
+            class(integrator_t), intent(inout) :: self
             real(dp), intent(inout) :: z(:)
             real(dp), intent(in) :: dtau
             integer, intent(out) :: ierr

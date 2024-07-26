@@ -17,7 +17,7 @@ module rk45_can_integrator
     !
     subroutine timestep(self, z, dtau, ierr)
     !
-        class(rk45_can_integrator_t), intent(in) :: self
+        class(rk45_can_integrator_t), intent(inout) :: self
         real(dp), intent(inout) :: z(:)
         real(dp), intent(in) :: dtau
         integer, intent(out) :: ierr

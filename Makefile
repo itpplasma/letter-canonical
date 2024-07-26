@@ -3,10 +3,8 @@ CMAKE_CACHE := $(BUILD_DIR)/CMakeCache.txt
 BUILD_NINJA := $(BUILD_DIR)/build.ninja
 CMAKE_BUILD_TYPE ?= release
 
-.PHONY: all
-all: ninja
-
-.PHONY: debug release
+.PHONY: all debug release
+all: reconfigure
 
 debug: CMAKE_BUILD_TYPE=Debug
 debug: reconfigure

@@ -10,7 +10,7 @@ program main
     character(1024) :: input_file = "letter_canonical.in"
     character(1024) :: arg
 
-    real(dp) :: R0=162.6d0, phi0=-6.283d0, Z0=-76.5d0, vpar0=1d0
+    real(dp) :: R0=162.6d0, phi0=-6.283d0, Z0=-76.5d0, vpar0=0d0
 
     real(dp), allocatable :: z_out(:,:)
 

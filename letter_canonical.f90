@@ -2,12 +2,12 @@ module letter_canonical
     use, intrinsic :: iso_fortran_env, only: dp => real64
     use magfie_tok, only: tok_field_t
     use integrator, only: integrator_t, rk45_cyl_integrator_t, rk45_can_integrator_t, &
-        expl_impl_euler_integrator_t
+        expl_impl_euler_integrator_t, symplectic_integrator_data_t
     use callback, only: callback_pointer_t
     use canonical, only: init_canonical, init_transformation, &
         init_canonical_field_components, init_splines_with_psi, &
         can_psi_to_cyl, cyl_to_can_psi, twopi
-    use field_can, only: field_can_t, field_can_new_t, field_can_data_t
+    use field_can, only: field_can_t, field_can_new_t, field_can_data_t, get_val
 
     implicit none
 
@@ -33,6 +33,7 @@ module letter_canonical
     class(tok_field_t), allocatable :: field
     class(field_can_t), allocatable :: field_can_
     class(integrator_t), allocatable :: integ
+    type(symplectic_integrator_data_t) :: si
     type(field_can_data_t) :: f
 
     real(dp) :: rmu=1d10, ro0=20000d0*2d0  ! 20000 Gauss, 1cm Larmor radius
@@ -85,11 +86,6 @@ contains
 
         call init_integrator_can
 
-        if (.not. allocated(integ)) then
-            call throw_error("init: " // trim(integ_error_message()))
-            return
-        end if
-
     end subroutine init
 
 
@@ -135,9 +131,7 @@ contains
             integ = rk45_can_integrator_t(rmu, ro0, 1d-8)
         else if (&
             velocity_coordinate == "pphi" .and. integrator_type=="expl_impl_euler") then
-            call init_field_can
-            call set_initial_conditions
-            call init_pphi_integrator
+            field_can_ = field_can_new_t()
         else
             call throw_error("init_integrator_can: " // trim(integ_error_message()))
             return
@@ -145,12 +139,28 @@ contains
     end subroutine init_integrator_can
 
 
+    subroutine set_initial_conditions(z)
+        class(expl_impl_euler_integrator_t), allocatable :: expl_impl_euler_integ
+        real(dp), intent(in) :: z(5)
 
-    subroutine init_field_can
-        field_can_ = field_can_new_t()
-        call field_can_init(f, mu, ro0, z0(5))
-        call field_can_%evaluate(f, psi0, th0, phi0, 2)
-    end subroutine init_field_can
+        if (.not. allocated(field_can_)) return  ! Don't to anything for non-canonical
+
+        si%atol = 1d-15
+        si%rtol = 1d-13
+
+        si%ntau = nskip
+        si%dt = dtau/sqrt(2d0)
+
+        si%z = z(1:4)
+
+        call field_can_%evaluate(f, z(1), z(2), z(3), 0)
+        call get_val(f, si%z(4)) ! for pth
+        si%pthold = f%pth
+
+        expl_impl_euler_integ = expl_impl_euler_integrator_t(si, f)
+        call expl_impl_euler_integ%init(field_can_)
+        integ = expl_impl_euler_integ
+    end subroutine set_initial_conditions
 
 
     subroutine trace_orbit(z0, z_out, callbacks)
@@ -164,6 +174,7 @@ contains
         allocate(z_out(5, ntau/nskip))
 
         call to_internal_coordinates(z0, z)
+        call set_initial_conditions(z)
 
         z_out(:, 1) = z
         do kt = 2, ntau
@@ -211,6 +222,19 @@ contains
 
         if (velocity_coordinate == "vpar") then
             z_internal(4:5) = z(4:5)
+        else if (velocity_coordinate == "pphi") then
+            call field_can_%evaluate(f, z_internal(1), z_internal(2), z_internal(3), 0)
+
+            ! normalization of thermal velocity different by factor sqrt(2) - see docs
+            f%mu = .5d0*z(4)**2*(1.d0-z(5)**2)/f%Bmod*2d0
+            f%ro0 = ro0/dsqrt(2d0)
+            f%vpar = z(4)*z(5)*dsqrt(2d0)
+
+            ! vpar_bar = vpar/sqrt(T/m), different by sqrt(2) from other modules
+            z_internal(4) = f%vpar*f%hph + f%Aph/f%ro0
+
+            ! normalized thermal momentum is kept here but moved to last variable
+            z_internal(5) = z(4)
         else
             call throw_error("to_internal_coordinates: " // integ_error_message())
             return
@@ -233,6 +257,10 @@ contains
 
         if (velocity_coordinate == "vpar") then
             z(4:5) = z_internal(4:5)
+        else if (velocity_coordinate == "pphi") then
+            call field_can_%evaluate(f, z_internal(1), z_internal(2), z_internal(3), 0)
+            z(4) = z_internal(5)
+            z(5) = f%vpar
         else
             call throw_error("from_internal_coordinates: " // integ_error_message())
             return

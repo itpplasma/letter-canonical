@@ -14,7 +14,7 @@ program main
     character(1024) :: input_file = "letter_canonical.in"
     character(1024) :: input_file_tok = "field_divB0.inp"
 
-    integer, parameter :: n_r=100, n_phi=64, n_z=75
+    integer, parameter :: n_r=100, n_phi=8, n_z=75
     integer :: nt = 80000
     real(dp) :: ro0 = 1d0*20000d0  ! 1cm Larmor radius at 20000 Gauss
     real(dp) :: mu = 0d0 !1d-5
