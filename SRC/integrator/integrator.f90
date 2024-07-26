@@ -96,7 +96,7 @@ module integrator
         si%rtol = config%rtol
 
         si%ntau = config%nskip
-        si%dt = config%dt
+        si%dt = config%dt/sqrt(2d0)
 
         si%z = config%zstart(1:4)
 

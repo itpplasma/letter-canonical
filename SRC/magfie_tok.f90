@@ -27,7 +27,7 @@ module magfie_tok
 
     subroutine init_magfie(self)
         use field_mod, only : icall, ipert, ampl
-        use field_eq_mod, only : icall_eq
+        use field_eq_mod, only : icall_eq, use_fpol
         use field_c_mod, only : icall_c
         use libneo_kinds, only : real_kind
         use field_sub, only : read_field_input
@@ -35,6 +35,7 @@ module magfie_tok
         class(tok_field_t), intent(in) :: self
 
         if (icall < 1) then
+            use_fpol = .false.
             call read_field_input(input_file)
             print *, 'Perturbation field', ipert, 'Ampl', ampl
             call init_stretch_coords
