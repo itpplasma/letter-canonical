@@ -3,7 +3,7 @@ module field_can
   use field_can_base
   use field_can_test
   use field_can_cyl
-  use field_can_new
+  use field_can_albert
 
   implicit none
 
@@ -19,8 +19,8 @@ contains
                 field = field_can_test_t()
             case("cyl_can")
                 field = field_can_cyl_t()
-            case("cyl_can_psi")
-                field = field_can_new_t()
+            case("albert")
+                field = field_can_albert_t()
             case default
                 print *, "create_field_can: Unknown field type ", field_type
                 error stop

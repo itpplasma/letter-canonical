@@ -38,7 +38,7 @@ set(SOURCES
     SRC/field_can_base.f90
     SRC/field_can_test.f90
     SRC/field_can_cyl.f90
-    SRC/field_can_new.f90
+    SRC/field_can_albert.f90
     SRC/field_can.f90
     SRC/integrator/integrator_base.f90
     SRC/integrator/integrator_rk45.f90

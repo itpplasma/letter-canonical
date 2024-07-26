@@ -6,7 +6,7 @@ module letter_canonical
     use canonical, only: init_canonical, init_transformation, &
         init_canonical_field_components, init_splines_with_psi, &
         can_psi_to_cyl, cyl_to_can_psi, twopi
-    use field_can, only: field_can_t, field_can_new_t, field_can_data_t, get_val
+    use field_can, only: field_can_t, field_can_albert_t, field_can_data_t, get_val
 
     implicit none
 
@@ -73,7 +73,7 @@ contains
 
         if (spatial_coordinates == "cyl") then
             print *, "init: using cylindrical coordinates"
-        else if (spatial_coordinates == "cyl_can") then
+        else if (spatial_coordinates == "albert") then
             print *, "init: using canonical cylindrical coordinates"
             print *, "init_canonical ..."
             call init_canonical(n_r, n_phi, n_z, &
@@ -120,36 +120,25 @@ contains
 
     subroutine init_integrator
         type(integrator_config_t) :: integ_config
+        real(dp) :: z_internal(5)
+
+        if (velocity_coordinate == "pphi") then
+            field_can_ = create_field_can(spatial_coordinates)
+        end if
+
+        print *, "init_integrator ...."
+
+        call to_internal_coordinates([R0, phi0, Z0, 1d0, vpar0], z_internal)
 
         integ_config = integrator_config_t(integrator_type, spatial_coordinates, &
-            velocity_coordinate, [R0, phi0, Z0, 1d0, vpar0], dtau, ro0, 1d-8, nskip)
+            velocity_coordinate, z_internal, dtau, ro0, 1d-8, nskip)
 
-        integ = create_integrator(integ_config)
+        if (integ_config%momentum_coord == "pphi") then
+            integ = create_integrator(integ_config, si, field_can_, f)
+        else
+            integ = create_integrator(integ_config)
+        end if
     end subroutine init_integrator
-
-
-    subroutine set_initial_conditions(z)
-        class(expl_impl_euler_integrator_t), allocatable :: expl_impl_euler_integ
-        real(dp), intent(in) :: z(5)
-
-        if (.not. allocated(field_can_)) return  ! Don't to anything for non-canonical
-
-        si%atol = 1d-15
-        si%rtol = 1d-13
-
-        si%ntau = nskip
-        si%dt = dtau/sqrt(2d0)
-
-        si%z = z(1:4)
-
-        call field_can_%evaluate(f, z(1), z(2), z(3), 0)
-        call get_val(f, si%z(4)) ! for pth
-        si%pthold = f%pth
-
-        expl_impl_euler_integ = expl_impl_euler_integrator_t(si, f)
-        call expl_impl_euler_integ%init(field_can_)
-        integ = expl_impl_euler_integ
-    end subroutine set_initial_conditions
 
 
     subroutine trace_orbit(z_out, callbacks)
@@ -164,7 +153,6 @@ contains
         allocate(z_out(5, ntau/nskip))
 
         call to_internal_coordinates(zstart, z)
-        call set_initial_conditions(z)
 
         z_out(:, 1) = z
         do kt = 2, ntau
@@ -186,14 +174,6 @@ contains
     end subroutine trace_orbit
 
 
-    function get_pphi(z) result(pphi)
-        real(dp), intent(in) :: z(5)
-        real(dp) :: pphi
-
-        pphi = z(4)
-    end function get_pphi
-
-
     subroutine to_internal_coordinates(z, z_internal)
         real(dp), intent(in) :: z(5)
         real(dp), intent(out) :: z_internal(5)
@@ -202,7 +182,7 @@ contains
 
         if (spatial_coordinates == "cyl") then
             z_internal(1:3) = z(1:3)
-        else if (spatial_coordinates == "cyl_can") then
+        else if (spatial_coordinates == "albert") then
             call cyl_to_can_psi(z(1:3), x)
             z_internal(1:3) = x([1,3,2])  ! swap phi and theta order
         else
@@ -238,7 +218,7 @@ contains
 
         if (spatial_coordinates == "cyl") then
             z(1:3) = z_internal(1:3)
-        else if (spatial_coordinates == "cyl_can") then
+        else if (spatial_coordinates == "albert") then
             call can_psi_to_cyl(z_internal([1,3,2]), z(1:3))  ! swap phi and theta order
         else
             call throw_error("from_internal_coordinates: " // integ_error_message())

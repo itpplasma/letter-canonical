@@ -6,7 +6,7 @@ program main
     use magfie_tok, only: input_file_tok_ => input_file
     use canonical, only: twopi, init_canonical, init_transformation, &
         init_canonical_field_components, init_splines_with_psi
-    use field_can, only: field_can_t, field_can_cyl_t, field_can_new_t
+    use field_can, only: field_can_t, field_can_cyl_t, field_can_albert_t
     use integrator
 
     implicit none
@@ -100,7 +100,7 @@ contains
     end subroutine read_input_file
 
     subroutine init_field_can
-        field = field_can_new_t()
+        field = field_can_albert_t()
         call field_can_init(f, mu, ro0, vpar0)
         call field%evaluate(f, psi0, th0, phi0, 2)
     end subroutine init_field_can

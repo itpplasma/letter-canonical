@@ -25,15 +25,16 @@ module integrator
 
     contains
 
-    function create_integrator(config, si, f) result(integ)
+    function create_integrator(config, si, field, f) result(integ)
         class(integrator_t), allocatable :: integ
 
         type(integrator_config_t), intent(in) :: config
         type(symplectic_integrator_data_t), intent(inout), optional :: si
+        class(field_can_t), intent(in), optional :: field
         type(field_can_data_t), intent(inout), optional :: f
 
         if (config%momentum_coord == "pphi") then
-            integ = create_integrator_pphi(config, si, f)
+            integ = create_integrator_pphi(config, si, field, f)
         else if (config%momentum_coord == "vpar") then
             integ = create_integrator_vpar(config)
         end if
@@ -41,17 +42,16 @@ module integrator
     end function create_integrator
 
 
-    function create_integrator_pphi(config, si, f) result(integ)
+    function create_integrator_pphi(config, si, field, f) result(integ)
         class(integrator_t), allocatable :: integ
 
         type(integrator_config_t), intent(in) :: config
         type(symplectic_integrator_data_t), intent(inout) :: si
+        class(field_can_t), intent(in) :: field
         type(field_can_data_t), intent(inout) :: f
 
-        class(field_can_t), allocatable :: field
         class(expl_impl_euler_integrator_t), allocatable :: expl_impl_euler_integ
 
-        field = create_field_can(config%spatial_coords)
         call integrator_init(si, field, f, config)
 
         select case(config%integ_type)
@@ -74,7 +74,7 @@ module integrator
         if (config%integ_type == "rk45" .and. config%spatial_coords == "cyl") then
             integ = rk45_cyl_integrator_t(1d30, config%ro0, config%rtol)
         else if (config%integ_type == "rk45" .and. &
-                 config%spatial_coords == "cyl_can") then
+                 config%spatial_coords == "albert") then
             integ = rk45_can_integrator_t(1d30, config%ro0, config%rtol)
         else
             print *, "create_integrator_vpar: Unknown type ", config%integ_type

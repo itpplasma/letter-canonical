@@ -6,7 +6,7 @@ program test_orbit
   use magfie_factory, only: magfie_type_from_string
   use canonical, only: twopi, init_canonical, init_transformation, &
     init_canonical_field_components, init_splines_with_psi, spl_R_of_xc
-  use field_can, only: field_can_t, field_can_cyl_t, field_can_new_t
+  use field_can, only: field_can_t, field_can_cyl_t, field_can_albert_t
   use integrator
   use rk45_can_integrator, only: magfie_can
   use odeint_sub

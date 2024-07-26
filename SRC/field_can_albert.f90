@@ -1,21 +1,21 @@
-module field_can_new
+module field_can_albert
     use, intrinsic :: iso_fortran_env, only: dp => real64
     use field_can_base, only: field_can_t, field_can_data_t
 
     implicit none
 
-    type, extends(field_can_t) :: field_can_new_t
+    type, extends(field_can_t) :: field_can_albert_t
     contains
-        procedure :: evaluate => evaluate_new
-    end type field_can_new_t
+        procedure :: evaluate => evaluate_albert
+    end type field_can_albert_t
 
     contains
 
-    subroutine evaluate_new(self, f, r, th_c, ph_c, mode_secders)
+    subroutine evaluate_albert(self, f, r, th_c, ph_c, mode_secders)
         use interpolate, only: evaluate_splines_3d_der2
         use canonical, only: spl_Aphi_of_xc, spl_hph_of_xc, spl_hth_of_xc, spl_Bmod_of_xc
 
-        class(field_can_new_t), intent(in) :: self
+        class(field_can_albert_t), intent(in) :: self
         type(field_can_data_t), intent(inout) :: f
         real(dp), intent(in) :: r, th_c, ph_c
         integer, intent(in) :: mode_secders
@@ -52,6 +52,6 @@ module field_can_new
         f%Bmod = a
         f%dBmod = da(reorder)
         f%d2Bmod = d2a(reorder2)
-    end subroutine evaluate_new
+    end subroutine evaluate_albert
 
-end module field_can_new
+end module field_can_albert
