@@ -37,6 +37,7 @@ module expl_impl_euler_integrator
         self%si%z = z
         call self%sym_integ%timestep(self%si, self%f, ierr)
         z(1:4) = self%si%z
+        z(5) = sqrt(self%f%vpar**2/2d0 + self%f%mu*self%f%Bmod)
     end subroutine timestep
 
 end module expl_impl_euler_integrator

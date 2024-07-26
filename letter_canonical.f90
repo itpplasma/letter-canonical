@@ -36,7 +36,7 @@ module letter_canonical
     type(symplectic_integrator_data_t) :: si
     type(field_can_data_t) :: f
 
-    real(dp) :: rmu=1d10, ro0=20000d0*2d0  ! 20000 Gauss, 1cm Larmor radius
+    real(dp) :: rmu=1d30, ro0=20000d0*2d0  ! 20000 Gauss, 1cm Larmor radius
 
     real(dp) :: dtau=1d0
     integer :: ntau=1000, nskip=1
@@ -233,8 +233,8 @@ contains
             ! vpar_bar = vpar/sqrt(T/m), different by sqrt(2) from other modules
             z_internal(4) = f%vpar*f%hph + f%Aph/f%ro0
 
-            ! normalized thermal momentum is kept here but moved to last variable
-            z_internal(5) = z(4)
+            ! we use our free last variable for the Hamiltonian H
+            z_internal(5) = f%vpar**2/2d0 + f%mu*f%Bmod
         else
             call throw_error("to_internal_coordinates: " // integ_error_message())
             return
@@ -259,8 +259,9 @@ contains
             z(4:5) = z_internal(4:5)
         else if (velocity_coordinate == "pphi") then
             call field_can_%evaluate(f, z_internal(1), z_internal(2), z_internal(3), 0)
+            call get_val(f, z_internal(4))
             z(4) = z_internal(5)
-            z(5) = f%vpar
+            z(5) = f%vpar/(z_internal(5)*dsqrt(2d0))
         else
             call throw_error("from_internal_coordinates: " // integ_error_message())
             return
@@ -271,15 +272,22 @@ contains
     subroutine write_output(z_out)
         real(dp), intent(in) :: z_out(:, :)
         real(dp) :: z(5)
-        integer :: kt, iunit
-        character(MAX_PATH_LENGTH) :: outname
+        integer :: kt, iunit, iunit_pphi_H
+        character(MAX_PATH_LENGTH) :: outname, outname_pphi_H
+
+        real(dp) :: pphi, H
 
         outname = trim(output_prefix) // ".out"
+        outname_pphi_H = trim(output_prefix) // "_pphi_H.out"
         open(newunit=iunit, file=outname)
+        open(newunit=iunit_pphi_H, file=outname_pphi_H)
         do kt = 1, size(z_out, 2)
             call from_internal_coordinates(z_out(:, kt), z)
             write(iunit, *) z
+            call get_pphi_H(z, pphi, H)
+            write(iunit_pphi_H, *) pphi, H
         end do
+        close(iunit_pphi_H)
         close(iunit)
 
         outname = trim(output_prefix) // "_internal.out"
@@ -289,6 +297,21 @@ contains
         end do
         close(iunit)
     end subroutine write_output
+
+
+    subroutine get_pphi_H(z, pphi, H)
+        real(dp), intent(in) :: z(5)
+        real(dp), intent(out) :: pphi, H
+
+        real(dp) :: AR, Aphi, AZ, BR, Bphi, BZ, Bmod
+
+        call field%compute_abfield(z(1), z(2), z(3), AR, Aphi, AZ, BR, Bphi, BZ)
+
+        Bmod = dsqrt(BR**2 + Bphi**2 + BZ**2)
+
+        pphi = (z(4)*z(5)*Bphi/Bmod + Aphi/ro0)*z(1)
+        H = z(4)**2
+    end subroutine get_pphi_H
 
 
     function integ_error_message() result(msg)
