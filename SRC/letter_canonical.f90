@@ -23,7 +23,7 @@ module letter_canonical
     character(64) :: spatial_coordinates = "cyl"
     character(64) :: velocity_coordinate = "vpar"
 
-    integer :: n_r=100, n_phi=8, n_z=150
+    integer :: n_r=100, n_phi=4, n_z=150
 
     real(dp) :: rmin = 75.d0, &
         rmax = 264.42281879194627d0, &
