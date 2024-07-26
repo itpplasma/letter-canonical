@@ -22,7 +22,7 @@ module letter_canonical
     character(64) :: spatial_coordinates = "cyl"
     character(64) :: velocity_coordinate = "vpar"
 
-    integer :: n_r=100, n_phi=4, n_z=150
+    integer :: n_r=100, n_phi=16, n_z=150
 
     real(dp) :: rmin = 75.d0, &
         rmax = 264.42281879194627d0, &
@@ -40,7 +40,7 @@ module letter_canonical
     real(dp) :: dtau=1d0
     integer :: ntau=1000, nskip=1
 
-    real(dp) :: R0=162.6d0, phi0=-6.283d0, Z0=-56.5d0, vpar0=0d0
+    real(dp) :: R0=154.0d0, phi0=-6.283d0, Z0=53.0d0, vpar0=1d0
 
     namelist /config/ magfie_type, integrator_type, input_file_tok, &
         output_prefix, spatial_coordinates, velocity_coordinate, &

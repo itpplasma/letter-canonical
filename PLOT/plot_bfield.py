@@ -23,9 +23,9 @@ def plot_poincare_cuts(filename, linestyle):
 
 
 plt.figure()
-plot_poincare_cuts("../fort.100", "b,")
-plot_poincare_cuts("../fort.101", "r,")
-plot_poincare_cuts("../fort.103", "g,")
+plot_poincare_cuts("../fort.100", "bx")
+plot_poincare_cuts("../fort.101", "rx")
+plot_poincare_cuts("../fort.103", "gx")
 
 #%%
 

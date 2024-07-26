@@ -12,7 +12,7 @@ program test_magfie
     implicit none
     save
 
-    integer, parameter :: n_r=100, n_phi=64, n_z=75
+    integer, parameter :: n_r=100, n_phi=16, n_z=75
     integer :: outfile_unit
     real(dp) :: rmin, rmax, zmin, zmax
     !complex(8) :: pert
@@ -98,7 +98,7 @@ contains
     subroutine test_integration
         real(dp), parameter :: tol = 1.0d-10
         real(dp), parameter :: dt = 5.75d-3*twopi
-        integer, parameter :: nt = 3000
+        integer, parameter :: nt = 30000
         integer, parameter :: n_flux = 15
 
         call test_integration_noncan(tol, dt, nt, n_flux)
