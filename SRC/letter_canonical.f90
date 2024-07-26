@@ -2,7 +2,7 @@ module letter_canonical
     use, intrinsic :: iso_fortran_env, only: dp => real64
     use magfie_tok, only: tok_field_t
     use integrator
-    use callback, only: callback_pointer_t
+    use callback, only: callback_pointer_t, cut_callback_t
     use canonical, only: init_canonical, init_transformation, &
         init_canonical_field_components, init_splines_with_psi, &
         can_psi_to_cyl, cyl_to_can_psi, twopi
@@ -41,6 +41,14 @@ module letter_canonical
     integer :: ntau=1000, nskip=1
 
     real(dp) :: R0=154.0d0, phi0=-6.283d0, Z0=0.0d0, vpar0=0d0
+
+    real(dp), allocatable :: z_out(:, :)
+
+    class(callback_pointer_t), allocatable :: callbacks(:)
+    class(cut_callback_t), allocatable :: phi0_plus_callback, phi0_minus_callback, &
+        vpar0_plus_callback, vpar0_minus_callback
+
+    integer :: phi0plus_unit, phi0minus_unit, vpar0plus_unit, vpar0minus_unit
 
     namelist /config/ magfie_type, integrator_type, input_file_tok, &
         output_prefix, spatial_coordinates, velocity_coordinate, &
@@ -87,6 +95,9 @@ contains
         end if
 
         call init_integrator
+        call init_callbacks
+
+        allocate(z_out(5, ntau/nskip))
 
     end subroutine init
 
@@ -141,16 +152,40 @@ contains
     end subroutine init_integrator
 
 
-    subroutine trace_orbit(z_out, callbacks)
-        real(dp), allocatable, intent(out) :: z_out(:, :)
-        class(callback_pointer_t), intent(inout), optional :: callbacks(:)
+    subroutine init_callbacks
+        allocate(callbacks(4))
 
+        allocate(phi0_plus_callback)
+        phi0_plus_callback%distance => phi0_plus_distance
+        phi0_plus_callback%event => phi0_plus_write
+        allocate(callbacks(1)%item, source=phi0_plus_callback)
+        open(newunit=phi0plus_unit, file=trim(output_prefix) // "_phi0plus.out")
+
+        allocate(phi0_minus_callback)
+        phi0_minus_callback%distance => phi0_minus_distance
+        phi0_minus_callback%event => phi0_minus_write
+        allocate(callbacks(2)%item, source=phi0_minus_callback)
+        open(newunit=phi0minus_unit, file=trim(output_prefix) // "_phi0minus.out")
+
+        allocate(vpar0_plus_callback)
+        vpar0_plus_callback%distance => vpar0_plus_distance
+        vpar0_plus_callback%event => vpar0_plus_write
+        allocate(callbacks(3)%item, source=vpar0_plus_callback)
+        open(newunit=vpar0plus_unit, file=trim(output_prefix) // "_vpar0plus.out")
+
+        allocate(vpar0_minus_callback)
+        vpar0_minus_callback%distance => vpar0_minus_distance
+        vpar0_minus_callback%event => vpar0_minus_write
+        allocate(callbacks(4)%item, source=vpar0_minus_callback)
+        open(newunit=vpar0minus_unit, file=trim(output_prefix) // "_vpar0minus.out")
+    end subroutine init_callbacks
+
+
+    subroutine trace_orbit
         integer :: i, kt, ierr
         real(dp) :: zstart(5), z(5), zcyl(5)
 
         zstart = [R0, phi0, Z0, 1d0, vpar0]
-
-        allocate(z_out(5, ntau/nskip))
 
         call to_internal_coordinates(zstart, z)
 
@@ -161,12 +196,10 @@ contains
                 call throw_error("trace_orbit: error in timestep", ierr)
                 return
             end if
-            if (present(callbacks)) then
-                call from_internal_coordinates(z, zcyl)
-                do i = 1, size(callbacks)
-                    call callbacks(i)%execute(kt*dtau, zcyl)
-                end do
-            end if
+            call from_internal_coordinates(z, zcyl)
+            do i = 1, size(callbacks)
+                call callbacks(i)%execute(kt*dtau, zcyl)
+            end do
             if (mod(kt, nskip) == 0) then
                 z_out(:, kt/nskip) = z
             end if
@@ -239,8 +272,7 @@ contains
     end subroutine from_internal_coordinates
 
 
-    subroutine write_output(z_out)
-        real(dp), intent(in) :: z_out(:, :)
+    subroutine write_output
         real(dp) :: z(5)
         integer :: kt, iunit, iunit_pphi_H
         character(MAX_PATH_LENGTH) :: outname, outname_pphi_H
@@ -282,6 +314,55 @@ contains
         pphi = (z(4)*z(5)*Bphi/Bmod + Aphi/ro0)*z(1)
         H = z(4)**2
     end subroutine get_pphi_H
+
+
+    function phi0_plus_distance(t, z) result(distance)
+        real(dp) :: distance
+        real(dp), intent(in) :: t, z(:)
+        distance = modulo(z(2), twopi) - 0.5d0*twopi
+    end function phi0_plus_distance
+
+    subroutine phi0_plus_write(t, z)
+        real(dp), intent(in) :: t, z(:)
+        write(phi0plus_unit, *) t, z
+    end subroutine phi0_plus_write
+
+
+    function phi0_minus_distance(t, z) result(distance)
+        real(dp) :: distance
+        real(dp), intent(in) :: t, z(:)
+        distance = -modulo(z(2), twopi) + 0.5d0*twopi
+    end function phi0_minus_distance
+
+    subroutine phi0_minus_write(t, z)
+        real(dp), intent(in) :: t, z(:)
+        write(phi0minus_unit, *) t, z
+    end subroutine phi0_minus_write
+
+
+    function vpar0_plus_distance(t, z) result(distance)
+        real(dp) :: distance
+        real(dp), intent(in) :: t, z(:)
+        distance = z(5)
+    end function vpar0_plus_distance
+
+    subroutine vpar0_plus_write(t, z)
+        real(dp), intent(in) :: t, z(:)
+        write(vpar0plus_unit, *) t, z
+    end subroutine vpar0_plus_write
+
+
+    function vpar0_minus_distance(t, z) result(distance)
+        real(dp) :: distance
+        real(dp), intent(in) :: t, z(:)
+        distance = -z(5)
+    end function vpar0_minus_distance
+
+    subroutine vpar0_minus_write(t, z)
+        real(dp), intent(in) :: t, z(:)
+        write(vpar0minus_unit, *) t, z
+    end subroutine vpar0_minus_write
+
 
 
     function integ_error_message() result(msg)
