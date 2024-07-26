@@ -37,7 +37,7 @@ module letter_canonical
 
     real(dp) :: rmu=1d30, ro0=20000d0*2d0  ! 20000 Gauss, 1cm Larmor radius
 
-    real(dp) :: dtau=1d0
+    real(dp) :: dtau=1d0, rtol=1d-13
     integer :: ntau=1000, nskip=1
 
     real(dp) :: R0=154.0d0, phi0=-6.283d0, Z0=0.0d0, vpar0=0d0
@@ -51,7 +51,7 @@ module letter_canonical
     integer :: phi0plus_unit, phi0minus_unit, vpar0plus_unit, vpar0minus_unit
 
     namelist /config/ magfie_type, integrator_type, input_file_tok, &
-        output_prefix, spatial_coordinates, velocity_coordinate, &
+        output_prefix, spatial_coordinates, velocity_coordinate, rtol, &
         rmin, rmax, zmin, zmax, rmu, ro0, dtau, ntau, nskip, n_r, n_phi, n_z
 
 contains
@@ -142,7 +142,7 @@ contains
         call to_internal_coordinates([R0, phi0, Z0, 1d0, vpar0], z_internal)
 
         integ_config = integrator_config_t(integrator_type, spatial_coordinates, &
-            velocity_coordinate, z_internal, dtau, ro0, 1d-8, nskip)
+            velocity_coordinate, z_internal, dtau, ro0, rtol, nskip)
 
         if (integ_config%momentum_coord == "pphi") then
             integ = create_integrator(integ_config, si, field_can_, f)
