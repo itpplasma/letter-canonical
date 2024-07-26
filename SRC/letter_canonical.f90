@@ -1,8 +1,7 @@
 module letter_canonical
     use, intrinsic :: iso_fortran_env, only: dp => real64
     use magfie_tok, only: tok_field_t
-    use integrator, only: integrator_t, rk45_cyl_integrator_t, rk45_can_integrator_t, &
-        expl_impl_euler_integrator_t, symplectic_integrator_data_t
+    use integrator
     use callback, only: callback_pointer_t
     use canonical, only: init_canonical, init_transformation, &
         init_canonical_field_components, init_splines_with_psi, &
@@ -41,7 +40,7 @@ module letter_canonical
     real(dp) :: dtau=1d0
     integer :: ntau=1000, nskip=1
 
-    real(dp) :: R0=162.6d0, phi0=-6.283d0, Z0=-56.5d0, vpar0=1d0
+    real(dp) :: R0=162.6d0, phi0=-6.283d0, Z0=-56.5d0, vpar0=0d0
 
     namelist /config/ magfie_type, integrator_type, input_file_tok, &
         output_prefix, spatial_coordinates, velocity_coordinate, &
@@ -74,8 +73,6 @@ contains
 
         if (spatial_coordinates == "cyl") then
             print *, "init: using cylindrical coordinates"
-            call init_integrator_cyl
-            return
         else if (spatial_coordinates == "cyl_can") then
             print *, "init: using canonical cylindrical coordinates"
             print *, "init_canonical ..."
@@ -84,9 +81,12 @@ contains
             call init_transformation
             call init_canonical_field_components
             call init_splines_with_psi
+        else
+            call throw_error("init: " // integ_error_message())
+            return
         end if
 
-        call init_integrator_can
+        call init_integrator
 
     end subroutine init
 
@@ -118,27 +118,14 @@ contains
     end subroutine remove_extension
 
 
-    subroutine init_integrator_cyl
-        if (integrator_type == "rk45" .and. velocity_coordinate == "vpar") then
-            integ = rk45_cyl_integrator_t(rmu, ro0, 1d-8)
-        else
-            call throw_error("init_integrator_cyl: " // trim(integ_error_message()))
-            return
-        end if
-    end subroutine init_integrator_cyl
+    subroutine init_integrator
+        type(integrator_config_t) :: integ_config
 
+        integ_config = integrator_config_t(integrator_type, spatial_coordinates, &
+            velocity_coordinate, [R0, phi0, Z0, 1d0, vpar0], dtau, ro0, 1d-8, nskip)
 
-    subroutine init_integrator_can
-        if (velocity_coordinate == "vpar" .and. integrator_type == "rk45") then
-            integ = rk45_can_integrator_t(rmu, ro0, 1d-8)
-        else if (&
-            velocity_coordinate == "pphi" .and. integrator_type=="expl_impl_euler") then
-            field_can_ = field_can_new_t()
-        else
-            call throw_error("init_integrator_can: " // trim(integ_error_message()))
-            return
-        end if
-    end subroutine init_integrator_can
+        integ = create_integrator(integ_config)
+    end subroutine init_integrator
 
 
     subroutine set_initial_conditions(z)

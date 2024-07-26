@@ -120,8 +120,14 @@ contains
     end subroutine set_initial_conditions
 
     subroutine init_integrator
+        real(dp), dimension(5) :: z0_extended
+        type(integrator_config_t) :: config
+        z0_extended(1:4) = z0
+        z0_extended(5) = 0d0
+        config = integrator_config_t( &
+            'expl_impl_euler', 'cyl_can', 'pphi', z0_extended, dt, 0d0, tol, 1)
         integ = symplectic_integrator_euler1_t(field)
-        call integrator_init(si, field, f, z0, dt, 1, tol)
+        call integrator_init(si, field, f, config)
     end subroutine init_integrator
 
     subroutine trace_orbit

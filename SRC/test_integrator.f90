@@ -5,7 +5,7 @@ program test_integrator
     use field_can, only: field_can_init, field_can_test_t, get_derivatives2
     use integrator_base, only: symplectic_integrator_data_t
     use integrator, only: symplectic_integrator_t, symplectic_integrator_euler1_t, &
-        integrator_init
+        integrator_config_t, integrator_init
 
 
     implicit none
@@ -16,13 +16,14 @@ program test_integrator
 
     integer :: ierr, kt
 
-    real(dp) :: z0(4), vpar0, dt, taub, starttime, endtime
+    real(dp) :: z0(4), vpar0, dt, taub, starttime, endtime, z0_extended(5)
     real(dp), allocatable :: out(:, :)
 
     class(field_can_t), allocatable :: field
     type(field_can_data_t) :: f
     class(symplectic_integrator_t), allocatable :: integ
     type(symplectic_integrator_data_t) :: si
+    type(integrator_config_t) :: config
 
 
     ! Initial conditions
@@ -54,7 +55,11 @@ program test_integrator
     print *, 'timesteps: ', nt
 
     integ = symplectic_integrator_euler1_t(field)
-    call integrator_init(si, field, f, z0, dt, ntau=1, rtol=1d-12)
+    z0_extended(1:4) = z0
+    z0_extended(5) = 0d0
+    config = integrator_config_t( &
+        'expl_impl_euler', 'cyl_can', 'pphi', z0_extended, dt, 0d0, 1d-12, 1)
+    call integrator_init(si, field, f, config)
 
     allocate(out(5,nt))
 
