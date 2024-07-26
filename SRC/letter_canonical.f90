@@ -41,6 +41,8 @@ module letter_canonical
     real(dp) :: dtau=1d0
     integer :: ntau=1000, nskip=1
 
+    real(dp) :: R0=162.6d0, phi0=-6.283d0, Z0=-56.5d0, vpar0=1d0
+
     namelist /config/ magfie_type, integrator_type, input_file_tok, &
         output_prefix, spatial_coordinates, velocity_coordinate, &
         rmin, rmax, zmin, zmax, rmu, ro0, dtau, ntau, nskip, n_r, n_phi, n_z
@@ -163,17 +165,18 @@ contains
     end subroutine set_initial_conditions
 
 
-    subroutine trace_orbit(z0, z_out, callbacks)
-        real(dp), intent(in) :: z0(5)
+    subroutine trace_orbit(z_out, callbacks)
         real(dp), allocatable, intent(out) :: z_out(:, :)
         class(callback_pointer_t), intent(inout), optional :: callbacks(:)
 
         integer :: i, kt, ierr
-        real(dp) :: z(5), zcyl(5)
+        real(dp) :: zstart(5), z(5), zcyl(5)
+
+        zstart = [R0, phi0, Z0, 1d0, vpar0]
 
         allocate(z_out(5, ntau/nskip))
 
-        call to_internal_coordinates(z0, z)
+        call to_internal_coordinates(zstart, z)
         call set_initial_conditions(z)
 
         z_out(:, 1) = z

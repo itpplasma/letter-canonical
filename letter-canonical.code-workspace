@@ -9,8 +9,5 @@
 		{
 			"path": "../libneo"
 		}
-	],
-	"settings": {
-		"fortran.linter.modOutput": "${workspaceFolder}/include"
-	}
+	]
 }

@@ -120,7 +120,7 @@ contains
     end subroutine set_initial_conditions
 
     subroutine init_integrator
-        integ = create_integrator(trim(integrator_type), field)
+        integ = symplectic_integrator_euler1_t(field)
         call integrator_init(si, field, f, z0, dt, 1, tol)
     end subroutine init_integrator
 

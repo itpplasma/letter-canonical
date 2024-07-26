@@ -8,9 +8,7 @@ program main
     implicit none
 
     character(1024) :: input_file = "letter_canonical.in"
-    character(1024) :: arg
-
-    real(dp) :: R0=162.6d0, phi0=-6.283d0, Z0=-56.5d0, vpar0=1d0
+    character(1024) :: integ_type = "rk45"
 
     real(dp), allocatable :: z_out(:,:)
 
@@ -23,15 +21,8 @@ program main
         call get_command_argument(1, input_file)
     end if
 
-    if (command_argument_count() > 4) then
-        call get_command_argument(2, arg)
-        read(arg, *) R0
-        call get_command_argument(3, arg)
-        read(arg, *) phi0
-        call get_command_argument(4, arg)
-        read(arg, *) Z0
-        call get_command_argument(5, arg)
-        read(arg, *) vpar0
+    if (command_argument_count() > 1) then
+        call get_command_argument(2, integ_type)
     end if
 
     call init(input_file)
@@ -43,7 +34,7 @@ program main
     cut_callback%event => print_state
     allocate(callbacks(1)%item, source=cut_callback)
 
-    call trace_orbit([R0, phi0, Z0, 1d0, vpar0], z_out, callbacks)
+    call trace_orbit(z_out, callbacks)
     call stop_on_error
 
     call write_output(z_out)

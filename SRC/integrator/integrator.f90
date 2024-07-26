@@ -12,25 +12,49 @@ module integrator
 
     implicit none
 
+    type :: integrator_config_t
+        character(len=64) :: integ_type
+        character(len=64) :: spatial_coords
+        character(len=64) :: momentum_coord
+    end type integrator_config_t
+
     contains
 
-    function create_integrator(integrator_type, field) result(integ)
-        character(*), intent(in) :: integrator_type
-        class(field_can_t), allocatable :: field
-        class(symplectic_integrator_t), allocatable :: integ
+    function create_integrator(config) result(integ)
+        class(integrator_t), allocatable :: integ
 
-        select case(integrator_type)
-            case("euler0")
-                integ = symplectic_integrator_euler0_t(field)
-            case("euler1")
-                integ = symplectic_integrator_euler1_t(field)
+        type(integrator_config_t), intent(in) :: config
+
+        if (config%momentum_coord == "pphi") then
+            integ = create_integrator_can(config)
+            return
+        end if
+
+    end function create_integrator
+
+
+    function create_integrator_can(config) result(integ)
+        class(integrator_t), allocatable :: integ
+
+        type(integrator_config_t), intent(in) :: config
+
+        class(field_can_t), allocatable :: field
+        class(symplectic_integrator_t), allocatable :: sympl_integ
+
+        field = create_field_can(config%spatial_coords)
+
+        select case(config%integ_type)
+            case("expl_euler")
+                sympl_integ = symplectic_integrator_euler0_t(field)
+            case("expl_impl_euler")
+                sympl_integ = symplectic_integrator_euler1_t(field)
             case("rk45")
-                integ = symplectic_integrator_rk45_t(field)
+                sympl_integ = symplectic_integrator_rk45_t(field)
             case default
-                print *, "create_integrator: Unknown integrator type ", integrator_type
+                print *, "create_integrator_can: Unknown type ", config%integ_type
                 error stop
         end select
-    end function create_integrator
+    end function create_integrator_can
 
     !ccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
     !

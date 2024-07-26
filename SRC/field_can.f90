@@ -9,6 +9,25 @@ module field_can
 
 contains
 
+    function create_field_can(field_type) result(field)
+        class(field_can_t), allocatable :: field
+
+        character(*), intent(in) :: field_type
+
+        select case(field_type)
+            case("test")
+                field = field_can_test_t()
+            case("cyl_can")
+                field = field_can_cyl_t()
+            case("cyl_can_psi")
+                field = field_can_new_t()
+            case default
+                print *, "create_field_can: Unknown field type ", field_type
+                error stop
+        end select
+    end function create_field_can
+
+
     subroutine field_can_init(f, mu, ro0, vpar)
         type(field_can_data_t), intent(inout) :: f
         real(dp), intent(in), optional  :: mu, ro0, vpar
