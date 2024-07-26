@@ -2,7 +2,7 @@ export LD_LIBRARY_PATH := $(LD_LIBRARY_PATH):..
 
 all: Aph_of_xc.out orbit.out orbit_rmp.out
 
-MAIN = ../build/letter_canonical.x
+MAIN = ../BUILD/letter_canonical.x
 
 orbit_rmp.out: letter_canonical_rmp.in $(MAIN)
 	$(MAIN) letter_canonical_rmp.in

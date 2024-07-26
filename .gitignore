@@ -9,6 +9,7 @@ stellarator/coils.c09r00
 *.out
 letter_canonical.lyx~
 build
+BUILD
 cachegrind.out.*
 callgrind.out.*
 gmon.out

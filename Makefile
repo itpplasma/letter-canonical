@@ -1,4 +1,4 @@
-BUILD_DIR := build
+BUILD_DIR := BUILD
 CMAKE_CACHE := $(BUILD_DIR)/CMakeCache.txt
 BUILD_NINJA := $(BUILD_DIR)/build.ninja
 CMAKE_BUILD_TYPE ?= release
