@@ -4,11 +4,11 @@
     spatial_coordinates = "cyl"         ! cyl, cyl_can, albert, flux, flux_can
     velocity_coordinate = "vpar"        ! vpar, pphi
     integrator_type = "rk45"            ! rk45, expl_impl_euler
-    ntau = 4000                       ! number of time steps
+    ntau = 10000                       ! number of time steps
     nskip = 1                          ! number of time steps to skip
     dtau = 1d2                          ! time step
     rtol = 1d-8
 
     ! banana tip
-    R0=154.0d0, phi0=-6.283d0, Z0=54.22d0, vpar0=0.1d0
+    R0=154.0d0, phi0=-6.283d0, Z0=54.22d0, vpar0=0d0
 /

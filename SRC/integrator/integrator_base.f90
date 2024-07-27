@@ -59,4 +59,45 @@ module integrator_base
         end subroutine symplectic_timestep
     end interface
 
+    contains
+
+    subroutine odeint_rk4(y, nvar, x1, x2, derivs)
+        integer, intent(in) :: nvar
+        real(dp), intent(in) :: x1, x2
+        real(dp), dimension(nvar), intent(inout) :: y
+        external :: derivs
+
+        real(dp) :: h, x, hh, h6
+        real(dp), dimension(nvar) :: dydx, dyt, dym, yt
+        integer :: i
+
+        h = (x2 - x1) / 2d0
+        hh = h * 0.5d0
+        h6 = h / 6.0d0
+        x = x1
+
+        call derivs(x, y, dydx)
+
+        do i = 1, nvar
+          yt(i) = y(i) + hh * dydx(i)
+        end do
+        call derivs(x + hh, yt, dyt)
+
+        do i = 1, nvar
+          yt(i) = y(i) + hh * dyt(i)
+        end do
+        call derivs(x + hh, yt, dym)
+
+        do i = 1, nvar
+          yt(i) = y(i) + h * dym(i)
+          dym(i) = dym(i) + dyt(i)
+        end do
+        call derivs(x + h, yt, dyt)
+
+        do i = 1, nvar
+          y(i) = y(i) + h6 * (dydx(i) + dyt(i) + 2.0d0 * dym(i))
+        end do
+
+      end subroutine odeint_rk4
+
 end module integrator_base

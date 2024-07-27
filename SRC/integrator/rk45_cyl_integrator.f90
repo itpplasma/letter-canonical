@@ -133,8 +133,6 @@ module rk45_cyl_integrator
         hcurl(3)=((bf+x(1)*bfr-brf)/bmod + hcovar(1)*bder(2)-hcovar(2)*bder(1))/sqrtg
         return
     end subroutine magfie_cyl
-    !ccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
-
 
 
 end module rk45_cyl_integrator

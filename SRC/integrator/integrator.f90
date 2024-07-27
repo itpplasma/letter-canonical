@@ -72,10 +72,10 @@ module integrator
         type(integrator_config_t), intent(in) :: config
 
         if (config%integ_type == "rk45" .and. config%spatial_coords == "cyl") then
-            integ = rk45_cyl_integrator_t(1d30, config%ro0, config%rtol)
+            integ = rk45_cyl_integrator_t(1d8, config%ro0, config%rtol)
         else if (config%integ_type == "rk45" .and. &
                  config%spatial_coords == "albert") then
-            integ = rk45_can_integrator_t(1d30, config%ro0, config%rtol)
+            integ = rk45_can_integrator_t(1d8, config%ro0, config%rtol)
         else
             print *, "create_integrator_vpar: Unknown type ", config%integ_type
             error stop

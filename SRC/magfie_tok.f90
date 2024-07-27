@@ -231,7 +231,7 @@ module magfie_tok
                             ,dBpdR,dBpdp,dBpdZ,dBzdR,dBzdp,dBzdZ,Ar,Ap,Az)
 
         use bdivfree_mod, only : nr,nz,ntor,icp,ipoint,hr,hz,pfac,&
-            & rpoi,zpoi,apav
+            & rpoi,zpoi,apav,rbpav_coef
         use libneo_kinds, only : complex_kind, real_kind
 
         implicit none
@@ -253,6 +253,9 @@ module magfie_tok
 
 
         Bp = 0.0d0
+        dBpdR = 0d0
+        dBpdZ = 0d0
+        dBpdp = 0d0
         ! TODO: Solve this with a vector potential being Az = -int Bp dr with gauge Ar=0
         !
         ! call spline(nr,nz,rpoi,zpoi,hr,hz,icp,rbpav_coef,ipoint,r,z,         &
@@ -260,7 +263,6 @@ module magfie_tok
         ! Bp = f/r
         ! dBpdR = fr/r - Bp/r
         ! dBpdZ = fz/r
-        ! dBpdp = 0.d0
 
         call spline(nr,nz,rpoi,zpoi,hr,hz,icp,apav,ipoint,r,z,         &
                     f,fr,fz,frr,frz,fzz,ierr)

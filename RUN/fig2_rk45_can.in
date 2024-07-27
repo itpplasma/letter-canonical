@@ -4,10 +4,10 @@
     spatial_coordinates = "albert"      ! cyl, cyl_can, albert, flux, flux_can
     velocity_coordinate = "vpar"        ! vpar, pphi
     integrator_type = "rk45"            ! rk45, expl_impl_euler
-    ntau = 100000                        ! number of time steps
-    nskip = 10                           ! number of time steps to skip
+    ntau = 10000                       ! number of time steps
+    nskip = 10                          ! number of time steps to skip
     dtau = 1d2                          ! time step
-    rtol = 5d-3
+    rtol = 1d-8
 
     ! need phi resolution now for the RMP
     n_r=100, n_phi=32, n_z=150
