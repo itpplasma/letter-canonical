@@ -1,0 +1,16 @@
+&config
+    magfie_type = "tok"                     ! test, tok, vmec
+    input_file_tok = "field_divB0_rmp.inp"  ! default: field_divB0.inp
+    spatial_coordinates = "albert"          ! cyl, cyl_can, albert, flux, flux_can
+    velocity_coordinate = "pphi"            ! vpar, pphi
+    integrator_type = "expl_impl_euler"     ! rk45, expl_impl_euler
+    ntau = 1000000                      ! number of time steps
+    nskip = 10                          ! number of time steps to skip
+    dtau = 1d1
+
+    ! need phi resolution now for the RMP
+    n_r=100, n_phi=32, n_z=150
+
+    ! island-chain at resonant surface
+    R0=154.0d0, phi0=-6.283d0, Z0=54.22d0, vpar0=1d0
+/

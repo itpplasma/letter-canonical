@@ -1,6 +1,6 @@
 module letter_canonical
     use, intrinsic :: iso_fortran_env, only: dp => real64
-    use magfie_tok, only: tok_field_t
+    use magfie_tok, only: tok_field_t, input_file_magfie_tok => input_file
     use integrator
     use callback, only: callback_pointer_t, cut_callback_t
     use canonical, only: init_canonical, init_transformation, &
@@ -75,6 +75,8 @@ contains
             call throw_error("init: magfie_type must be 'tok'")
             return
         end if
+
+        input_file_magfie_tok = input_file_tok
 
         print *, "init: main output is ", trim(output_prefix) // ".out"
 
