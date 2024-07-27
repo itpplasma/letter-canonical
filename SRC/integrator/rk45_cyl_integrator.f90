@@ -2,13 +2,18 @@ module rk45_cyl_integrator
     use, intrinsic :: iso_fortran_env, only: dp => real64
     use odeint_sub, only: odeint_allroutines
     use integrator_base, only: integrator_t
-
     implicit none
+
+    integer(8) :: n_field_evaluations = 0
+
+    !$omp threadprivate(n_field_evaluations)
+
 
     type, extends(integrator_t) :: rk45_cyl_integrator_t
         real(dp) :: rmu, ro0, rtol
         contains
         procedure :: timestep
+        procedure :: get_field_evaluations
     end type rk45_cyl_integrator_t
 
     abstract interface
@@ -66,7 +71,16 @@ module rk45_cyl_integrator
         real(dp), intent(out) :: bmod, sqrtg, bder(3), hcovar(3), hctrvr(3), hcurl(3)
 
         call magfie_cyl(x, bmod, sqrtg, bder, hcovar, hctrvr, hcurl, my_field)
+        n_field_evaluations = n_field_evaluations + 1
     end subroutine magfie_cyl_tok
+
+
+    function get_field_evaluations(self) result(n)
+        class(rk45_cyl_integrator_t), intent(in) :: self
+        integer(8) :: n
+
+        n = n_field_evaluations
+    end function get_field_evaluations
 
 
     !ccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc

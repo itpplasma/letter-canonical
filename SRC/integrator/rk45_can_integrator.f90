@@ -2,13 +2,18 @@ module rk45_can_integrator
     use, intrinsic :: iso_fortran_env, only: dp => real64
     use odeint_sub, only: odeint_allroutines
     use integrator_base, only: integrator_t
-
     implicit none
+
+    integer(8) :: n_field_evaluations = 0
+
+    !$omp threadprivate(n_field_evaluations)
+
 
     type, extends(integrator_t) :: rk45_can_integrator_t
         real(dp) :: rmu, ro0, rtol
         contains
         procedure :: timestep
+        procedure :: get_field_evaluations
     end type rk45_can_integrator_t
 
     contains
@@ -43,6 +48,14 @@ module rk45_can_integrator
 
         end subroutine ydot
     end subroutine timestep
+
+
+    function get_field_evaluations(self) result(n)
+        class(rk45_can_integrator_t), intent(in) :: self
+        integer(8) :: n
+
+        n = n_field_evaluations
+    end function get_field_evaluations
 
 
     !ccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
@@ -99,6 +112,8 @@ module rk45_can_integrator
         hcurl(1) = (dhph(2) - dhth(3))/sqrtg
         hcurl(2) = -dhph(1)/sqrtg
         hcurl(3) = dhth(1)/sqrtg
+
+        n_field_evaluations = n_field_evaluations + 1
 
     end subroutine magfie_can
 

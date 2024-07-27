@@ -1,7 +1,10 @@
 module field_can_base
     use, intrinsic :: iso_fortran_env, only: dp => real64
-
     implicit none
+
+    integer(8) :: n_field_evaluations = 0
+
+    !$omp threadprivate(n_field_evaluations)
 
     type :: field_can_data_t
         real(dp) :: Ath, Aph

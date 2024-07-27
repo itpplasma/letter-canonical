@@ -7,8 +7,8 @@ module integrator_base
     type, abstract :: integrator_t
         contains
         procedure(timestep), deferred :: timestep
+        procedure(get_field_evaluations), deferred :: get_field_evaluations
     end type integrator_t
-
 
     abstract interface
         subroutine timestep(self, z, dtau, ierr)
@@ -18,6 +18,14 @@ module integrator_base
             real(dp), intent(in) :: dtau
             integer, intent(out) :: ierr
         end subroutine timestep
+    end interface
+
+    abstract interface
+        function get_field_evaluations(self)
+            import integrator_t, field_can_data_t, dp
+            integer(8) :: get_field_evaluations
+            class(integrator_t), intent(in) :: self
+        end function get_field_evaluations
     end interface
 
 

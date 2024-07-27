@@ -4,8 +4,10 @@
     spatial_coordinates = "cyl"         ! cyl, cyl_can, albert, flux, flux_can
     velocity_coordinate = "vpar"        ! vpar, pphi
     integrator_type = "rk45"            ! rk45, expl_impl_euler
-    ntau = 10000000                     ! number of time steps
-    nskip = 100                         ! number of time steps to skip
-    dtau = 1d2
-    rtol = 1d-1
+    ntau = 1000000                     ! number of time steps
+    nskip = 10                         ! number of time steps to skip
+    dtau = 4d1                        ! time step
+    rtol = 1d-9
+    ! banana crossing separatrix
+    R0=162.6d0, phi0=-6.283d0, Z0=-76.5d0, vpar0=0d0
 /

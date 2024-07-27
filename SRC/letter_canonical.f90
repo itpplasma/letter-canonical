@@ -7,6 +7,7 @@ module letter_canonical
         init_canonical_field_components, init_splines_with_psi, &
         can_psi_to_cyl, cyl_to_can_psi, twopi
     use field_can, only: field_can_t, field_can_albert_t, field_can_data_t, get_val
+    use field_can_base, only: n_field_evaluations
 
     implicit none
 
@@ -54,7 +55,8 @@ module letter_canonical
 
     namelist /config/ magfie_type, integrator_type, input_file_tok, &
         output_prefix, spatial_coordinates, velocity_coordinate, rtol, &
-        rmin, rmax, zmin, zmax, rmu, ro0, dtau, ntau, nskip, n_r, n_phi, n_z
+        rmin, rmax, zmin, zmax, rmu, ro0, dtau, ntau, nskip, n_r, n_phi, n_z, &
+        R0, phi0, Z0, vpar0
 
 contains
 
@@ -222,6 +224,9 @@ contains
                 z_out(:, kt/nskip) = z
             end if
         end do
+
+        print *, "timesteps: ", ntau
+        print *, "field evaluations: ", integ%get_field_evaluations()
     end subroutine trace_orbit
 
 
@@ -245,6 +250,7 @@ contains
             z_internal(4:5) = z(4:5)
         else if (velocity_coordinate == "pphi") then
             call field_can_%evaluate(f, z_internal(1), z_internal(2), z_internal(3), 0)
+            n_field_evaluations = n_field_evaluations - 1  ! don't count for benchmark
 
             ! normalization of thermal velocity different by factor sqrt(2) - see docs
             f%mu = .5d0*z(4)**2*(1.d0-z(5)**2)/f%Bmod*2d0
@@ -280,6 +286,8 @@ contains
             z(4:5) = z_internal(4:5)
         else if (velocity_coordinate == "pphi") then
             call field_can_%evaluate(f, z_internal(1), z_internal(2), z_internal(3), 0)
+            n_field_evaluations = n_field_evaluations - 1  ! don't count for benchmark
+
             call get_val(f, z_internal(4))
             z(4) = z_internal(5)
             z(5) = f%vpar/(z_internal(5)*dsqrt(2d0))

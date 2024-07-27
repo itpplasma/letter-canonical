@@ -1,6 +1,6 @@
 module field_can_albert
     use, intrinsic :: iso_fortran_env, only: dp => real64
-    use field_can_base, only: field_can_t, field_can_data_t
+    use field_can_base, only: field_can_t, field_can_data_t, n_field_evaluations
 
     implicit none
 
@@ -52,6 +52,8 @@ module field_can_albert
         f%Bmod = a
         f%dBmod = da(reorder)
         f%d2Bmod = d2a(reorder2)
+
+        n_field_evaluations = n_field_evaluations + 1
     end subroutine evaluate_albert
 
 end module field_can_albert
