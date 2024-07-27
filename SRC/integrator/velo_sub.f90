@@ -165,8 +165,10 @@ module velo_sub
     ! velocities in the phase space
 
         vz(4)=-0.5d0*gamma*phidot/p
+        !vz(5)=coala/(alambd+dsign(1.d-32,alambd))*(vz(4)/p-0.5d0*blodot)
         vz(5)=-(0.5d0*coala/hpstar)*(sum(hstar*derphi)/p                 &
                 + p*sum(hstar*bder)/gamma+alambd*sum(a_phi*bder))
+
 
     end subroutine velo
 
