@@ -86,8 +86,7 @@ contains
         if (spatial_coordinates == "cyl") then
             print *, "init: using cylindrical coordinates"
         else if (spatial_coordinates == "albert") then
-            print *, "init: using canonical cylindrical coordinates"
-            print *, "init_canonical ..."
+            print *, "init: using canonical cylindrical coordinates with A_Z as radius"
             call init_canonical(n_r, n_phi, n_z, &
                 [rmin, 0.0d0, zmin], [rmax, twopi, zmax], field)
             call init_transformation
@@ -123,8 +122,6 @@ contains
 
         i = index(path, ".", back=.true.)
 
-        print *, "remove_extension: i = ", i
-
         if (i == 0) then
             prefix = path
         else
@@ -148,7 +145,7 @@ contains
         call to_internal_coordinates([R0, phi0, Z0, 1d0, vpar0], z_internal)
 
         integ_config = integrator_config_t(integrator_type, spatial_coordinates, &
-            velocity_coordinate, z_internal, dtau, ro0, rtol, nskip)
+            velocity_coordinate, z_internal, dtau, ro0, rtol, 1)
 
         if (integ_config%momentum_coord == "pphi") then
             integ = create_integrator(integ_config, si, field_can_, f)
@@ -311,9 +308,9 @@ contains
         open(newunit=iunit_pphi_H, file=outname_pphi_H)
         do kt = 1, size(z_out, 2)
             call from_internal_coordinates(z_out(:, kt), z)
-            write(iunit, *) z
+            write(iunit, *) (kt-1)*dtau*nskip, z
             call get_pphi_H(z, pphi, H)
-            write(iunit_pphi_H, *) pphi, H
+            write(iunit_pphi_H, *) (kt-1)*dtau*nskip, pphi, H
         end do
         close(iunit_pphi_H)
         close(iunit)
@@ -321,7 +318,7 @@ contains
         outname = trim(output_prefix) // "_internal.out"
         open(newunit=iunit, file=outname)
         do kt = 1, size(z_out, 2)
-            write(iunit, *) z_out(:, kt)
+            write(iunit, *) (kt-1)*dtau*nskip, z_out(:, kt)
         end do
         close(iunit)
     end subroutine write_output
