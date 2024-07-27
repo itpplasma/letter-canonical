@@ -4,8 +4,8 @@
     spatial_coordinates = "cyl"         ! cyl, cyl_can, albert, flux, flux_can
     velocity_coordinate = "vpar"        ! vpar, pphi
     integrator_type = "rk45"            ! rk45, expl_impl_euler
-    dtau = 1d1
-    ntau = 1000000                     ! number of time steps
-    nskip = 10                          ! number of time steps to skip
-    rtol = 1d-5
+    ntau = 10000000                     ! number of time steps
+    nskip = 100                         ! number of time steps to skip
+    dtau = 1d2
+    rtol = 1d-1
 /

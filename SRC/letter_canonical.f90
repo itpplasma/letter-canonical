@@ -42,6 +42,8 @@ module letter_canonical
 
     real(dp) :: R0=154.0d0, phi0=-6.283d0, Z0=0.0d0, vpar0=0d0
 
+    real(dp) :: mu  ! magnetic moment
+
     real(dp), allocatable :: z_out(:, :)
 
     class(callback_pointer_t), allocatable :: callbacks(:)
@@ -139,6 +141,8 @@ contains
 
         print *, "init_integrator ...."
 
+        mu = compute_mu([R0, phi0, Z0, 1d0, vpar0])
+
         call to_internal_coordinates([R0, phi0, Z0, 1d0, vpar0], z_internal)
 
         integ_config = integrator_config_t(integrator_type, spatial_coordinates, &
@@ -150,6 +154,20 @@ contains
             integ = create_integrator(integ_config)
         end if
     end subroutine init_integrator
+
+
+    function compute_mu(z)
+        real(dp) :: compute_mu
+        real(dp), intent(in) :: z(5)
+        real(dp) :: BR, Bphi, BZ, Bmod
+
+        call field%compute_bfield(z(1), z(2), z(3), BR, Bphi, BZ)
+
+        Bmod = dsqrt(BR**2 + Bphi**2 + BZ**2)
+
+        compute_mu = 0.5d0*z(4)**2*(1.d0-z(5)**2)/Bmod
+
+    end function compute_mu
 
 
     subroutine init_callbacks
@@ -312,7 +330,7 @@ contains
         Bmod = dsqrt(BR**2 + Bphi**2 + BZ**2)
 
         pphi = (z(4)*z(5)*Bphi/Bmod + Aphi/ro0)*z(1)
-        H = z(4)**2
+        H = 2d0*(z(4)**2*0.5d0*z(5)**2 + mu*Bmod)  ! energy normalization factor 2
     end subroutine get_pphi_H
 
 
