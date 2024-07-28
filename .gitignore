@@ -3,6 +3,7 @@
 *.so
 __pycache__
 *.pdf
+*.png
 fort.*
 stellarator/coils.c09r00
 *.x
