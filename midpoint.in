@@ -1,0 +1,10 @@
+&config
+    magfie_type = "tok"                 ! test, tok, vmec
+    input_file_tok = "field_divB0.inp"  ! default: field_divB0.inp
+    output_prefix = "letter_canonical"  ! default: letter_canonical
+    spatial_coordinates = "albert"      ! cyl, cyl_can, albert, flux, flux_can
+    velocity_coordinate = "pphi"        ! vpar, pphi
+    integrator_type = "midpoint"        ! rk45, expl_impl_euler, midpoint
+    ntau = 100000                       ! number of time steps
+    nskip = 1                           ! number of time steps to skip
+/

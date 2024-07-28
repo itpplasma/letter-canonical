@@ -53,6 +53,7 @@ module integrator
         type(field_can_data_t), intent(inout) :: f
 
         class(expl_impl_euler_integrator_t), allocatable :: expl_impl_euler_integ
+        class(midpoint_integrator_t), allocatable :: midpoint_integ
 
         call integrator_init(si, field, f, config)
 
@@ -61,6 +62,10 @@ module integrator
                 expl_impl_euler_integ = expl_impl_euler_integrator_t(si, f)
                 call expl_impl_euler_integ%init(field)
                 integ = expl_impl_euler_integ
+            case("midpoint")
+                midpoint_integ = midpoint_integrator_t(si, f)
+                call midpoint_integ%init(field)
+                integ = midpoint_integ
             case default
                 print *, "create_integrator_pphi: Unknown type ", config%integ_type
                 error stop

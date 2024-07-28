@@ -42,14 +42,14 @@ subroutine orbit_timestep_midpoint(self, si, f, ierr)
     x(1:4) = si%z
     x(5) = si%z(1)
 
-    call newton_midpoint(si, f, x, si%atol, si%rtol, maxit, xlast)
+    call newton_midpoint(si, self%field, f, x, si%atol, si%rtol, maxit, xlast)
 
     si%z = x(1:4)
 
     f%pth = f%pth + f%dpth(1)*(x(1)-xlast(1) + x(5) - xlast(5)) &  ! d/dr
-                   + f%dpth(2)*(x(2)-xlast(2)) &  ! d/dth
-                   + f%dpth(3)*(x(3)-xlast(3)) &  ! d/dph
-                   + f%dpth(4)*(x(4)-xlast(4))    ! d/dpph
+                  + f%dpth(2)*(x(2)-xlast(2)) &  ! d/dth
+                  + f%dpth(3)*(x(3)-xlast(3)) &  ! d/dph
+                  + f%dpth(4)*(x(4)-xlast(4))    ! d/dpph
 
     ktau = ktau+1
   enddo
@@ -57,20 +57,66 @@ subroutine orbit_timestep_midpoint(self, si, f, ierr)
 end subroutine orbit_timestep_midpoint
 
 
+subroutine newton_midpoint(si, field, f, x, atol, rtol, maxit, xlast)
+  type(symplectic_integrator_data_t), intent(inout) :: si
+  class(field_can_t), intent(in) :: field
+  type(field_can_data_t), intent(inout) :: f
+  type(field_can_data_t) :: fmid
+
+  integer, parameter :: n = 5
+  integer :: kit
+
+  double precision, intent(inout) :: x(n)
+  double precision, intent(in) :: atol, rtol
+  integer, intent(in) :: maxit
+  double precision, intent(out) :: xlast(n)
+
+  double precision :: fvec(n), fjac(n,n)
+  integer :: pivot(n), info
+
+  double precision :: xabs(n), tolref(n), fabs(n)
+
+
+  real(dp), parameter :: twopi = atan(1.0d0)*8.0d0
+
+  do kit = 1, maxit
+    call f_midpoint_part1(si, field, f, n, x, fvec)
+    call jac_midpoint_part1(si, f, x, fjac)
+    fmid = f
+    call f_midpoint_part2(si, field, f, n, x, fvec)
+    call jac_midpoint_part2(si, f, fmid, x, fjac)
+    fabs = dabs(fvec)
+    xlast = x
+    call dgesv(n, 1, fjac, n, pivot, fvec, n, info)
+    ! after solution: fvec = (xold-xnew)_Newton
+    x = x - fvec
+    xabs = dabs(x - xlast)
+
+    tolref = dabs(xlast)
+    tolref(2) = twopi
+    tolref(3) = twopi
+
+    if (all(fabs < atol)) return
+    if (all(xabs < rtol*tolref)) return
+  enddo
+  print *, 'newton_midpoint: maximum iterations reached: ', maxit, 'z = ', x(1), x(2), x(3), si%z(4)
+  write(6603,*) x(1), x(2), x(3), x(4), x(5), xabs, fvec
+end subroutine
     
 !ccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
 !
-subroutine f_midpoint_part1(si, f, n, x, fvec)
+subroutine f_midpoint_part1(si, field, f, n, x, fvec)
   !
 
   type(symplectic_integrator_data_t), intent(inout) :: si
+  class(field_can_t), intent(in) :: field
   type(field_can_data_t), intent(inout) :: f
     integer, intent(in) :: n
     double precision, intent(in) :: x(n)  ! = (rend, thend, phend, pphend, rmid)
     double precision, intent(out) :: fvec(n)
 
     ! evaluate at midpoint
-    call eval_field(f, x(5), 0.5d0*(x(2) + si%z(2)), 0.5d0*(x(3) + si%z(3)), 2)
+    call field%evaluate(f, x(5), 0.5d0*(x(2) + si%z(2)), 0.5d0*(x(3) + si%z(3)), 2)
     call get_derivatives2(f, 0.5d0*(x(4) + si%z(4)))
 
     fvec(2) = f%dpth(1)*(x(2) - si%z(2)) - si%dt*f%dH(1)
@@ -82,9 +128,10 @@ subroutine f_midpoint_part1(si, f, n, x, fvec)
 
 !ccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
 !
-subroutine f_midpoint_part2(si, f, n, x, fvec)
+subroutine f_midpoint_part2(si, field, f, n, x, fvec)
   !
   type(symplectic_integrator_data_t), intent(inout) :: si
+  class(field_can_t), intent(in) :: field
   type(field_can_data_t), intent(inout) :: f
     integer, intent(in) :: n
     double precision, intent(in) :: x(n)  ! = (rend, thend, phend, pphend, rmid)
@@ -97,7 +144,7 @@ subroutine f_midpoint_part2(si, f, n, x, fvec)
     pthdotbar = f%dpth(1)*f%dH(2) - f%dpth(2)*f%dH(1)
 
     ! evaluate at endpoint
-    call eval_field(f, x(1), x(2), x(3), 2)
+    call field%evaluate(f, x(1), x(2), x(3), 2)
     call get_derivatives2(f, x(4))
     fvec(1) = dpthmid*(f%pth - si%pthold) + si%dt*pthdotbar
 
@@ -189,52 +236,5 @@ subroutine jac_midpoint_part2(si, f, fmid, x, jac)
 end subroutine jac_midpoint_part2
 
 
-subroutine newton_midpoint(si, f, x, atol, rtol, maxit, xlast)
-  type(symplectic_integrator_data_t), intent(inout) :: si
-  type(field_can_data_t), intent(inout) :: f
-  type(field_can_data_t) :: fmid
-
-  integer, parameter :: n = 5
-  integer :: kit
-
-  double precision, intent(inout) :: x(n)
-  double precision, intent(in) :: atol, rtol
-  integer, intent(in) :: maxit
-  double precision, intent(out) :: xlast(n)
-
-  double precision :: fvec(n), fjac(n,n)
-  integer :: pivot(n), info
-
-  double precision :: xabs(n), tolref(n), fabs(n)
-
-
-  real(dp), parameter :: twopi = atan(1.0d0)*8.0d0
-
-  do kit = 1, maxit
-    if(x(1) > 1.0) return
-    if(x(1) < 0.0) x(1) = 0.01
-    if(x(5) < 0.0) x(5) = 0.01
-    call f_midpoint_part1(si, f, n, x, fvec)
-    call jac_midpoint_part1(si, f, x, fjac)
-    fmid = f
-    call f_midpoint_part2(si, f, n, x, fvec)
-    call jac_midpoint_part2(si, f, fmid, x, fjac)
-    fabs = dabs(fvec)
-    xlast = x
-    call dgesv(n, 1, fjac, n, pivot, fvec, n, info)
-    ! after solution: fvec = (xold-xnew)_Newton
-    x = x - fvec
-    xabs = dabs(x - xlast)
-
-    tolref = dabs(xlast)
-    tolref(2) = twopi
-    tolref(3) = twopi
-
-    if (all(fabs < atol)) return
-    if (all(xabs < rtol*tolref)) return
-  enddo
-  print *, 'newton_midpoint: maximum iterations reached: ', maxit, 'z = ', x(1), x(2), x(3), si%z(4)
-  write(6603,*) x(1), x(2), x(3), x(4), x(5), xabs, fvec
-end subroutine
 
 end module integrator_midpoint
