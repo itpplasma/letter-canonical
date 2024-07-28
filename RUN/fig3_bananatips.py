@@ -8,7 +8,7 @@ def load_banana(prefix):
     z = data[:,1:]
     return tau, z
 
-tau_euler, z_euler = load_banana('fig3_expl_impl_euler')
+tau_euler, z_euler = load_banana('fig3_midpoint')
 tau_rk45_cyl, z_rk45_cyl = load_banana('fig3_rk45_cyl')
 tau_rk45_can, z_rk45_can = load_banana('fig3_rk45_can')
 

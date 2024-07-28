@@ -79,6 +79,12 @@ subroutine newton_midpoint(si, field, f, x, atol, rtol, maxit, xlast)
 
   real(dp), parameter :: twopi = atan(1.0d0)*8.0d0
 
+  tolref(1) = 1d7
+  tolref(2) = 1d2
+  tolref(3) = 1d3
+  tolref(4) = 1d3
+  tolref(5) = 1d7
+
   do kit = 1, maxit
     call f_midpoint_part1(si, field, f, n, x, fvec)
     call jac_midpoint_part1(si, f, x, fjac)
@@ -92,17 +98,13 @@ subroutine newton_midpoint(si, field, f, x, atol, rtol, maxit, xlast)
     x = x - fvec
     xabs = dabs(x - xlast)
 
-    tolref = dabs(xlast)
-    tolref(2) = twopi
-    tolref(3) = twopi
-
     if (all(fabs < atol)) return
     if (all(xabs < rtol*tolref)) return
   enddo
   print *, 'newton_midpoint: maximum iterations reached: ', maxit, 'z = ', x(1), x(2), x(3), si%z(4)
   write(6603,*) x(1), x(2), x(3), x(4), x(5), xabs, fvec
 end subroutine
-    
+
 !ccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
 !
 subroutine f_midpoint_part1(si, field, f, n, x, fvec)

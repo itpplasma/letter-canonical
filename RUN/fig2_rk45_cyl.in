@@ -7,7 +7,7 @@
     ntau = 100000                       ! number of time steps
     nskip = 10                          ! number of time steps to skip
     dtau = 1d2                          ! time step
-    rtol = 1d-6
+    rtol = 2.5d-9
 
     ! island-chain at resonant surface
     R0=154.0d0, phi0=-6.283d0, Z0=54.22d0, vpar0=1d0

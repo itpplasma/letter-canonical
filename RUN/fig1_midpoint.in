@@ -1,0 +1,13 @@
+&config
+    magfie_type = "tok"
+    input_file_tok = "field_divB0.inp"
+    spatial_coordinates = "albert"
+    velocity_coordinate = "pphi"
+    integrator_type = "midpoint"
+    ntau = 1562500
+    nskip = 15
+    dtau = 2.56d1
+
+    ! banana crossing separatrix
+    R0=162.6d0, phi0=-6.283d0, Z0=-76.5d0, vpar0=0d0
+/

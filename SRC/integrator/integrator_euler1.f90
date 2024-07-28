@@ -95,7 +95,6 @@ module integrator_euler1
 
             ! Don't take too small values in pphi as tolerance reference
             tolref(2) = max(dabs(x(2)), tolref(2))
-            tolref(2) = max(dabs(x(2)), tolref(2))
 
             if (all(dabs(fvec) < si%atol)) return
             if (all(dabs(x-xlast) < si%rtol*tolref)) return

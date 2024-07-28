@@ -11,7 +11,7 @@ def load_data(prefix):
     H = data[:,2]
     return tau, pphi, H
 
-tau_euler, pphi_euler, H_euler = load_data('fig1_expl_impl_euler')
+tau_euler, pphi_euler, H_euler = load_data('fig1_midpoint')
 tau_rk45_cyl, pphi_rk45_cyl, H_rk45_cyl = load_data('fig1_rk45_cyl')
 tau_rk45_can, pphi_rk45_can, H_rk45_can = load_data('fig1_rk45_can')
 

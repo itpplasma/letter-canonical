@@ -7,7 +7,7 @@
     ntau = 100000                       ! number of time steps
     nskip = 10                          ! number of time steps to skip
     dtau = 1d2                          ! time step
-    rtol = 1d-6
+    rtol = 2.5d-9
 
     ! need phi resolution now for the RMP
     n_r=100, n_phi=32, n_z=150
