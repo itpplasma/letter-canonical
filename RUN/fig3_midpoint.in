@@ -4,8 +4,8 @@
     spatial_coordinates = "albert"
     velocity_coordinate = "pphi"
     integrator_type = "midpoint"
-    ntau = 500000
-    nskip = 5
+    ntau = 5000000
+    nskip = 50
     dtau = 2d1
 
     ! need phi resolution now for the RMP

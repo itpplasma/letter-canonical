@@ -1,7 +1,6 @@
 #%%
 import numpy as np
 import matplotlib.pyplot as plt
-from exportfig import exportfig
 from exportfig import exportpng
 
 def load_banana(prefix):
@@ -24,7 +23,6 @@ plt.ylabel(r'$Z$ / cm')
 plt.xlim([130, 140])
 plt.ylim([-23, 12])
 
-exportfig('fig2_islands')
 exportpng('fig2_islands')
 
 # %%
