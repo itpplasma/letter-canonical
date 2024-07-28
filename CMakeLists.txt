@@ -44,10 +44,12 @@ set(SOURCES
     SRC/integrator/integrator_rk45.f90
     SRC/integrator/integrator_euler0.f90
     SRC/integrator/integrator_euler1.f90
+    SRC/integrator/integrator_midpoint.f90
     SRC/integrator/velo_sub.f90
     SRC/integrator/rk45_cyl_integrator.f90
     SRC/integrator/rk45_can_integrator.f90
     SRC/integrator/expl_impl_euler_integrator.f90
+    SRC/integrator/midpoint_integrator.f90
     SRC/integrator/integrator.f90
     SRC/callback/callback_base.f90
     SRC/callback/cut_callback.f90
@@ -83,7 +85,7 @@ set(MAGFIE_SOURCES
 
 add_library(field SHARED ${LIBNEO_SOURCES} ${MAGFIE_SOURCES})
 add_library(canonical SHARED ${SOURCES})
-target_link_libraries(canonical field)
+target_link_libraries(canonical field blas lapack)
 
 add_executable(letter_canonical.x SRC/main.f90)
 target_link_libraries(letter_canonical.x canonical)
