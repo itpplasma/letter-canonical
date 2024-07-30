@@ -802,7 +802,7 @@ literal "false"
 \end_layout
 
 \begin_layout Section
-Results from symplectic integration
+Results from symplectic orbit integration
 \end_layout
 
 \begin_layout Standard
@@ -824,6 +824,7 @@ status open
 \begin_layout Plain Layout
 \begin_inset Graphics
 	filename figures/fig1a_banana.png
+	lyxscale 50
 
 \end_inset
 
@@ -834,7 +835,11 @@ status open
 \begin_inset Caption Standard
 
 \begin_layout Plain Layout
-
+Banana orbit crossing an axisymmetric tokamak's separatrix.
+ Results from symplectic midpoint (black) and non-symplectic RK45 in cylindrical
+ (dark gray) and canonical (light gray).
+ Orbits from non-symplectic methods escape after a few 1000 bounces in contrast
+ to symplectic ones at similar computational cost in terms of field evaluations.
 \end_layout
 
 \end_inset
@@ -842,7 +847,68 @@ status open
 
 \end_layout
 
+\end_inset
+
+
+\begin_inset Float figure
+wide false
+sideways false
+status open
+
 \begin_layout Plain Layout
+(a) 
+\begin_inset Graphics
+	filename figures/fig1b_energy.png
+	lyxscale 50
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Plain Layout
+(b) 
+\begin_inset Graphics
+	filename figures/fig1c_pphi.png
+	lyxscale 50
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Plain Layout
+\begin_inset Caption Standard
+
+\begin_layout Plain Layout
+Energy 
+\begin_inset Formula $H$
+\end_inset
+
+ (a) and toroidal momentum 
+\begin_inset Formula $p_{\varphi}$
+\end_inset
+
+ (b) of the orbit of Fig.
+ 1 over time 
+\begin_inset Formula $t$
+\end_inset
+
+ with same coloring.
+ Values drift away for non-symplectic methods while symplectic methods ensure
+ exact conservation (
+\begin_inset Formula $p_{\varphi}$
+\end_inset
+
+) or oscillation within bounds (
+\begin_inset Formula $H$
+\end_inset
+
+).
+\end_layout
+
+\end_inset
+
 
 \end_layout
 
@@ -852,7 +918,86 @@ status open
 \end_layout
 
 \begin_layout Standard
+\begin_inset Float figure
+wide false
+sideways false
+status open
 
+\begin_layout Plain Layout
+\begin_inset Graphics
+	filename figures/fig2_islands.png
+	lyxscale 50
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Plain Layout
+\begin_inset Caption Standard
+
+\begin_layout Plain Layout
+TODO Islands
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\end_inset
+
+
+\begin_inset Float figure
+wide false
+sideways false
+status open
+
+\begin_layout Plain Layout
+\begin_inset Graphics
+	filename figures/fig3_bananatips.png
+	lyxscale 50
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Plain Layout
+\begin_inset Caption Standard
+
+\begin_layout Plain Layout
+TODO Banana tip precession
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Section
+Conclusion
+\end_layout
+
+\begin_layout Section*
+Acknowledgements
+\end_layout
+
+\begin_layout Standard
+This work has been carried out within the framework of the EUROfusion Consortium
+, funded by the European Union via the Euratom Research and Training Programme
+ (Grant Agreement No 101052200 — EUROfusion).
+ Views and opinions expressed are however those of the author(s) only and
+ do not necessarily reflect those of the European Union or the European
+ Commission.
+ Neither the European Union nor the European Commission can be held responsible
+ for them.
+ We gratefully acknowledge support from NAWI Graz.
 \end_layout
 
 \begin_layout Standard
