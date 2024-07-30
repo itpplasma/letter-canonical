@@ -32,7 +32,7 @@ subroutine orbit_timestep_midpoint(self, si, f, ierr)
   integer, parameter :: maxit = 32
 
   double precision, dimension(n) :: x, xlast
-  integer :: k, ktau
+  integer :: ktau
 
   ierr = 0
   ktau = 0
