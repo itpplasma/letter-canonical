@@ -4,7 +4,7 @@
     spatial_coordinates = "albert"
     velocity_coordinate = "pphi"
     integrator_type = "midpoint"
-    ntau = 5000000
+    ntau = 500000
     nskip = 50
     dtau = 2d1
 
