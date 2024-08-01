@@ -720,5 +720,40 @@ A_{3} & =\sum\varphi_{i}(x^{1})\varphi_{j}(x^{2})\varphi_{k}^{\prime}(x^{3})\\
 
 \end_layout
 
+\begin_layout Subsection*
+Metric tensor from field
+\end_layout
+
+\begin_layout Standard
+\begin_inset Formula 
+\begin{align*}
+\sqrt{g}B & =h_{i}\sqrt{g}B^{i}=\varepsilon^{ijk}h_{i}\difp{A_{k}}{x^{j}}\\
+\sqrt{g} & =\frac{\varepsilon^{ijk}}{B}h_{i}\difp{A_{k}}{x^{j}}
+\end{align*}
+
+\end_inset
+
+
+\begin_inset Formula 
+\[
+A_{\psi}=0,\quad A_{\vartheta}=\psi,\quad A_{\varphi}=H_{B}
+\]
+
+\end_inset
+
+
+\begin_inset Formula 
+\begin{align*}
+\sqrt{g} & =\frac{1}{B}\left(h_{\varphi}\difp{A_{\vartheta}}{\psi}-h_{\vartheta}\difp{A_{\varphi}}{\psi}\right)\\
+ & =\frac{1}{B}\left(h_{\varphi}-h_{\vartheta}\difp{A_{\varphi}}{\psi}\right)\\
+ & =\frac{1}{B^{2}}\left(B_{\varphi}-\bar{\iota}B_{\vartheta}\right)\\
+\bar{\iota} & =\difp{A_{\varphi}}{\psi}
+\end{align*}
+
+\end_inset
+
+
+\end_layout
+
 \end_body
 \end_document

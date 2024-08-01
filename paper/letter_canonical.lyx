@@ -394,7 +394,7 @@ A_{i}^{\star}(\v x,z^{4})=\frac{v_{\parallel}(\v x,z^{4})}{\omega_{c,\alpha}(\v 
 
 \end_inset
 
-(TODO: normalization of Astar??) contain both, covariant components 
+contain both, covariant components 
 \begin_inset Formula $A_{i}$
 \end_inset
 
@@ -411,7 +411,7 @@ A_{i}^{\star}(\v x,z^{4})=\frac{v_{\parallel}(\v x,z^{4})}{\omega_{c,\alpha}(\v 
 \begin_inset Formula $c$
 \end_inset
 
- and species charge 
+, species charge 
 \begin_inset Formula $e_{\alpha}$
 \end_inset
 
@@ -436,7 +436,7 @@ A_{i}^{\star}(\v x,z^{4})=\frac{v_{\parallel}(\v x,z^{4})}{\omega_{c,\alpha}(\v 
 \begin_inset Formula $H$
 \end_inset
 
-, or, as we will see later, the toroidal canonical momentum 
+, or the toroidal canonical momentum 
 \begin_inset Formula $p_{\varphi}$
 \end_inset
 
@@ -981,7 +981,30 @@ TODO Banana tip precession
 \end_layout
 
 \begin_layout Section
-Conclusion
+Conclusion and Outlook
+\end_layout
+
+\begin_layout Standard
+A simple and effective transformation to canonical coordinates is possible
+ for the guiding-center system of charged particle dynamics in strong magnetic
+ fields.
+ Starting with a short review of previously available methods, we derived
+ a new transformation for this purpose.
+ In contrast to related approaches, this transformation requires neither
+ nested magnetic flux surfaces nor a full phase-space transformation.
+ Starting with the general description, we pursue a variant for cylindrical
+ coordinates.
+ Based on these canonical coordinates, we implemented the symplectic midpoint
+ rule based on the SIMPLE algorithm.
+ For realistic conditions in a tokamak field with resonant magnetic perturbation
+s, the method outperforms conventional non-symplectic integrators to a similar
+ degree as observed in previous works.
+ This is significant for efficient and physics-consistent numerical implementati
+ons of drift- and gyrokinetic models from the plasma core to the wall.
+ Due to their similarity to straight field-line magnetic flux coordinates,
+ the new canonical coordinates could also be of interest to generalize theoretic
+al results that previously relied on nested magnetic flux surfaces.
+ 
 \end_layout
 
 \begin_layout Section*
