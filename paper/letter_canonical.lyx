@@ -247,8 +247,8 @@ Kasilov
 \begin_layout Abstract
 Canonical coordinades for the guiding-center model of plasma particles are
  introduced for toroidal magnetic fields with general topology.
- Their realization with unique-valued toroidal angle is discussed based
- on a transformation from cylindrical coordinates.
+ Their realization with unique-valued toroidal angle is discussed and applied
+ as a transformation from cylindrical coordinates.
  The Z-component of the magnetic vector potential replaces the cylinder
  radius.
  This choice is efficient in both, theoretical and numerical developments,
@@ -259,8 +259,7 @@ on schemes on the guiding-center system without requiring flux coordinates.
  scheme compared to a conventional non-symplectic Runge-Kutta-Fehlberg method
  are demonstrated on a tokamak field with resonant magnetic perturbation.
  The presented coordinates are potentially suitable to introduce structure-prese
-rvation to a wide range of simulations based on gyrokinetic models in plasma
- physics.
+rvation to a wide range of simulations of gyrokinetic models in plasma physics.
 \end_layout
 
 \begin_layout Section
@@ -478,6 +477,8 @@ under the restriction that
 \end_inset
 
  never vanishes.
+ This condition is, in particular, realized in magnetic plasma confinement
+ devices where the toroidal magnetic field component is dominant.
  Eq.
 \begin_inset space ~
 \end_inset
@@ -799,6 +800,10 @@ literal "false"
 
 .
  
+\end_layout
+
+\begin_layout Standard
+TODO: reference robert babin work
 \end_layout
 
 \begin_layout Section
