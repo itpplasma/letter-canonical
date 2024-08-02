@@ -4,16 +4,16 @@ module biotsavart
 
     real(dp), parameter :: clight = 2.99792458d10
 
-    type CoilsData
+    type coils_t
         real(dp), dimension(:), allocatable :: x, y, z, current
-    end type CoilsData
+    end type coils_t
 
     contains
 
 
     subroutine init_coils_data(x, y, z, current, coils)
         real(dp), intent(in) :: x(:), y(:), z(:), current(:)
-        type(CoilsData), intent(out) :: coils
+        type(coils_t), intent(out) :: coils
 
         integer :: n_points
 
@@ -28,7 +28,7 @@ module biotsavart
 
 
     subroutine deinit_coils_data(coils)
-        type(CoilsData), intent(inout) :: coils
+        type(coils_t), intent(inout) :: coils
 
         call deallocate_coils_data(coils)
     end subroutine deinit_coils_data
@@ -36,7 +36,7 @@ module biotsavart
 
     subroutine load_coils_file(filename, coils)
         character(*), intent(in) :: filename
-        type(CoilsData), intent(out) :: coils
+        type(coils_t), intent(out) :: coils
 
         integer :: unit
         integer :: i, n_points
@@ -54,7 +54,7 @@ module biotsavart
 
     subroutine save_coils_file(filename, coils)
         character(*), intent(in) :: filename
-        type(CoilsData), intent(in) :: coils
+        type(coils_t), intent(in) :: coils
 
         integer :: unit
         integer :: i, n_points
@@ -70,7 +70,7 @@ module biotsavart
 
 
     subroutine allocate_coils_data(coils, n_points)
-        type(CoilsData), intent(out) :: coils
+        type(coils_t), intent(out) :: coils
         integer, intent(in) :: n_points
 
         allocate(coils%x(n_points), coils%y(n_points), coils%z(n_points))
@@ -79,7 +79,7 @@ module biotsavart
 
 
     subroutine deallocate_coils_data(coils)
-        type(CoilsData), intent(inout) :: coils
+        type(coils_t), intent(inout) :: coils
 
         deallocate(coils%x, coils%y, coils%z, coils%current)
     end subroutine deallocate_coils_data
@@ -87,7 +87,7 @@ module biotsavart
 
     function compute_vector_potential(coils, x) result(A)
         ! Formula of Hanson and Hirshman (2002)
-        type(CoilsData), intent(in) :: coils
+        type(coils_t), intent(in) :: coils
         real(dp), intent(in) :: x(3)
 
         real(dp) :: A(3), dx_i(3), dx_f(3), dl(3), R_i, R_f, L, eps, log_term

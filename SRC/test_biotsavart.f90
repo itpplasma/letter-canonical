@@ -15,9 +15,9 @@ program test_biotsavart
     contains
 
     subroutine test_load_coils_file
-        use biotsavart, only: CoilsData, load_coils_file, deinit_coils_data
+        use biotsavart, only: coils_t, load_coils_file, deinit_coils_data
 
-        type(CoilsData) :: coils
+        type(coils_t) :: coils
 
         call print_test("load_coils_file")
 
@@ -39,13 +39,13 @@ program test_biotsavart
 
 
     subroutine test_compute_vector_potential
-        use biotsavart, only: CoilsData, compute_vector_potential, &
+        use biotsavart, only: coils_t, compute_vector_potential, &
             deinit_coils_data, clight
 
         real(dp), parameter :: tol = 1.0e-9
         integer, parameter :: N_TEST = 3
 
-        type(CoilsData) :: coils
+        type(coils_t) :: coils
         real(dp) :: x_test(3, N_TEST)
         real(dp), dimension(3) :: x, A, A_expected
         real(dp) :: sqrt_term, L, R, AZ_expected
@@ -94,9 +94,9 @@ program test_biotsavart
 
 
     subroutine init_test_coils_data(coils)
-        use biotsavart, only: CoilsData, init_coils_data
+        use biotsavart, only: coils_t, init_coils_data
 
-        type(CoilsData), intent(out) :: coils
+        type(coils_t), intent(out) :: coils
 
         real(dp), dimension(2) :: x, y, z, current
 
@@ -110,9 +110,9 @@ program test_biotsavart
 
 
     subroutine create_test_coils_file
-        use biotsavart, only: CoilsData, init_coils_data, save_coils_file
+        use biotsavart, only: coils_t, init_coils_data, save_coils_file
 
-        type(CoilsData) :: coils
+        type(coils_t) :: coils
 
         call init_test_coils_data(coils)
         call save_coils_file(test_coils_file, coils)
