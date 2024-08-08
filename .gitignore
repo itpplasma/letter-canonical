@@ -14,3 +14,5 @@ BUILD
 cachegrind.out.*
 callgrind.out.*
 gmon.out
+paper/#letter_canonical.lyx#
+.DS_Store

@@ -303,44 +303,276 @@ Magnetized plasmas appear in nature as well as science and technology, notably
 
 \begin_layout Standard
 Why are canonical coordinates important? First of all, they are useful in
- analytical treatments in terms of action-angle variables.
- Such methods can describe resonant interaction and the emergence of Hamiltonian
- chaos.
+ analytical treatments in terms of action-angle variables
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset CommandInset citation
+LatexCommand citep
+key "Hazeltine1981-1164,Mahajan1985-3538,Cary1988,Chavanis2007-469"
+literal "false"
+
+\end_inset
+
+ derived from canonical coordinates.
+ Such methods can describe resonant interaction
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset CommandInset citation
+LatexCommand citep
+key "Heyn2006-S159a"
+literal "false"
+
+\end_inset
+
+ and the emergence of Hamiltonian chaos
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset CommandInset citation
+LatexCommand citep
+key "Chirikov1979-263,Abdullaev2006-S113"
+literal "false"
+
+\end_inset
+
+.
  Second, they underly an important class of structure-preserving numerical
- integration methods: symplectic integrators.
- Symplectic integrators and their generalizations retain the symplectic
+ integration methods: symplectic integrators
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset CommandInset citation
+LatexCommand citep
+key "Hairer2006"
+literal "false"
+
+\end_inset
+
+.
+ Symplectic integrators and their generalizations retain a discrete symplectic
  structure of phase-space and thereby essential features of continuous Hamiltoni
 an systems.
- This includes conservation of energy and momentum within finite bounds.
+ This includes conservation of energy and momentum within fixed bounds.
  
 \end_layout
 
 \begin_layout Standard
-TODO: related work – Boozer, variational integrators
+Symplectic integrators are a subset of more general structure-preserving
+ methods.
+ Such approaches based on non-canonical coordinates include variational
+ integrators 
+\begin_inset CommandInset citation
+LatexCommand citep
+key "Qin2008-35006,Qin2009-42510,Morrison2017-55502,Kraus2017,Burby2017-110703,Ellison2018-52502"
+literal "false"
+
+\end_inset
+
+, methods based on exact integration in lowest-order fields
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset CommandInset citation
+LatexCommand citep
+key "Eder2020-122508,Schatzlmayr2024"
+literal "false"
+
+\end_inset
+
+ and methods based on slow manifolds 
+\begin_inset CommandInset citation
+LatexCommand citep
+key "Burby2021-093506,Xiao2021-107981"
+literal "false"
+
+\end_inset
+
+, line integrals 
+\begin_inset CommandInset citation
+LatexCommand citep
+key "Brugnano2020-112994"
+literal "false"
+
+\end_inset
+
+ and average vector fields 
+\begin_inset CommandInset citation
+LatexCommand citep
+key "Zhu2022-032501,Zhang2024-065101"
+literal "false"
+
+\end_inset
+
+.
+ Due to the special nature of the guiding-center system being a degenerate
+ Hamiltonian system formulated in non-canonical coordinates, such methods
+ come with limitations.
+ They are either not fully symplectic, e.g.
+ preserve only energy, are of low order, or require careful stabilization.
+ Straightforward application of standard symplectic integrators in canonical
+ coordinates is therefore of interest to obtain simple, reliable and fully
+ structure-preserving integration schemes.
+ 
 \end_layout
 
 \begin_layout Standard
-Recently, symplectic integrators for non-canonical coordinates with an implicit
- spatial transformation to canonical coordinates have been introduced and
- applied to the guiding-center system.
- In the application to alpha particle losses in stellarator magnetic confinement
- fields, symplectic integrators have shown speed-ups of factor three to
- five compared to non-symplectic methods.
- The main reason: symplectic integrators retain physics-consistency at larger
+For an 
+\emph on
+explicit
+\emph default
+ transformation with canonical coordinates given as functions of non-canonical
+ ones, it is well-known 
+\begin_inset CommandInset citation
+LatexCommand citep
+key "Hairer2006"
+literal "false"
+
+\end_inset
+
+ that symplectic integrators can be applied in a straight-forward manner.
+ This has been leveraged for analytical approximations of fields in tokamak
+ plasmas
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset CommandInset citation
+LatexCommand citep
+key "Khan2012-547,Khan2015-298,Khan2017-40"
+literal "false"
+
+\end_inset
+
+.
+ Also for an 
+\emph on
+implicit
+\emph default
+ transformation to canonical coordinates it is possible to formulate symplectic
+ integrators.
+ The original idea by
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset CommandInset citation
+LatexCommand citet
+key "Cary1989"
+literal "false"
+
+\end_inset
+
+ of solving the implicit transformation together with the implicit time-step
+ of the integrator has recently been picked up
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset CommandInset citation
+LatexCommand citep
+key "Zhang2014-32504,Zhu2016-1650008a,Albert2020-109065"
+literal "false"
+
+\end_inset
+
+ and applied to significantly accelerate particle tracing in application
+ to alpha particle losses in stellarator optimization
+\begin_inset space ~
+\end_inset
+
+
+\begin_inset CommandInset citation
+LatexCommand citep
+key "Albert2020-815860201,Albert2023-955890301"
+literal "false"
+
+\end_inset
+
+.
+ Despite their implicit formulation, an average speed-up of factor three
+ to five compared to non-symplectic methods at similar performance is consistent
+ly observed in literature.
+ The main reason: symplectic integrators retain consistent physics at larger
  timesteps.
  
 \end_layout
 
 \begin_layout Standard
-Up to now, the mentioned implicit transformation to canonical guiding-center
- coordinates has only been realized for the special case of magnetic flux
- coordinates.
+Up to now, implicit transformations to canonical guiding-center coordinates
+ have only been realized for the special case of magnetic flux coordinates.
  Such coordinates exist only in configurations with nested magnetic flux
  surfaces and exclude, for example, the tracing of particles up to the wall
  of a magnetic confinement configuration.
  Also in the case of magnetic perturbations, flux surface geometry is destroyed,
  and the topology of the magnetic field includes islands and ergodic regions.
- Here we introduce, for the first time, a general and global implicit spatial
+ 
+\end_layout
+
+\begin_layout Standard
+TODO: related work coordinates
+\end_layout
+
+\begin_layout Itemize
+Boozer 
+\begin_inset CommandInset citation
+LatexCommand citep
+key "Boozer2005-1071a"
+literal "false"
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Itemize
+White 
+\begin_inset CommandInset citation
+LatexCommand citep
+key "White1984-2455a"
+literal "false"
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Itemize
+Breizman 
+\begin_inset CommandInset citation
+LatexCommand citep
+key "Li2016-334"
+literal "false"
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Itemize
+Hazeltine Meiss 
+\begin_inset CommandInset citation
+LatexCommand citep
+key "Meiss1990-2563"
+literal "false"
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+TODO: related work integrators
+\end_layout
+
+\begin_layout Standard
+Here we introduce, for the first time, a general and global implicit spatial
  transformation of the guiding-center system to canonical coordinates.
  The procedure consists of two steps: a coordinate transformation to eliminate
  one covariant component of the magnetic field, and a gauge transformation
