@@ -206,31 +206,169 @@
 \end_inset
 
 
+\begin_inset FormulaMacro
+\newcommand{\cyl}{\mathrm{cyl}}
+\end_inset
+
+
 \end_layout
 
 \begin_layout Title
 Comments: Global canonical coordinates for the guiding-center system
 \end_layout
 
-\begin_layout Standard
-Cylindrical coordinates:
+\begin_layout Section*
+Starting with cylindrical coordinates
 \end_layout
 
 \begin_layout Standard
-Old coordinates in terms of new coordinates
+Assume covariant components 
+\begin_inset Formula $A_{i}^{\cyl}$
+\end_inset
+
+ of vector potential and 
+\begin_inset Formula $B_{i}^{\cyl}$
+\end_inset
+
+ of magnetic field given in cylindrical coordinates 
+\begin_inset Formula $\v x_{\cyl}=(R,\varphi,Z)$
+\end_inset
+
+ with
 \begin_inset Formula 
-\begin{align*}
-x^{1}=R & =R_{c}=x_{c}^{1}\\
-x^{2}=\varphi & =\varphi_{c}+\lambda(R_{c},Z_{c},\varphi_{c})\\
-x^{3}=Z & =Z_{c}=x_{c}^{3}
-\end{align*}
+\begin{align}
+x & =R\cos\varphi,\\
+y & =R\sin\varphi,\\
+z & =Z.
+\end{align}
 
 \end_inset
 
 
+\end_layout
+
+\begin_layout Standard
+We introduce general curvilinear coordinates 
+\begin_inset Formula $\v x=(x^{1},x^{2},x^{3})$
+\end_inset
+
+, with known transformation functions 
+\begin_inset Formula $R(\v x),\varphi(\v x),Z(\v x)$
+\end_inset
+
+.
+ The inverse transformation is not needed here.
+ In such coordinates, covariant components of 
+\begin_inset Formula $\v A$
+\end_inset
+
+ and 
+\begin_inset Formula $\v B$
+\end_inset
+
+ are given by
 \begin_inset Formula 
 \begin{align}
-0\overset{!}{=}B_{1}^{(c)}(\v x_{\c}) & =B_{i}\difp{x^{i}}{R_{c}}=B_{R}(\v x(\v x_{\c}))+\frac{\partial\lambda(\v x_{\c})}{\partial R_{c}}B_{\varphi}(\v x(\v x_{\c})).
+A_{i} & =\difp{x_{\cyl}^{k}}{x^{i}}A_{k}^{\cyl}=\difp R{x^{i}}A_{R}^{\cyl}+\difp{\varphi}{x^{i}}A_{\varphi}^{\cyl}+\difp Z{x^{i}}A_{Z}^{\cyl},\label{eq:Ai}\\
+B_{i} & =\difp{x_{\cyl}^{k}}{x^{i}}B_{k}^{\cyl}=\difp R{x^{i}}B_{R}^{\cyl}+\difp{\varphi}{x^{i}}B_{\varphi}^{\cyl}+\difp Z{x^{i}}B_{Z}^{\cyl}.\label{eq:Bi}
+\end{align}
+
+\end_inset
+
+For the construction of cylindrical-like coordinates, we choose 
+\begin_inset Formula $\v x=\v x_{\cyl}$
+\end_inset
+
+, such that 
+\begin_inset Formula $A_{i}=A_{i}^{\cyl}$
+\end_inset
+
+ and 
+\begin_inset Formula $B_{i}=B_{i}^{\cyl}$
+\end_inset
+
+.
+ For the construction of flux-like coordinates, we use the general transformatio
+n rules
+\begin_inset space ~
+\end_inset
+
+(
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "eq:Ai"
+
+\end_inset
+
+-
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "eq:Bi"
+
+\end_inset
+
+).
+ A simple example are quasi-toroidal coordinates
+\begin_inset Formula 
+\begin{align}
+R(r,\varphi,\vartheta) & =R_{0}+r\cos\vartheta,\nonumber \\
+\varphi(r,\varphi,\vartheta) & =\varphi,\nonumber \\
+Z(r,\varphi,\vartheta) & =Z_{0}+r\sin\vartheta.
+\end{align}
+
+\end_inset
+
+We require partial derivatives from 1D splines or Lagrange polynomials.
+ For flux coordinates, we use 
+\begin_inset Formula $x^{1}=\sqrt{s}$
+\end_inset
+
+ if 
+\begin_inset Formula $s$
+\end_inset
+
+ is a normalized toroidal or poloidal magnetic flux to keep regularity.
+\end_layout
+
+\begin_layout Section*
+General Coordinates
+\end_layout
+
+\begin_layout Standard
+\begin_inset Formula 
+\begin{align}
+x^{1} & =x_{\c}^{1},\nonumber \\
+x^{2}=\varphi & =\varphi_{\c}+\lambda(x_{\c}^{1},\varphi_{\c},x_{\c}^{3}),\nonumber \\
+x^{3} & =x_{\c}^{3}.
+\end{align}
+
+\end_inset
+
+In cylindrical-type coordinates, we haves 
+\begin_inset Formula $x^{1}=R,\,x^{3}=Z$
+\end_inset
+
+, and in flux-like coordinates, 
+\begin_inset Formula $x^{1}=r$
+\end_inset
+
+ is a radial coordinate and 
+\begin_inset Formula $x^{3}=\vartheta$
+\end_inset
+
+ a poloidal angle.
+ 
+\end_layout
+
+\begin_layout Standard
+For 
+\begin_inset Formula $B_{1}^{\c}(\v x_{\c})=0$
+\end_inset
+
+ we require
+\begin_inset Formula 
+\begin{align}
+0\overset{!}{=}B_{1}^{\c}(\v x_{\c}) & =B_{i}\difp{x^{i}}{x_{\c}^{1}}=B_{1}(\v x(\v x_{\c}))+\frac{\partial\lambda(\v x_{\c})}{\partial x_{\c}^{1}}B_{\varphi}(\v x(\v x_{\c})).\label{eq:ode1}
 \end{align}
 
 \end_inset
@@ -241,478 +379,117 @@ So we require
 \begin_layout Standard
 \begin_inset Formula 
 \begin{equation}
-\frac{\partial\lambda(\v x_{\c})}{\partial R_{c}}=-\frac{B_{R}(\v x(\v x_{\c}))}{B_{\varphi}(\v x(\v x_{\c}))},\label{eq:dx3}
+\frac{\partial\lambda(\v x_{\c})}{\partial x_{\c}^{1}}=-\frac{B_{1}(x_{\c}^{1},\varphi_{\c}+\lambda(\v x_{\c}),x_{\c}^{3})}{B_{\varphi}(x_{\c}^{1},\varphi_{\c}+\lambda(\v x_{\c}),x_{\c}^{3})}.\label{eq:ode}
 \end{equation}
 
 \end_inset
 
-or written differently,
+
 \end_layout
 
 \begin_layout Standard
+For 
+\begin_inset Formula $A_{1}^{\c}=0$
+\end_inset
+
+ we require
 \begin_inset Formula 
 \begin{equation}
-\frac{\partial\lambda(R_{c},Z_{c},\varphi_{c})}{\partial R_{c}}=-\frac{B_{R}(R_{c},\varphi_{c}+\lambda(R_{c},Z_{c},\varphi_{c}),Z_{c})}{B_{\varphi}(R_{c},\varphi_{c}+\lambda(R_{c},Z_{c},\varphi_{c}),Z_{c})}.\label{eq:dx3-1}
+A_{1}^{\c}=A_{1}+A_{\varphi}\difp{\varphi}{x_{\c}^{1}}-\difp{\chi}{x_{\c}^{1}}=A_{1}+A_{\varphi}\difp{\lambda}{x_{\c}^{1}}-\difp{\chi}{x_{\c}^{1}}=A_{1}-\frac{A_{\varphi}B_{1}}{B_{\varphi}}-\difp{\chi}{x_{\c}^{1}}=0
 \end{equation}
 
 \end_inset
 
-
-\end_layout
-
-\begin_layout Standard
-Then the other two components transform as
-\begin_inset Formula 
-\begin{align}
-B_{Z}^{(c)}(\v x_{\c}) & =B_{Z}(\v x(\v x_{\c}))+\frac{\partial\lambda(\v x_{\c})}{\partial Z_{c}}B_{\varphi}(\v x(\v x_{\c})),\\
-B_{\varphi}^{(c)}(\v x_{\c}) & =B_{\ph}(\v x(\v x_{\c}))\left(1+\frac{\partial\lambda(\v x_{\c})}{\partial\varphi_{c}}\right).
-\end{align}
-
-\end_inset
-
-
-\end_layout
-
-\begin_layout Standard
-Coordinate and gauge transform of vector potential:
-\end_layout
-
-\begin_layout Standard
+resulting in
 \begin_inset Formula 
 \begin{equation}
-A_{R}^{(c)}=A_{R}+A_{\varphi}\difp{\varphi}{R_{c}}-\difp{\chi}{R_{c}}=A_{R}+A_{\varphi}\difp{\lambda}{R_{c}}-\difp{\chi}{R_{c}}=A_{R}-\frac{A_{\varphi}B_{R}}{B_{\varphi}}-\difp{\chi}{R_{c}}=0.
+\difp{\chi(\v x_{\c})}{x_{\c}^{1}}=A_{1}-\frac{A_{\varphi}B_{1}}{B_{\varphi}},\label{eq:ode2}
 \end{equation}
 
 \end_inset
 
-
-\begin_inset Formula 
-\begin{equation}
-\difp{\chi(R_{c},Z_{c},\varphi_{c})}{R_{c}}=A_{R}-\frac{A_{\varphi}B_{R}}{B_{\varphi}}.
-\end{equation}
-
-\end_inset
-
-Then the other two components transform as
-\end_layout
-
-\begin_layout Standard
-\begin_inset Formula 
-\begin{equation}
-A_{Z}^{(c)}=A_{Z}+A_{\varphi}\difp{\lambda}{Z_{c}}-\difp{\chi}{Z_{c}}
-\end{equation}
-
-\end_inset
-
-
-\end_layout
-
-\begin_layout Standard
-and
-\end_layout
-
-\begin_layout Standard
-\begin_inset Formula 
-\begin{equation}
-A_{\varphi}^{(c)}=A_{\varphi}\left(1+\difp{\lambda}{\varphi_{c}}\right)-\difp{\chi}{\varphi_{c}}
-\end{equation}
-
-\end_inset
-
-
-\end_layout
-
-\begin_layout Subsection*
-Using vector potential as one coordinate
-\end_layout
-
-\begin_layout Standard
-Now we get 
-\begin_inset Formula $A_{Z}^{(c)}(R_{c},\varphi_{c},Z_{c})$
-\end_inset
-
- on regular grid in 
-\begin_inset Formula $R_{c},\varphi_{c},Z_{c}$
+where again all quantities on the right-hand side are evaluated at 
+\begin_inset Formula $(x_{\c}^{1},\varphi_{\c}+\lambda(\v x_{\c}),x_{\c}^{3})$
 \end_inset
 
 .
- Let's also the vector potential component 
-\begin_inset Formula $A_{Z}^{(c)}$
-\end_inset
-
- set as a radial variable.
- See also Sadrilla Abdullaev, canonical variables in tokamaks.
- Now invert and interpolate 
-\begin_inset Formula $R_{c}=R_{c}(A_{Z}^{(c)},\varphi_{c},Z_{c})$
+ We start on an equidistant grid in 
+\begin_inset Formula $x^{1},x^{2},x^{3}$
 \end_inset
 
 .
- Could be a problem at the edges but not big.
- Reinterpolate all other dependencies on this grid.
- With 
-\begin_inset Formula $x_{c}^{1}=\psi_{c}\equiv A_{Z}^{(c)}$
+ Then 
+\begin_inset Formula $x^{3}$
 \end_inset
 
- instead of 
-\begin_inset Formula $R_{c}$
-\end_inset
-
- we now continue to compute.
-\end_layout
-
-\begin_layout Standard
-The metric tensor is given by
-\begin_inset Formula 
-\begin{equation}
-g_{ij}^{(c)}=g_{kl}\frac{\partial x^{k}}{\partial x_{c}^{i}}\frac{\partial x^{l}}{\partial x_{c}^{j}}
-\end{equation}
-
-\end_inset
-
-Metric determinant
-\begin_inset Formula 
-\begin{align}
-\sqrt{g_{c}} & =R\det\frac{\partial(x^{1},x^{2},x^{3})}{\partial(x_{c}^{1},x_{c}^{2},x_{c}^{3})}=R\det\left(\begin{array}{ccc}
-\partial_{1}R & \partial_{1}\lambda & 0\\
-\partial_{2}R & 1+\partial_{2}\lambda & 0\\
-\partial_{3}R & \partial_{3}\lambda & 1
-\end{array}\right)\nonumber \\
- & =R[\partial_{1}R(1+\partial_{2}\lambda)-\partial_{2}R\partial_{1}\lambda].
-\end{align}
-
-\end_inset
-
-
-\begin_inset Formula 
-\begin{align}
-\sqrt{g_{\c}} & =R\left(\difp R{\psi_{\c}}\left(1+\difp{\lambda}{\varphi_{\c}}\right)-\difp R{\varphi_{\c}}\difp{\lambda}{\psi_{\c}}\right)\\
- & =R\left(\difp R{\psi_{\c}}\left(1+\difp{\lambda(\psi_{c})}{\varphi_{\c}}-\difp R{\varphi_{\c}}\difp{\lambda}R\right)\right)\\
- & =R\difp R{\psi_{\c}}\left(1+\difp{\lambda(R,\varphi_{c},Z_{c})}{\varphi_{\c}}\right)\\
- & =R\left(\difp{\psi_{\c}(R,\varphi_{c},Z_{c})}R\right)^{-1}\left(1+\difp{\lambda(R,\varphi_{c},Z_{c})}{\varphi_{\c}}\right)
-\end{align}
-
-\end_inset
-
-
-\end_layout
-
-\begin_layout Standard
-....OLD
-\end_layout
-
-\begin_layout Standard
-From cylindrical coordinates
-\begin_inset Formula 
-\begin{equation}
-\sqrt{g^{(c)}}=R_{c}\left(1+\difp{\lambda(R_{c},\varphi_{c},Z_{c})}{\varphi_{c}}\right)
-\end{equation}
-
-\end_inset
-
-
-\begin_inset Formula 
-\begin{align*}
-\sqrt{g}\difp{R_{c}}{\psi}\bar{B}_{(c)}^{\psi} & =\difp{A_{\varphi}^{(c)}}{Z_{c}}\\
-\sqrt{g}\difp{R_{c}}{\psi}\bar{B}_{(c)}^{\varphi} & =1\\
-\sqrt{g}\difp{R_{c}}{\psi}\bar{B}_{(c)}^{Z} & =-\difp{A_{\varphi}^{(c)}}{\psi}
-\end{align*}
-
-\end_inset
-
-Field line equations are
-\begin_inset Formula 
-\begin{align}
-\frac{\d\psi}{\d\varphi} & =\frac{\bar{B}_{(c)}^{\psi}}{\bar{B}_{(c)}^{\varphi}}=\difp{A_{\varphi}^{(c)}}{Z_{c}},\\
-\frac{\d Z}{\d\varphi} & =\frac{\bar{B}_{(c)}^{Z}}{\bar{B}_{(c)}^{\varphi}}=-\difp{A_{\varphi}^{(c)}}{\psi}.
-\end{align}
-
-\end_inset
-
-Covariant components are
-\begin_inset Formula 
-\begin{align}
-\bar{B}_{\psi}^{(c)} & =B_{R}^{(c)}\difp{R_{c}}{\psi}+B_{\varphi}^{(c)}\difp{\varphi_{c}}{\psi}+B_{Z}\difp{Z_{c}}{\psi}=B_{R}^{(c)}\difp{R_{c}}{\psi}=0.\\
-\bar{B}_{\varphi}^{(c)} & =B_{R}^{(c)}\difp{R_{c}}{\varphi_{c}}+B_{\varphi}^{(c)}\difp{\varphi_{c}}{\varphi_{c}}+B_{Z}\difp{Z_{c}}{\varphi_{c}}=B_{\varphi}^{(c)}\\
-\bar{B}_{Z}^{(c)} & =B_{R}^{(c)}\difp{R_{c}}{Z_{c}}+B_{\varphi}^{(c)}\difp{\varphi_{c}}{Z_{c}}+B_{Z}\difp{Z_{c}}{Z_{c}}=B_{Z}^{(c)}
-\end{align}
-
-\end_inset
-
-In terms of original cylinder variables
-\begin_inset Formula 
-\begin{align}
-\difp{(R,\varphi,Z)}{(R_{c},\varphi_{c},Z_{c})} & =\left(\begin{array}{ccc}
-1 & 0 & 0\\
-\partial\lambda/\partial R_{c} & 1+\partial\lambda/\partial\varphi_{c} & \partial\lambda/\partial Z_{c}\\
-0 & 0 & 1
-\end{array}\right)
-\end{align}
-
-\end_inset
-
-
-\begin_inset Formula 
-\begin{align}
-B_{R}^{(c)} & =0,\\
-B_{\varphi}^{(c)} & =\difp R{\varphi_{c}}B_{R}+\difp{\varphi}{\varphi_{c}}B_{\varphi}+\difp Z{\varphi_{c}}B_{Z}=\left(1+\difp{\lambda}{\varphi_{c}}\right)B_{\varphi}.\\
-B_{Z}^{(c)} & =\difp R{Z_{c}}B_{R}+\difp{\varphi}{Z_{c}}B_{\varphi}+\difp Z{Z_{c}}B_{Z}=\difp f{Z_{c}}B_{\varphi}+B_{Z}.
-\end{align}
-
-\end_inset
-
-Re-use in the SIMPLE orbit algorithm
-\begin_inset Formula 
-\begin{equation}
-A_{\vartheta}\rightarrow Z
-\end{equation}
-
-\end_inset
-
-
-\end_layout
-
-\begin_layout Subsection*
-Field lines
-\end_layout
-
-\begin_layout Standard
-Non-Canonical
-\begin_inset Formula 
-\begin{align}
-RB^{R} & =\difp{A_{Z}}{\varphi}-\difp{A_{\varphi}}Z\\
-RB^{\varphi} & =\difp{A_{R}}Z-\difp{A_{Z}}R\\
-RB^{Z} & =\difp{A_{\varphi}}R-\difp{A_{R}}{\varphi}
-\end{align}
-
-\end_inset
-
-
-\end_layout
-
-\begin_layout Standard
-Canonical
-\begin_inset Formula 
-\begin{align}
-R_{c}\left(1+\difp{\lambda(R_{c},Z_{c},\varphi_{c})}{\varphi_{c}}\right)B_{(c)}^{R} & =\difp{A_{Z}^{(c)}}{\varphi_{c}}-\difp{A_{\varphi}^{(c)}}{Z_{c}}\\
-R_{c}\left(1+\difp{\lambda(R_{c},Z_{c},\varphi_{c})}{\varphi_{c}}\right)B_{(c)}^{\varphi} & =-\difp{A_{Z}^{(c)}}{R_{c}}\\
-R_{c}\left(1+\difp{\lambda(R_{c},Z_{c},\varphi_{c})}{\varphi_{c}}\right)B_{(c)}^{Z} & =\difp{A_{\varphi}^{(c)}}{R_{c}}
-\end{align}
-
-\end_inset
-
-
-\end_layout
-
-\begin_layout Subsection*
-Field lines as limiting case of guiding centers
-\end_layout
-
-\begin_layout Standard
-\begin_inset Formula 
-\begin{align}
-L_{\mathrm{gc}}(\v x,z^{4}) & =\frac{e_{\alpha}}{c}A_{i}^{\star}(\v x,z^{4})\dot{x}^{i}-H(\boldsymbol{x},z^{4})\\
-A_{i}^{\star}(\v x,z^{4}) & =\frac{v_{\parallel}(\v x,z^{4})}{\omega_{c,\alpha}(\v x)}B_{i}(\v x)+A_{i}(\v x)
-\end{align}
-
-\end_inset
-
-with 
-\begin_inset Formula 
-\begin{align}
-B_{i} & =\frac{g_{ij}}{\sqrt{g}}\varepsilon^{jkl}\frac{\partial}{\partial x^{k}}A_{l}(\v x).\\
-H & =\frac{m_{\alpha}v_{\parallel}(\v x,z^{4})}{2}+J_{\perp}\omega_{c,\alpha}(\v x)+e_{\alpha}\Phi_{e}(\v x).
-\end{align}
-
-\end_inset
-
-We assume spatial length scales 
-\begin_inset Formula $L_{0}$
-\end_inset
-
- of fields in Cartesian coordinates with 
-\begin_inset Formula $g=I$
-\end_inset
-
- and gyrofrequency of the order 
-\begin_inset Formula $\omega_{c0}$
-\end_inset
-
-.
+ plays the role of a parameter, and we need to spline covariant components
  
-\begin_inset Formula 
-\begin{equation}
-\frac{v_{\parallel0}}{L_{0}\omega_{c0}}=\varepsilon
-\end{equation}
-
+\begin_inset Formula $A_{1},B_{1}$
 \end_inset
 
-to be small with ordering parameter 
-\begin_inset Formula $\varepsilon\ll1$
+ and 
+\begin_inset Formula $A_{\varphi},B_{\varphi}$
 \end_inset
 
-.
- Furthermore we assume no electric field and pick a strongly passing orbit
- with 
-\begin_inset Formula $J_{\perp}=0$
+ only in 2D over 
+\begin_inset Formula $(x^{1},\varphi)$
 \end_inset
 
-.
- Then we have
-\begin_inset Formula 
-\begin{align*}
-L_{\mathrm{gc}}(\v x,z^{4}) & =\frac{e_{\alpha}}{c}\left(\varepsilon\frac{L_{0}\omega_{c0}}{v_{\parallel0}}\frac{v_{\parallel}(\v x,z^{4})}{\omega_{c,\alpha}(\v x)}B_{i}(\v x)+A_{i}(\v x,z^{4})\right)\dot{x}^{i}-\underbrace{\varepsilon\frac{L_{0}\omega_{c0}}{v_{\parallel0}}\frac{m_{\alpha}v_{\parallel}^{\,2}(\v x,z^{4})}{2}}_{H}
-\end{align*}
-
-\end_inset
-
-In the first term in the Lagrangian it is clear by construction, that the
- the first term is of 
-\begin_inset Formula $\mathcal{O}(\varepsilon)$
-\end_inset
-
- compared to 
-\begin_inset Formula $A_{i}(\v x,z^{4})$
+ for each coordinate surface 
+\begin_inset Formula $x_{\c}^{3}=x^{3}=\mathrm{const}$
 \end_inset
 
 .
- To compare 
-\begin_inset Formula $H$
+ We solve Eqs.
+\begin_inset space ~
 \end_inset
 
-, we divide 
-\begin_inset Formula $L_{\mathrm{gc}}(\v x,z^{4})$
-\end_inset
 
- by 
-\begin_inset Formula $m_{\alpha}L_{0}$
-\end_inset
-
- and to obtain the resulting order of magnitude of
-\begin_inset Formula 
-\begin{equation}
-\frac{e_{\alpha}}{c}\frac{A_{i}(\v x,z^{4})}{m_{\alpha}L_{0}}\dot{x}^{i}\approx\frac{e_{\alpha}B_{0}}{m_{\alpha}c}v_{\parallel0}=\omega_{c0}v_{\parallel0},
-\end{equation}
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "eq:ode"
+plural "false"
+caps "false"
+noprefix "false"
 
 \end_inset
 
-where we put 
-\begin_inset Formula $\dot{x}^{i}\approx v_{\parallel0}$
-\end_inset
-
-.
- In comparison,
-\begin_inset Formula 
-\begin{equation}
-\frac{H}{m_{\alpha}L_{0}}=\varepsilon\omega_{c0}v_{\parallel0}\underbrace{\frac{v_{\parallel}^{\,2}(\v x,z^{4})}{2v_{\parallel0}^{2}}}_{\mathcal{O}(1)}.
-\end{equation}
+ and 
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "eq:ode2"
+plural "false"
+caps "false"
+noprefix "false"
 
 \end_inset
 
-Again, this term is of 
-\begin_inset Formula $\mathcal{O}(\varepsilon)$
+ simultaneously in an ODE solver on each 
+\begin_inset Formula $x_{\c}^{1}$
 \end_inset
 
- compared to the leading order term above.
- Skipping the verbose notation and just marking orders with 
-\begin_inset Formula $\varepsilon$
+ coordinate line where 
+\begin_inset Formula $\varphi_{\c}$
 \end_inset
 
-, we finally obtain
-\begin_inset Formula 
-\begin{align}
-L_{\mathrm{gc}}(\v x,z^{4}) & =\frac{e_{\alpha}}{c}A_{i}(\v x)\dot{x}^{i}\nonumber \\
- & +\varepsilon m_{\alpha}\left(v_{\parallel}(\v x,z^{4})h_{i}(\v x)\dot{x}^{i}-\frac{v_{\parallel}^{\,2}(\v x,z^{4})}{2}\right),
-\end{align}
-
+ and 
+\begin_inset Formula $x_{\c}^{3}$
 \end_inset
 
-where 
-\begin_inset Formula $h_{i}=B_{i}/B$
-\end_inset
-
-.
- Euler-Lagrange equations for 
-\begin_inset Formula $\v x$
-\end_inset
-
- of 
-\begin_inset Formula $\mathcal{O}(1)$
-\end_inset
-
- are
-\begin_inset Formula 
-\begin{equation}
-\dot{\v x}\times(\nabla\times\v A)=0.
-\end{equation}
-
-\end_inset
-
-This is an underdetermined set that states that orbits must not have components
- orthogonal to 
-\begin_inset Formula $\v B=\nabla\times\v A$
-\end_inset
-
-.
- The component 
-\begin_inset Formula $\dot{\v x}\cdot\v B$
-\end_inset
-
- is chosen freely.
- Euler-Lagrange equations for 
-\begin_inset Formula $z^{4}$
-\end_inset
-
- are of 
-\begin_inset Formula $\mathcal{O}(\varepsilon)$
-\end_inset
-
- where a common factor 
-\begin_inset Formula $\varepsilon$
-\end_inset
-
- can be cancelled.
- Choosing 
-\begin_inset Formula $z^{4}=v_{\parallel}$
-\end_inset
-
- we obtain the simplest variant,
-\begin_inset Formula 
-\begin{equation}
-h_{i}(\v x)\dot{x}^{i}=v_{\parallel},
-\end{equation}
-
-\end_inset
-
-just stating that 
-\begin_inset Formula $v_{\parallel}$
-\end_inset
-
- is the parallel velocity.
- It makes no restrictions to choose an arbitrary 
-\begin_inset Formula $v_{\parallel}(t)$
-\end_inset
-
- to follow the field lines.
+ are constant.
+ 
 \end_layout
 
-\begin_layout Subsection*
-Tensor-product splines for FEEC
+\begin_layout Standard
+Covariant magnetic field components are given by
 \end_layout
 
 \begin_layout Standard
 \begin_inset Formula 
 \begin{align}
-\chi & =\sum\varphi_{i}(x^{1})\varphi_{j}(x^{2})\varphi_{k}(x^{3})\\
- & \downarrow\mathrm{grad}\nonumber \\
-A_{1} & =\sum\varphi_{i}^{\prime}(x^{1})\varphi_{j}(x^{2})\varphi_{k}(x^{3})\\
-A_{2} & =\sum\varphi_{i}(x^{1})\varphi_{j}^{\prime}(x^{2})\varphi_{k}(x^{3})\\
-A_{3} & =\sum\varphi_{i}(x^{1})\varphi_{j}(x^{2})\varphi_{k}^{\prime}(x^{3})\\
- & \downarrow\mathrm{curl}\nonumber \\
-\sqrt{g}B^{1} & =\sum\varphi_{i}(x^{1})\varphi_{j}^{\prime}(x^{2})\varphi_{k}^{\prime}(x^{3})\\
-\sqrt{g}B^{2} & =\sum\varphi_{i}^{\prime}(x^{1})\varphi_{j}(x^{2})\varphi_{k}^{\prime}(x^{3})\\
-\sqrt{g}B^{3} & =\sum\varphi_{i}^{\prime}(x^{1})\varphi_{j}^{\prime}(x^{2})\varphi_{k}(x^{3})\\
- & \downarrow\mathrm{div}\nonumber \\
-\rho & =\sum\varphi_{i}^{\prime}(x^{1})\varphi_{j}^{\prime}(x^{2})\varphi_{k}^{\prime}(x^{3})
+B_{1}^{\c} & =0,\\
+B_{\varphi}^{\c} & =B_{\varphi}\left(1+\frac{\partial\lambda}{\partial\varphi_{\c}}\right),\\
+B_{3}^{\c} & =B_{3}+\frac{\partial\lambda}{\partial x_{\c}^{3}}B_{\varphi}.
 \end{align}
 
 \end_inset
@@ -720,8 +497,86 @@ A_{3} & =\sum\varphi_{i}(x^{1})\varphi_{j}(x^{2})\varphi_{k}^{\prime}(x^{3})\\
 
 \end_layout
 
+\begin_layout Standard
+Covariant vector potential components are given by
+\end_layout
+
+\begin_layout Standard
+\begin_inset Formula 
+\begin{align}
+A_{1}^{\c} & =0,\\
+A_{\varphi}^{\c} & =A_{\varphi}\left(1+\frac{\partial\lambda}{\partial\varphi_{\c}}\right)-\frac{\partial\chi}{\partial\varphi_{\c}},\\
+A_{3}^{\c} & =A_{3}+\frac{\partial\lambda}{\partial x_{\c}^{3}}A_{\varphi}-\frac{\partial\chi}{\partial x_{\c}^{3}}.
+\end{align}
+
+\end_inset
+
+To compute partial derivatives, we interpolate 
+\begin_inset Formula $\lambda$
+\end_inset
+
+ and 
+\begin_inset Formula $\chi$
+\end_inset
+
+ in 1D in 
+\begin_inset Formula $\varphi_{\c}$
+\end_inset
+
+ and 
+\begin_inset Formula $x_{\c}^{3}$
+\end_inset
+
+, respectively, by either splines or Lagrange polynomials.
+ 
+\end_layout
+
+\begin_layout Standard
+Finally, we replace 
+\begin_inset Formula $x_{\text{c}}^{1}$
+\end_inset
+
+ by using the vector potential component 
+\begin_inset Formula $A_{3}^{\c}\equiv\psi_{\text{c}}$
+\end_inset
+
+ as the first coordinate.
+ After this exchange, radial covariant components 
+\begin_inset Formula $A_{\psi}^{\c},B_{\psi}^{\c}$
+\end_inset
+
+ remain to be zero, and other components do not change.
+ We re-interpolate from an equidistant grid on 
+\begin_inset Formula $x_{\c}^{1}$
+\end_inset
+
+ to one in 
+\begin_inset Formula $\psi_{\text{c}}$
+\end_inset
+
+.
+ The third variable is now called 
+\begin_inset Formula $x^{3}=x_{\c}^{3}\equiv\vartheta_{\c}$
+\end_inset
+
+ to mark the final set of coordinates 
+\begin_inset Formula $(\psi_{\c},\varphi_{\c},\vartheta_{\c})$
+\end_inset
+
+.
+ In cylindrical-type coordinates, 
+\begin_inset Formula $\vartheta_{\c}=Z$
+\end_inset
+
+ is not a periodic variable, and in flux-like coordinates, 
+\begin_inset Formula $\vartheta_{\c}=\vartheta$
+\end_inset
+
+ is periodic.
+\end_layout
+
 \begin_layout Subsection*
-Metric tensor from field
+Metric determinant from field
 \end_layout
 
 \begin_layout Standard

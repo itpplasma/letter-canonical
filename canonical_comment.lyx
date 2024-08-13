@@ -1,0 +1,459 @@
+#LyX 2.3 created this file. For more info see http://www.lyx.org/
+\lyxformat 544
+\begin_document
+\begin_header
+\save_transient_properties true
+\origin unavailable
+\textclass article
+\use_default_options true
+\maintain_unincluded_children false
+\language english
+\language_package default
+\inputencoding auto
+\fontencoding global
+\font_roman "default" "default"
+\font_sans "default" "default"
+\font_typewriter "default" "default"
+\font_math "auto" "auto"
+\font_default_family default
+\use_non_tex_fonts false
+\font_sc false
+\font_osf false
+\font_sf_scale 100 100
+\font_tt_scale 100 100
+\use_microtype false
+\use_dash_ligatures true
+\graphics default
+\default_output_format default
+\output_sync 0
+\bibtex_command default
+\index_command default
+\paperfontsize default
+\use_hyperref false
+\papersize default
+\use_geometry false
+\use_package amsmath 1
+\use_package amssymb 1
+\use_package cancel 1
+\use_package esint 1
+\use_package mathdots 1
+\use_package mathtools 1
+\use_package mhchem 1
+\use_package stackrel 1
+\use_package stmaryrd 1
+\use_package undertilde 1
+\cite_engine basic
+\cite_engine_type default
+\use_bibtopic false
+\use_indices false
+\paperorientation portrait
+\suppress_date false
+\justification true
+\use_refstyle 1
+\use_minted 0
+\index Index
+\shortcut idx
+\color #008000
+\end_index
+\secnumdepth 3
+\tocdepth 3
+\paragraph_separation indent
+\paragraph_indentation default
+\is_math_indent 0
+\math_numbering_side default
+\quotes_style english
+\dynamic_quotes 0
+\papercolumns 1
+\papersides 1
+\paperpagestyle default
+\tracking_changes false
+\output_changes false
+\html_math_output 0
+\html_css_as_file 0
+\html_be_strict false
+\end_header
+
+\begin_body
+
+\begin_layout Standard
+\begin_inset FormulaMacro
+\newcommand{\tht}{\vartheta}
+\end_inset
+
+
+\begin_inset FormulaMacro
+\newcommand{\ph}{\varphi}
+\end_inset
+
+
+\begin_inset FormulaMacro
+\newcommand{\balpha}{\boldsymbol{\alpha}}
+\end_inset
+
+
+\begin_inset FormulaMacro
+\newcommand{\btheta}{\boldsymbol{\theta}}
+\end_inset
+
+
+\begin_inset FormulaMacro
+\newcommand{\bJ}{\boldsymbol{J}}
+\end_inset
+
+
+\begin_inset FormulaMacro
+\newcommand{\bGamma}{\boldsymbol{\Gamma}}
+\end_inset
+
+
+\begin_inset FormulaMacro
+\newcommand{\bOmega}{\boldsymbol{\Omega}}
+\end_inset
+
+
+\begin_inset FormulaMacro
+\newcommand{\d}{\text{d}}
+\end_inset
+
+
+\begin_inset FormulaMacro
+\newcommand{\t}[1]{\text{#1}}
+\end_inset
+
+
+\begin_inset FormulaMacro
+\newcommand{\m}{\text{m}}
+\end_inset
+
+
+\begin_inset FormulaMacro
+\newcommand{\v}[1]{\boldsymbol{#1}}
+\end_inset
+
+
+\begin_inset FormulaMacro
+\newcommand{\u}[1]{\underline{#1}}
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\begin_inset FormulaMacro
+\renewcommand{\t}[1]{\mathbf{#1}}
+\end_inset
+
+
+\begin_inset FormulaMacro
+\newcommand{\bA}{\boldsymbol{A}}
+\end_inset
+
+
+\begin_inset FormulaMacro
+\newcommand{\bB}{\boldsymbol{B}}
+\end_inset
+
+
+\begin_inset FormulaMacro
+\newcommand{\c}{\mathrm{c}}
+\end_inset
+
+
+\begin_inset FormulaMacro
+\newcommand{\difp}[2]{\frac{\partial#1}{\partial#2}}
+\end_inset
+
+
+\begin_inset FormulaMacro
+\newcommand{\xset}{{\bf x}}
+\end_inset
+
+
+\begin_inset FormulaMacro
+\newcommand{\zset}{{\bf z}}
+\end_inset
+
+
+\begin_inset FormulaMacro
+\newcommand{\qset}{{\bf q}}
+\end_inset
+
+
+\begin_inset FormulaMacro
+\newcommand{\pset}{{\bf p}}
+\end_inset
+
+
+\begin_inset FormulaMacro
+\newcommand{\wset}{{\bf w}}
+\end_inset
+
+
+\begin_inset FormulaMacro
+\newcommand{\ei}{{\bf \mathrm{ei}}}
+\end_inset
+
+
+\begin_inset FormulaMacro
+\newcommand{\ie}{{\bf \mathrm{ie}}}
+\end_inset
+
+
+\begin_inset FormulaMacro
+\newcommand{\vrho}{\boldsymbol{\rho}}
+\end_inset
+
+
+\end_layout
+
+\begin_layout Subsection*
+Field lines as limiting case of guiding centers
+\end_layout
+
+\begin_layout Standard
+\begin_inset Formula 
+\begin{align}
+L_{\mathrm{gc}}(\v x,z^{4}) & =\frac{e_{\alpha}}{c}A_{i}^{\star}(\v x,z^{4})\dot{x}^{i}-H(\boldsymbol{x},z^{4})\\
+A_{i}^{\star}(\v x,z^{4}) & =\frac{v_{\parallel}(\v x,z^{4})}{\omega_{c,\alpha}(\v x)}B_{i}(\v x)+A_{i}(\v x)
+\end{align}
+
+\end_inset
+
+with 
+\begin_inset Formula 
+\begin{align}
+B_{i} & =\frac{g_{ij}}{\sqrt{g}}\varepsilon^{jkl}\frac{\partial}{\partial x^{k}}A_{l}(\v x).\\
+H & =\frac{m_{\alpha}v_{\parallel}(\v x,z^{4})}{2}+J_{\perp}\omega_{c,\alpha}(\v x)+e_{\alpha}\Phi_{e}(\v x).
+\end{align}
+
+\end_inset
+
+We assume spatial length scales 
+\begin_inset Formula $L_{0}$
+\end_inset
+
+ of fields in Cartesian coordinates with 
+\begin_inset Formula $g=I$
+\end_inset
+
+ and gyrofrequency of the order 
+\begin_inset Formula $\omega_{c0}$
+\end_inset
+
+.
+ 
+\begin_inset Formula 
+\begin{equation}
+\frac{v_{\parallel0}}{L_{0}\omega_{c0}}=\varepsilon
+\end{equation}
+
+\end_inset
+
+to be small with ordering parameter 
+\begin_inset Formula $\varepsilon\ll1$
+\end_inset
+
+.
+ Furthermore we assume no electric field and pick a strongly passing orbit
+ with 
+\begin_inset Formula $J_{\perp}=0$
+\end_inset
+
+.
+ Then we have
+\begin_inset Formula 
+\begin{align*}
+L_{\mathrm{gc}}(\v x,z^{4}) & =\frac{e_{\alpha}}{c}\left(\varepsilon\frac{L_{0}\omega_{c0}}{v_{\parallel0}}\frac{v_{\parallel}(\v x,z^{4})}{\omega_{c,\alpha}(\v x)}B_{i}(\v x)+A_{i}(\v x,z^{4})\right)\dot{x}^{i}-\underbrace{\varepsilon\frac{L_{0}\omega_{c0}}{v_{\parallel0}}\frac{m_{\alpha}v_{\parallel}^{\,2}(\v x,z^{4})}{2}}_{H}
+\end{align*}
+
+\end_inset
+
+In the first term in the Lagrangian it is clear by construction, that the
+ the first term is of 
+\begin_inset Formula $\mathcal{O}(\varepsilon)$
+\end_inset
+
+ compared to 
+\begin_inset Formula $A_{i}(\v x,z^{4})$
+\end_inset
+
+.
+ To compare 
+\begin_inset Formula $H$
+\end_inset
+
+, we divide 
+\begin_inset Formula $L_{\mathrm{gc}}(\v x,z^{4})$
+\end_inset
+
+ by 
+\begin_inset Formula $m_{\alpha}L_{0}$
+\end_inset
+
+ and to obtain the resulting order of magnitude of
+\begin_inset Formula 
+\begin{equation}
+\frac{e_{\alpha}}{c}\frac{A_{i}(\v x,z^{4})}{m_{\alpha}L_{0}}\dot{x}^{i}\approx\frac{e_{\alpha}B_{0}}{m_{\alpha}c}v_{\parallel0}=\omega_{c0}v_{\parallel0},
+\end{equation}
+
+\end_inset
+
+where we put 
+\begin_inset Formula $\dot{x}^{i}\approx v_{\parallel0}$
+\end_inset
+
+.
+ In comparison,
+\begin_inset Formula 
+\begin{equation}
+\frac{H}{m_{\alpha}L_{0}}=\varepsilon\omega_{c0}v_{\parallel0}\underbrace{\frac{v_{\parallel}^{\,2}(\v x,z^{4})}{2v_{\parallel0}^{2}}}_{\mathcal{O}(1)}.
+\end{equation}
+
+\end_inset
+
+Again, this term is of 
+\begin_inset Formula $\mathcal{O}(\varepsilon)$
+\end_inset
+
+ compared to the leading order term above.
+ Skipping the verbose notation and just marking orders with 
+\begin_inset Formula $\varepsilon$
+\end_inset
+
+, we finally obtain
+\begin_inset Formula 
+\begin{align}
+L_{\mathrm{gc}}(\v x,z^{4}) & =\frac{e_{\alpha}}{c}A_{i}(\v x)\dot{x}^{i}\nonumber \\
+ & +\varepsilon m_{\alpha}\left(v_{\parallel}(\v x,z^{4})h_{i}(\v x)\dot{x}^{i}-\frac{v_{\parallel}^{\,2}(\v x,z^{4})}{2}\right),
+\end{align}
+
+\end_inset
+
+where 
+\begin_inset Formula $h_{i}=B_{i}/B$
+\end_inset
+
+.
+ Euler-Lagrange equations for 
+\begin_inset Formula $\v x$
+\end_inset
+
+ of 
+\begin_inset Formula $\mathcal{O}(1)$
+\end_inset
+
+ are
+\begin_inset Formula 
+\begin{equation}
+\dot{\v x}\times(\nabla\times\v A)=0.
+\end{equation}
+
+\end_inset
+
+This is an underdetermined set that states that orbits must not have components
+ orthogonal to 
+\begin_inset Formula $\v B=\nabla\times\v A$
+\end_inset
+
+.
+ The component 
+\begin_inset Formula $\dot{\v x}\cdot\v B$
+\end_inset
+
+ is chosen freely.
+ Euler-Lagrange equations for 
+\begin_inset Formula $z^{4}$
+\end_inset
+
+ are of 
+\begin_inset Formula $\mathcal{O}(\varepsilon)$
+\end_inset
+
+ where a common factor 
+\begin_inset Formula $\varepsilon$
+\end_inset
+
+ can be cancelled.
+ Choosing 
+\begin_inset Formula $z^{4}=v_{\parallel}$
+\end_inset
+
+ we obtain the simplest variant,
+\begin_inset Formula 
+\begin{equation}
+h_{i}(\v x)\dot{x}^{i}=v_{\parallel},
+\end{equation}
+
+\end_inset
+
+just stating that 
+\begin_inset Formula $v_{\parallel}$
+\end_inset
+
+ is the parallel velocity.
+ It makes no restrictions to choose an arbitrary 
+\begin_inset Formula $v_{\parallel}(t)$
+\end_inset
+
+ to follow the field lines.
+\end_layout
+
+\begin_layout Subsection*
+Field lines
+\end_layout
+
+\begin_layout Standard
+Non-Canonical
+\begin_inset Formula 
+\begin{align}
+RB^{R} & =\difp{A_{Z}}{\varphi}-\difp{A_{\varphi}}Z\\
+RB^{\varphi} & =\difp{A_{R}}Z-\difp{A_{Z}}R\\
+RB^{Z} & =\difp{A_{\varphi}}R-\difp{A_{R}}{\varphi}
+\end{align}
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+Canonical
+\begin_inset Formula 
+\begin{align}
+R_{c}\left(1+\difp{\lambda(R_{c},Z_{c},\varphi_{c})}{\varphi_{c}}\right)B_{(c)}^{R} & =\difp{A_{Z}^{(c)}}{\varphi_{c}}-\difp{A_{\varphi}^{(c)}}{Z_{c}}\\
+R_{c}\left(1+\difp{\lambda(R_{c},Z_{c},\varphi_{c})}{\varphi_{c}}\right)B_{(c)}^{\varphi} & =-\difp{A_{Z}^{(c)}}{R_{c}}\\
+R_{c}\left(1+\difp{\lambda(R_{c},Z_{c},\varphi_{c})}{\varphi_{c}}\right)B_{(c)}^{Z} & =\difp{A_{\varphi}^{(c)}}{R_{c}}
+\end{align}
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Subsection*
+Tensor-product splines for FEEC
+\end_layout
+
+\begin_layout Standard
+\begin_inset Formula 
+\begin{align}
+\chi & =\sum\varphi_{i}(x^{1})\varphi_{j}(x^{2})\varphi_{k}(x^{3})\\
+ & \downarrow\mathrm{grad}\nonumber \\
+A_{1} & =\sum\varphi_{i}^{\prime}(x^{1})\varphi_{j}(x^{2})\varphi_{k}(x^{3})\\
+A_{2} & =\sum\varphi_{i}(x^{1})\varphi_{j}^{\prime}(x^{2})\varphi_{k}(x^{3})\\
+A_{3} & =\sum\varphi_{i}(x^{1})\varphi_{j}(x^{2})\varphi_{k}^{\prime}(x^{3})\\
+ & \downarrow\mathrm{curl}\nonumber \\
+\sqrt{g}B^{1} & =\sum\varphi_{i}(x^{1})\varphi_{j}^{\prime}(x^{2})\varphi_{k}^{\prime}(x^{3})\\
+\sqrt{g}B^{2} & =\sum\varphi_{i}^{\prime}(x^{1})\varphi_{j}(x^{2})\varphi_{k}^{\prime}(x^{3})\\
+\sqrt{g}B^{3} & =\sum\varphi_{i}^{\prime}(x^{1})\varphi_{j}^{\prime}(x^{2})\varphi_{k}(x^{3})\\
+ & \downarrow\mathrm{div}\nonumber \\
+\rho & =\sum\varphi_{i}^{\prime}(x^{1})\varphi_{j}^{\prime}(x^{2})\varphi_{k}^{\prime}(x^{3})
+\end{align}
+
+\end_inset
+
+
+\end_layout
+
+\end_body
+\end_document
