@@ -877,7 +877,11 @@ literal "false"
 \end_inset
 
 .
- Now let us consider special cases useful in toroidal magnetic configurations
+ 
+\end_layout
+
+\begin_layout Standard
+Let us now us consider special cases useful in toroidal magnetic configurations
  such as tokamaks or stellarators.
  There, 
 \begin_inset Formula $B_{\ph}$
