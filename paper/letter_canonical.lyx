@@ -1114,7 +1114,7 @@ literal "false"
 \end_layout
 
 \begin_layout Itemize
-Babin corodinates: 
+Babin coordinates: 
 \begin_inset CommandInset citation
 LatexCommand citep
 key "Babin2024"
@@ -1337,8 +1337,9 @@ Acknowledgements
 \end_layout
 
 \begin_layout Standard
-This work has been carried out within the framework of the EUROfusion Consortium
-, funded by the European Union via the Euratom Research and Training Programme
+The authors thank Pedro Gil for useful discussions.
+ This work has been carried out within the framework of the EUROfusion Consortiu
+m, funded by the European Union via the Euratom Research and Training Programme
  (Grant Agreement No 101052200 — EUROfusion).
  Views and opinions expressed are however those of the author(s) only and
  do not necessarily reflect those of the European Union or the European
