@@ -72,12 +72,12 @@ module psi_transform
 !
               ibeg = i_R - nshift
               iend = ibeg+nplagr-1
-              if(ibeg.lt.0) then
+              if(ibeg.lt.1) then
                 ibeg = 1
-                iend = ibeg+nplagr-1
+                iend = min(ibeg+nplagr-1,n_R)
               elseif(iend.gt.n_R) then
                 iend = n_R
-                ibeg = iend-nplagr+1
+                ibeg = max(1, iend-nplagr+1)
               endif
 !
               call plag_coeff(nplagr,nder,psi_fix,psi_loc(ibeg:iend),coef)
