@@ -233,6 +233,7 @@ contains
         call construct_splines_3d([psi_inner, 0.0d0, zmin], [psi_outer, twopi, zmax], &
             R_of_xc, order, periodic, spl_R_of_xc)
 
+        ! TODO: check if this can be removed
         !$omp parallel private(i_r, i_phi, i_z, x)
         !$omp do
         do i_z = 1, n_z
