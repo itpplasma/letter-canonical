@@ -30,6 +30,8 @@ module letter_canonical
         zmin = -150.d0, &
         zmax = 147.38193979933115d0
 
+    real(dp) :: ZPLANE_VALUE = -105.0d0
+
     class(tok_field_t), allocatable :: field
     class(field_can_t), allocatable :: field_can_
     class(integrator_t), allocatable :: integ
@@ -49,9 +51,10 @@ module letter_canonical
 
     class(callback_pointer_t), allocatable :: callbacks(:)
     class(cut_callback_t), allocatable :: phi0_plus_callback, phi0_minus_callback, &
-        vpar0_plus_callback, vpar0_minus_callback
+        vpar0_plus_callback, vpar0_minus_callback, zplane_callback
 
-    integer :: phi0plus_unit, phi0minus_unit, vpar0plus_unit, vpar0minus_unit
+    integer :: phi0plus_unit, phi0minus_unit, vpar0plus_unit, vpar0minus_unit, &
+        zplane_unit
 
     namelist /config/ magfie_type, integrator_type, input_file_tok, &
         output_prefix, spatial_coordinates, velocity_coordinate, rtol, &
@@ -172,7 +175,8 @@ contains
 
 
     subroutine init_callbacks
-        allocate(callbacks(4))
+        integer, parameter :: NUM_CALLBACKS = 5
+        allocate(callbacks(NUM_CALLBACKS))
 
         allocate(phi0_plus_callback)
         phi0_plus_callback%distance => phi0_plus_distance
@@ -197,6 +201,12 @@ contains
         vpar0_minus_callback%event => vpar0_minus_write
         allocate(callbacks(4)%item, source=vpar0_minus_callback)
         open(newunit=vpar0minus_unit, file=trim(output_prefix) // "_vpar0minus.out")
+
+        allocate(zplane_callback)
+        zplane_callback%distance => zplane_distance
+        zplane_callback%event => zplane_write
+        allocate(callbacks(5)%item, source=zplane_callback)
+        open(newunit=zplane_unit, file=trim(output_prefix) // "_zplane.out")
     end subroutine init_callbacks
 
 
@@ -387,6 +397,13 @@ contains
         real(dp), intent(in) :: t, z(:)
         write(vpar0minus_unit, *) t, z
     end subroutine vpar0_minus_write
+
+
+    function zplane_distance(t, z) result(distance)
+        real(dp) :: distance
+        real(dp), intent(in) :: t, z(:)
+        distance = -(z(3) - ZPLANE_VALUE)
+    end function zplane_distance
 
 
 
