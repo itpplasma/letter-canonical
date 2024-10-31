@@ -405,7 +405,11 @@ contains
         distance = -(z(3) - ZPLANE_VALUE)
     end function zplane_distance
 
-
+    subroutine zplane_write(t, z)
+        real(dp), intent(in) :: t, z(:)
+        write(zplane_unit, *) t, z
+    end subroutine zplane_write
+    
 
     function integ_error_message() result(msg)
         character(1024) :: msg
