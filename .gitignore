@@ -1,4 +1,5 @@
 *.mod
+*~
 *.o
 *.so
 __pycache__
