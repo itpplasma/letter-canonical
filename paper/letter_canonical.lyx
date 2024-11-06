@@ -1002,7 +1002,7 @@ Combined with the choice
 \begin_layout Standard
 \begin_inset Formula 
 \begin{align}
-L_{\mathrm{gc}}(\v x_{\c},p_{\varphi}) & =p_{\varphi}\dot{\varphi}_{\text{c}}+p_{\vartheta}(\v x_{\c},p_{\varphi})\dot{Z}_{\text{c}}-H(\v x_{\c},p_{\varphi}),\label{eq:Lgc1}\\
+L_{\mathrm{gc}}(\v x_{\c},p_{\varphi}) & =p_{\varphi}\dot{\varphi}_{\text{c}}+p_{\vartheta}(\v x_{\c},p_{\varphi})\dot{\vartheta}-H(\v x_{\c},p_{\varphi}),\label{eq:Lgc1}\\
 p_{\vartheta}(\v x_{\c},p_{\varphi}) & =m_{\alpha}v_{\parallel}(\v x_{\c},p_{\varphi})\frac{B_{\vartheta}^{\c}(\v x_{\c})}{B(\v x_{\c})}+\frac{e_{\alpha}}{c}\psi_{\text{c}}.\label{eq:Lgc2}
 \end{align}
 

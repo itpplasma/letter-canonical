@@ -610,5 +610,25 @@ A_{\psi}=0,\quad A_{\vartheta}=\psi,\quad A_{\varphi}=H_{B}
 
 \end_layout
 
+\begin_layout Subsection*
+Field line equations (now for psi, theta, phi order and opposite sign in
+ Jacobian)
+\end_layout
+
+\begin_layout Standard
+\begin_inset Formula 
+\begin{align*}
+\sqrt{g_{\c}}B_{\c}^{i} & =\varepsilon^{ijk}\difp{}{x_{\c}^{j}}A_{k}^{\c}\\
+\\
+\sqrt{g_{\c}}B_{\c}^{\psi} & =\difp{A_{\varphi}^{\c}}{\vartheta}\\
+\sqrt{g_{\c}}B_{\c}^{\vartheta} & =-\difp{A_{\varphi}^{\c}}{\psi}\\
+\sqrt{g_{\c}}B_{\c}^{\varphi} & =1
+\end{align*}
+
+\end_inset
+
+
+\end_layout
+
 \end_body
 \end_document

@@ -455,5 +455,31 @@ A_{3} & =\sum\varphi_{i}(x^{1})\varphi_{j}(x^{2})\varphi_{k}^{\prime}(x^{3})\\
 
 \end_layout
 
+\begin_layout Standard
+\begin_inset Formula 
+\begin{align*}
+x^{1}(\v x_{\c}) & =x_{\c}^{1}\\
+x^{2}(\v x_{\c}) & =x_{\c}^{2}+\lambda(\v x_{\c})\\
+x^{3}(\v x_{\c}) & =x_{\c}^{3}
+\end{align*}
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\begin_inset Formula 
+\begin{align*}
+A_{1}^{\c}(\v x_{\c}) & =A_{1}(\v x_{\c})-\difp{\chi(\v x_{\c})}{x_{\c}^{1}}\\
+A_{2}^{\c}(\v x_{\c}) & =A_{2}(\v x_{\c})-\difp{\chi(\v x_{\c})}{x_{\c}^{2}}\\
+A_{3}^{\c}(\v x_{\c}) & =A_{3}(\v x_{\c})-\difp{\chi(\v x_{\c})}{x_{\c}^{3}}
+\end{align*}
+
+\end_inset
+
+
+\end_layout
+
 \end_body
 \end_document
