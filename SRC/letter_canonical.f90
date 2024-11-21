@@ -47,6 +47,16 @@ module letter_canonical
 
     real(dp) :: mu  ! magnetic moment
 
+    real(dp) :: energy_ev = 0
+
+    integer :: n_d = 4, n_e = 2
+    integer :: n_particles
+
+    real(dp), parameter :: p_mass=1.6726d-24
+    real(dp), parameter :: ev=1.6022d-12
+    real(dp), parameter :: clight=2.9979d10
+    real(dp), parameter :: e_charge=4.8032d-10
+
     real(dp), allocatable :: z_out(:, :)
 
     class(callback_pointer_t), allocatable :: callbacks(:)
@@ -59,7 +69,7 @@ module letter_canonical
     namelist /config/ magfie_type, integrator_type, input_file_tok, &
         output_prefix, spatial_coordinates, velocity_coordinate, rtol, &
         rmin, rmax, zmin, zmax, rmu, ro0, dtau, ntau, nskip, n_r, n_phi, n_z, &
-        R0, phi0, Z0, vpar0
+        R0, phi0, Z0, vpar0, energy_ev, n_particles
 
 contains
 
@@ -102,7 +112,7 @@ contains
             return
         end if
 
-        call init_integrator
+        call init_integrator([R0, phi0, Z0, 1d0, vpar0])
         call init_callbacks
 
         allocate(z_out(5, ntau/nskip))
@@ -135,9 +145,9 @@ contains
     end subroutine remove_extension
 
 
-    subroutine init_integrator
+    subroutine init_integrator(z)
         type(integrator_config_t) :: integ_config
-        real(dp) :: z_internal(5)
+        real(dp) :: z(5), z_internal(5)
 
         if (velocity_coordinate == "pphi") then
             field_can_ = create_field_can(spatial_coordinates)
@@ -145,9 +155,9 @@ contains
 
         print *, "init_integrator ...."
 
-        mu = compute_mu([R0, phi0, Z0, 1d0, vpar0])
+        mu = compute_mu(z)
 
-        call to_internal_coordinates([R0, phi0, Z0, 1d0, vpar0], z_internal)
+        call to_internal_coordinates(z, z_internal)
 
         integ_config = integrator_config_t(integrator_type, spatial_coordinates, &
             velocity_coordinate, z_internal, dtau, ro0, rtol, 1)
@@ -157,6 +167,7 @@ contains
         else
             integ = create_integrator(integ_config)
         end if
+
     end subroutine init_integrator
 
 
@@ -237,6 +248,47 @@ contains
         print *, "timesteps: ", ntau
         print *, "field evaluations: ", integ%get_field_evaluations()
     end subroutine trace_orbit
+
+    subroutine trace_multiple_orbits
+        integer :: i, j, kt, ierr
+        real(dp) :: zstart(5), z(5), zcyl(5)
+        real(dp) :: constant, v0, R, vpar
+
+        v0 = sqrt(2.d0*energy_ev*ev/(n_d*p_mass))
+        ro0 = v0*n_d*p_mass*clight/(n_e*e_charge)
+        constant = (1-vpar0**2)*R0
+
+        !problem: openmp cannot deal with integ being a polymorphic array
+        !!$OMP PARALLEL DEFAULT(NONE) &
+        !!$OMP& SHARED(n_particles,constant,phi0,Z0,ntau,dtau,R0) &
+        !!$OMP& PRIVATE(i,R,vpar,zstart,z,kt,ierr,zcyl,callbacks,integ)
+        !!$OMP DO
+        do i = 1, n_particles
+            print*, i, ' / ', n_particles
+
+            R = R0+(i-1)*2/(dble(n_particles)-1)
+            vpar = sqrt(1-constant/R)
+            zstart = [R, phi0, Z0, 1d0, vpar]
+
+            call init_integrator(zstart)
+
+            call to_internal_coordinates(zstart, z)
+
+            do kt = 2, ntau
+                call integ%timestep(z, dtau, ierr)
+                if (ierr /= 0) then
+                    call throw_error("trace_orbit: error in timestep", ierr)
+                    !return
+                end if
+                call from_internal_coordinates(z, zcyl)
+                do j = 1, size(callbacks)
+                    call callbacks(j)%execute(kt*dtau, zcyl)
+                end do
+            end do
+        enddo   
+        !!$OMP END DO
+        !!$OMP END PARALLEL
+    end subroutine trace_multiple_orbits
 
 
     subroutine to_internal_coordinates(z, z_internal)
