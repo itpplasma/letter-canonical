@@ -51,6 +51,7 @@ module letter_canonical
 
     integer :: n_d = 4, n_e = 2
     integer :: n_particles
+    logical :: poincare_shift = .true.
 
     real(dp), parameter :: p_mass=1.6726d-24
     real(dp), parameter :: ev=1.6022d-12
@@ -69,7 +70,7 @@ module letter_canonical
     namelist /config/ magfie_type, integrator_type, input_file_tok, &
         output_prefix, spatial_coordinates, velocity_coordinate, rtol, &
         rmin, rmax, zmin, zmax, rmu, ro0, dtau, ntau, nskip, n_r, n_phi, n_z, &
-        R0, phi0, Z0, vpar0, energy_ev, n_particles
+        R0, phi0, Z0, vpar0, energy_ev, n_particles, poincare_shift
 
 contains
 
@@ -266,7 +267,8 @@ contains
         do i = 1, n_particles
             print*, i, ' / ', n_particles
 
-            R = R0+(i-1)*2/(dble(n_particles)-1)
+            if (n_particles.gt.1) R = R0+(i-1)*2/(dble(n_particles)-1)
+            if (n_particles.eq.1) R = R0
             vpar = sqrt(1-constant/R)
             zstart = [R, phi0, Z0, 1d0, vpar]
 
@@ -406,7 +408,11 @@ contains
     function phi0_plus_distance(t, z) result(distance)
         real(dp) :: distance
         real(dp), intent(in) :: t, z(:)
-        distance = modulo(z(2), twopi) - 0.5d0*twopi
+        if (poincare_shift.eqv..false.) then
+            distance = modulo(z(2) + 0.5d0*twopi, twopi) - 0.5d0*twopi
+        else
+            distance = modulo(z(2), twopi) - 0.5d0*twopi
+        endif
     end function phi0_plus_distance
 
     subroutine phi0_plus_write(t, z)
@@ -418,7 +424,11 @@ contains
     function phi0_minus_distance(t, z) result(distance)
         real(dp) :: distance
         real(dp), intent(in) :: t, z(:)
-        distance = -modulo(z(2), twopi) + 0.5d0*twopi
+        if (poincare_shift.eqv..false.) then
+            distance = -modulo(z(2) + 0.5d0*twopi, twopi) + 0.5d0*twopi
+        else
+            distance = -modulo(z(2), twopi) + 0.5d0*twopi
+        endif
     end function phi0_minus_distance
 
     subroutine phi0_minus_write(t, z)
