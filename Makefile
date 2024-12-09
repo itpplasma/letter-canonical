@@ -31,10 +31,10 @@ $(BUILD_NINJA): $(CMAKE_CACHE) | $(BUILD_DIR)
 
 paper:
 	@echo "\
---------------------------------------------------------------------------- \n\
-| Log in with username 'git' and your authentication token as a password. | \n\
-| Generate your token on https://www.overleaf.com/user/settings           | \n\
----------------------------------------------------------------------------"
+---------------------------------------------------------------------------- \n\
+| Log in with 'git' as username and your authentication token as password. | \n\
+| Generate your token on https://www.overleaf.com/user/settings            | \n\
+----------------------------------------------------------------------------"
 	@if [ ! -d "paper" ]; then \
 		git clone https://git@git.overleaf.com/675740e8b9283f4c4678d63b paper; \
 	else \
