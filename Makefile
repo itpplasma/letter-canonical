@@ -31,6 +31,9 @@ ninja: $(BUILD_NINJA)
 
 $(BUILD_NINJA): $(CMAKE_CACHE) | $(BUILD_DIR)
 
+paper:
+	git clone https://git@git.overleaf.com/675740e8b9283f4c4678d63b paper
+
 .PHONY: clean
 clean:
 	rm -rf $(BUILD_DIR)
