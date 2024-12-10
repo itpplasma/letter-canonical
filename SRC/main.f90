@@ -6,7 +6,7 @@ program main
 
     implicit none
 
-    character(1024) :: input_file = "benchmark_gorilla.in" !"letter_canonical.in"
+    character(1024) :: input_file = "letter_canonical.in" !"benchmark_gorilla.in" 
 
     call print_usage
 
