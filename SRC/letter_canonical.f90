@@ -30,6 +30,8 @@ module letter_canonical
         zmin = -150.d0, &
         zmax = 147.38193979933115d0
 
+    real(dp) :: ZPLANE_VALUE = -105.0d0
+
     class(tok_field_t), allocatable :: field
     class(field_can_t), allocatable :: field_can_
     class(integrator_t), allocatable :: integ
@@ -45,18 +47,30 @@ module letter_canonical
 
     real(dp) :: mu  ! magnetic moment
 
+    real(dp) :: energy_ev = 0
+
+    integer :: n_d = 4, n_e = 2
+    integer :: n_particles
+    logical :: poincare_shift = .true.
+
+    real(dp), parameter :: p_mass=1.6726d-24
+    real(dp), parameter :: ev=1.6022d-12
+    real(dp), parameter :: clight=2.9979d10
+    real(dp), parameter :: e_charge=4.8032d-10
+
     real(dp), allocatable :: z_out(:, :)
 
     class(callback_pointer_t), allocatable :: callbacks(:)
     class(cut_callback_t), allocatable :: phi0_plus_callback, phi0_minus_callback, &
-        vpar0_plus_callback, vpar0_minus_callback
+        vpar0_plus_callback, vpar0_minus_callback, zplane_callback
 
-    integer :: phi0plus_unit, phi0minus_unit, vpar0plus_unit, vpar0minus_unit
+    integer :: phi0plus_unit, phi0minus_unit, vpar0plus_unit, vpar0minus_unit, &
+        zplane_unit
 
     namelist /config/ magfie_type, integrator_type, input_file_tok, &
         output_prefix, spatial_coordinates, velocity_coordinate, rtol, &
         rmin, rmax, zmin, zmax, rmu, ro0, dtau, ntau, nskip, n_r, n_phi, n_z, &
-        R0, phi0, Z0, vpar0
+        R0, phi0, Z0, vpar0, energy_ev, n_particles, poincare_shift
 
 contains
 
@@ -99,7 +113,7 @@ contains
             return
         end if
 
-        call init_integrator
+        call init_integrator([R0, phi0, Z0, 1d0, vpar0])
         call init_callbacks
 
         allocate(z_out(5, ntau/nskip))
@@ -132,9 +146,9 @@ contains
     end subroutine remove_extension
 
 
-    subroutine init_integrator
+    subroutine init_integrator(z)
         type(integrator_config_t) :: integ_config
-        real(dp) :: z_internal(5)
+        real(dp) :: z(5), z_internal(5)
 
         if (velocity_coordinate == "pphi") then
             field_can_ = create_field_can(spatial_coordinates)
@@ -142,9 +156,9 @@ contains
 
         print *, "init_integrator ...."
 
-        mu = compute_mu([R0, phi0, Z0, 1d0, vpar0])
+        mu = compute_mu(z)
 
-        call to_internal_coordinates([R0, phi0, Z0, 1d0, vpar0], z_internal)
+        call to_internal_coordinates(z, z_internal)
 
         integ_config = integrator_config_t(integrator_type, spatial_coordinates, &
             velocity_coordinate, z_internal, dtau, ro0, rtol, 1)
@@ -154,6 +168,7 @@ contains
         else
             integ = create_integrator(integ_config)
         end if
+
     end subroutine init_integrator
 
 
@@ -172,7 +187,8 @@ contains
 
 
     subroutine init_callbacks
-        allocate(callbacks(4))
+        integer, parameter :: NUM_CALLBACKS = 5
+        allocate(callbacks(NUM_CALLBACKS))
 
         allocate(phi0_plus_callback)
         phi0_plus_callback%distance => phi0_plus_distance
@@ -197,6 +213,12 @@ contains
         vpar0_minus_callback%event => vpar0_minus_write
         allocate(callbacks(4)%item, source=vpar0_minus_callback)
         open(newunit=vpar0minus_unit, file=trim(output_prefix) // "_vpar0minus.out")
+
+        allocate(zplane_callback)
+        zplane_callback%distance => zplane_distance
+        zplane_callback%event => zplane_write
+        allocate(callbacks(5)%item, source=zplane_callback)
+        open(newunit=zplane_unit, file=trim(output_prefix) // "_zplane.out")
     end subroutine init_callbacks
 
 
@@ -227,6 +249,48 @@ contains
         print *, "timesteps: ", ntau
         print *, "field evaluations: ", integ%get_field_evaluations()
     end subroutine trace_orbit
+
+    subroutine trace_multiple_orbits
+        integer :: i, j, kt, ierr
+        real(dp) :: zstart(5), z(5), zcyl(5)
+        real(dp) :: constant, v0, R, vpar
+
+        v0 = sqrt(2.d0*energy_ev*ev/(n_d*p_mass))
+        ro0 = v0*n_d*p_mass*clight/(n_e*e_charge)
+        constant = (1-vpar0**2)*R0
+
+        !problem: openmp cannot deal with integ being a polymorphic array
+        !!$OMP PARALLEL DEFAULT(NONE) &
+        !!$OMP& SHARED(n_particles,constant,phi0,Z0,ntau,dtau,R0) &
+        !!$OMP& PRIVATE(i,R,vpar,zstart,z,kt,ierr,zcyl,callbacks,integ)
+        !!$OMP DO
+        do i = 1, n_particles
+            print*, i, ' / ', n_particles
+
+            if (n_particles.gt.1) R = R0+(i-1)*2/(dble(n_particles)-1)
+            if (n_particles.eq.1) R = R0
+            vpar = sqrt(1-constant/R)
+            zstart = [R, phi0, Z0, 1d0, vpar]
+
+            call init_integrator(zstart)
+
+            call to_internal_coordinates(zstart, z)
+
+            do kt = 2, ntau
+                call integ%timestep(z, dtau, ierr)
+                if (ierr /= 0) then
+                    call throw_error("trace_orbit: error in timestep", ierr)
+                    !return
+                end if
+                call from_internal_coordinates(z, zcyl)
+                do j = 1, size(callbacks)
+                    call callbacks(j)%execute(kt*dtau, zcyl)
+                end do
+            end do
+        enddo   
+        !!$OMP END DO
+        !!$OMP END PARALLEL
+    end subroutine trace_multiple_orbits
 
 
     subroutine to_internal_coordinates(z, z_internal)
@@ -344,7 +408,11 @@ contains
     function phi0_plus_distance(t, z) result(distance)
         real(dp) :: distance
         real(dp), intent(in) :: t, z(:)
-        distance = modulo(z(2), twopi) - 0.5d0*twopi
+        if (poincare_shift.eqv..false.) then
+            distance = modulo(z(2) + 0.5d0*twopi, twopi) - 0.5d0*twopi
+        else
+            distance = modulo(z(2), twopi) - 0.5d0*twopi
+        endif
     end function phi0_plus_distance
 
     subroutine phi0_plus_write(t, z)
@@ -356,7 +424,11 @@ contains
     function phi0_minus_distance(t, z) result(distance)
         real(dp) :: distance
         real(dp), intent(in) :: t, z(:)
-        distance = -modulo(z(2), twopi) + 0.5d0*twopi
+        if (poincare_shift.eqv..false.) then
+            distance = -modulo(z(2) + 0.5d0*twopi, twopi) + 0.5d0*twopi
+        else
+            distance = -modulo(z(2), twopi) + 0.5d0*twopi
+        endif
     end function phi0_minus_distance
 
     subroutine phi0_minus_write(t, z)
@@ -389,6 +461,17 @@ contains
     end subroutine vpar0_minus_write
 
 
+    function zplane_distance(t, z) result(distance)
+        real(dp) :: distance
+        real(dp), intent(in) :: t, z(:)
+        distance = -(z(3) - ZPLANE_VALUE)
+    end function zplane_distance
+
+    subroutine zplane_write(t, z)
+        real(dp), intent(in) :: t, z(:)
+        write(zplane_unit, *) t, z
+    end subroutine zplane_write
+    
 
     function integ_error_message() result(msg)
         character(1024) :: msg

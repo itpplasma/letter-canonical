@@ -1,6 +1,7 @@
-&letter_canonical
+&config
     magfie_type = "tok",         ! test, tok
     integrator_type = "rk45",    ! euler0, euler1, rk45
+    input_file_tok = "field_divB0.inp", 
     !tol = 1d-8,
     !outfile = "orbit.out"
 /

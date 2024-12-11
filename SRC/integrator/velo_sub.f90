@@ -169,7 +169,6 @@ module velo_sub
         vz(5)=-(0.5d0*coala/hpstar)*(sum(hstar*derphi)/p                 &
                 + p*sum(hstar*bder)/gamma+alambd*sum(a_phi*bder))
 
-
     end subroutine velo
 
 end module velo_sub

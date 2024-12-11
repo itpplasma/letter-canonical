@@ -1,0 +1,16 @@
+&config
+    magfie_type = "tok",         ! test, tok
+    integrator_type = "rk45",     ! euler0, euler1, rk45
+    input_file_tok = "field_divB0_with_perturbations.inp", 
+    R0 = 214,!215.006d0,
+    phi0 = 0.0d0,!-6.283d0,
+    Z0 = 12.0d0,
+    vpar0 = 0.70169902018918828d0,
+    rtol = 1d-8,
+    ntau = 100000,!100000,
+    energy_eV = 3.5d3,
+    n_particles = 1, 
+    poincare_shift = .false.
+    !tol = 1d-8,
+    !outfile = "orbit.out"
+/

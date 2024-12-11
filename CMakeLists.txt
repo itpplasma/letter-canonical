@@ -63,7 +63,7 @@ set(LIBNEO_SOURCES
     ../libneo/src/spl_three_to_five.f90
     ../libneo/src/odeint_rkf45.f90
     ../libneo/src/contrib/rkf45.f90
-    ../libneo/src/interpolate.f90
+    ../libneo/src/interpolate/interpolate.f90
     ../libneo/src/binsrc.f90
     ../libneo/src/plag_coeff.f90
 )
