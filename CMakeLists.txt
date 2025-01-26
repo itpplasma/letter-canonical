@@ -12,7 +12,7 @@ if(CMAKE_Fortran_COMPILER_ID STREQUAL "Intel")
     set(CMAKE_Fortran_FLAGS_RELEASE "-O3 ${CMAKE_Fortran_FLAGS}")
     set(CMAKE_Fortran_FLAGS_DEBUG "-O0 ${CMAKE_Fortran_FLAGS}")
 elseif(CMAKE_Fortran_COMPILER_ID STREQUAL "GNU")
-    set(CMAKE_Fortran_FLAGS "-fPIC -g -fbacktrace -fopenmp -march=native -mtune=native \
+    set(CMAKE_Fortran_FLAGS "-fPIC -g -fbacktrace -fopenmp -march=native \
         -Wall -Wuninitialized -Wno-maybe-uninitialized -Wno-unused-label \
         -Wno-unused-dummy-argument -fmax-errors=1")
     set(CMAKE_Fortran_FLAGS_RELEASE "-O3 ${CMAKE_Fortran_FLAGS}")
