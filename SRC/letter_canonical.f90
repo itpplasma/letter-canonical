@@ -287,7 +287,7 @@ contains
                     call callbacks(j)%execute(kt*dtau, zcyl)
                 end do
             end do
-        enddo   
+        enddo
         !!$OMP END DO
         !!$OMP END PARALLEL
     end subroutine trace_multiple_orbits
@@ -471,7 +471,7 @@ contains
         real(dp), intent(in) :: t, z(:)
         write(zplane_unit, *) t, z
     end subroutine zplane_write
-    
+
 
     function integ_error_message() result(msg)
         character(1024) :: msg
