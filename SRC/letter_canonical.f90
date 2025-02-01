@@ -408,7 +408,7 @@ contains
     function phi0_plus_distance(t, z) result(distance)
         real(dp) :: distance
         real(dp), intent(in) :: t, z(:)
-        if (poincare_shift.eqv..false.) then
+        if (.not. poincare_shift) then
             distance = modulo(z(2) + 0.5d0*twopi, twopi) - 0.5d0*twopi
         else
             distance = modulo(z(2), twopi) - 0.5d0*twopi
@@ -424,7 +424,7 @@ contains
     function phi0_minus_distance(t, z) result(distance)
         real(dp) :: distance
         real(dp), intent(in) :: t, z(:)
-        if (poincare_shift.eqv..false.) then
+        if (.not. poincare_shift) then
             distance = -modulo(z(2) + 0.5d0*twopi, twopi) + 0.5d0*twopi
         else
             distance = -modulo(z(2), twopi) + 0.5d0*twopi
