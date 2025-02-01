@@ -2,7 +2,8 @@ export LD_LIBRARY_PATH := $(LD_LIBRARY_PATH):..
 
 
 MAIN = ../BUILD/letter_canonical.x
-CASES = fig1_dop853_cyl fig1_rk45_cyl fig1_midpoint
+CASES = fig1_dop853_cyl fig1_rk45_cyl fig1_midpoint \
+        fig2_dop853_cyl fig2_rk45_cyl fig2_midpoint
 
 all: Aph_of_xc.out $(addsuffix .out, $(CASES))
 
