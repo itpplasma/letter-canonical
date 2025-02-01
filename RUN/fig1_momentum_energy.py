@@ -14,27 +14,24 @@ def load_data(prefix):
 
 tau_midpoint, pphi_midpoint, H_midpoint = load_data('fig1_midpoint')
 tau_rk45_cyl, pphi_rk45_cyl, H_rk45_cyl = load_data('fig1_rk45_cyl')
-tau_rk45_can, pphi_rk45_can, H_rk45_can = load_data('fig1_rk45_can')
-tau_dop853_cyl, pphi_dop853_cyl, H_dop853_cyl = load_data('fig1_dop853_cyl')
+tau_rk45_can, pphi_rk45_can, H_rk45_can = load_data('fig1_dop853_cyl')
 
 plt.figure()
-plt.plot(tau_midpoint/tau_bounce, H_midpoint/H_midpoint[0], ',', color='black')
 plt.plot(tau_rk45_cyl/tau_bounce, H_rk45_cyl/H_rk45_cyl[0], ',', color='darkgray')
 plt.plot(tau_rk45_can/tau_bounce, H_rk45_can/H_rk45_can[0], ',', color='lightgray')
-plt.plot(tau_dop853_cyl/tau_bounce, H_dop853_cyl/H_dop853_cyl[0], ',', color='red')
+plt.plot(tau_midpoint/tau_bounce, H_midpoint/H_midpoint[0], ',', color='black')
 plt.xlabel(r'number of bounce periods $t/\tau_{\mathrm{b}}$')
 plt.ylabel(r'normalized energy $H$')
-plt.ylim([0.94, 1.06])
+plt.ylim([0.9, 1.1])
 exportpng('fig1b_energy')
 
 plt.figure()
-plt.plot(tau_midpoint/tau_bounce, pphi_midpoint/pphi_midpoint[0], ',', color='black')
 plt.plot(tau_rk45_cyl/tau_bounce, pphi_rk45_cyl/pphi_rk45_cyl[0], ',', color='darkgray')
 plt.plot(tau_rk45_can/tau_bounce, pphi_rk45_can/pphi_rk45_can[0], ',', color='lightgray')
-plt.plot(tau_dop853_cyl/tau_bounce, pphi_dop853_cyl/pphi_dop853_cyl[0], ',', color='red')
+plt.plot(tau_midpoint/tau_bounce, pphi_midpoint/pphi_midpoint[0], ',', color='black')
 plt.xlabel(r'number of bounce periods $t/\tau_{\mathrm{b}}$')
 plt.ylabel(r'normalized toroidal momentum $p_\varphi$')
-plt.ylim([0.94, 1.06])
+plt.ylim([0.9, 1.1])
 exportpng('fig1c_pphi')
 
 # %%
@@ -45,16 +42,14 @@ def load_banana(prefix):
     z = data[:,1:]
     return tau, z
 
-tau_midpoint, z_euler = load_banana('fig1_midpoint')
+tau_midpoint, z_midpoint = load_banana('fig1_midpoint')
 tau_rk45_cyl, z_rk45_cyl = load_banana('fig1_rk45_cyl')
-tau_rk45_can, z_rk45_can = load_banana('fig1_rk45_can')
 tau_dop853_cyl, z_dop853_cyl = load_banana('fig1_dop853_cyl')
 
 plt.figure(figsize=(2.4,3.2))
-plt.plot(z_rk45_cyl[:,0], z_rk45_cyl[:,2], '-', color='darkgray')
-plt.plot(z_rk45_can[:,0], z_rk45_can[:,2], '-', color='lightgray')
-plt.plot(z_euler[:,0], z_euler[:,2], ',', color='black')
-plt.plot(z_dop853_cyl[:,0], z_dop853_cyl[:,2], ',', color='red')
+plt.plot(z_rk45_cyl[:,0], z_rk45_cyl[:,2], ',', color='darkgray')
+plt.plot(z_dop853_cyl[:,0], z_dop853_cyl[:,2], ',', color='lightgray')
+plt.plot(z_midpoint[:,0], z_midpoint[:,2], ',', color='black')
 plt.xlabel(r'$R$ / cm')
 plt.ylabel(r'$Z$ / cm')
 

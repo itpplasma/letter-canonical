@@ -1,17 +1,17 @@
 export LD_LIBRARY_PATH := $(LD_LIBRARY_PATH):..
 
-all: Aph_of_xc.out orbit.out orbit_rmp.out
 
 MAIN = ../BUILD/letter_canonical.x
+CASES = fig1_dop853_cyl fig1_rk45_cyl fig1_midpoint
 
-orbit_rmp.out: letter_canonical_rmp.in $(MAIN)
-	$(MAIN) letter_canonical_rmp.in
+all: Aph_of_xc.out $(addsuffix .out, $(CASES))
 
-expl_impl_euler.out: field_divB0.inp letter_canonical.in ../letter_canonical.x
+%.out: %.in $(MAIN)
+	$(MAIN) $<
 
 
-Aph_of_xc.out: field_divB0.inp ../test_magfie.x
-	../build/test_magfie.x
+Aph_of_xc.out: field_divB0.inp ../BUILD/test_magfie.x
+	../BUILD/test_magfie.x
 
 clean:
 	rm -f *.out fort.*
