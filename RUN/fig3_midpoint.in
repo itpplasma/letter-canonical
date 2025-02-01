@@ -6,7 +6,7 @@
     integrator_type = "midpoint"
     ntau = 500000
     nskip = 50
-    dtau = 2d1
+    dtau = 1d1
 
     ! need phi resolution now for the RMP
     n_r=100, n_phi=64, n_z=150
