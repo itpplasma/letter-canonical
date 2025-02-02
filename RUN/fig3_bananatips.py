@@ -20,8 +20,8 @@ plt.plot(z_euler[:,0], z_euler[:,2], ',', color='red')
 plt.xlabel(r'$R$ / cm')
 plt.ylabel(r'$Z$ / cm')
 
-#plt.xlim([153.8, 154.12])
-#plt.ylim([53.1, 54.3])
+plt.xlim([153.8, 154.12])
+plt.ylim([53.1, 54.3])
 exportpng('fig3_bananatips')
 
 # %%
