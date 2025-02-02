@@ -7,7 +7,7 @@
     ntau = 160000                       ! number of time steps
     nskip = 1                           ! number of time steps to skip
     dtau = 4d2                          ! time step
-    rtol = 2d-5
+    rtol = 5d-11
 
     ! banana tip
     R0=154.0d0, phi0=-6.283d0, Z0=54.22d0, vpar0=0d0
