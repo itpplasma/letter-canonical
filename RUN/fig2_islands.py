@@ -11,7 +11,7 @@ def load_banana(prefix):
 
 tau_euler, z_euler = load_banana('fig2_midpoint')
 tau_rk45_cyl, z_rk45_cyl = load_banana('fig2_rk45_cyl')
-tau_rk45_can, z_rk45_can = load_banana('fig2_rk45_can')
+tau_rk45_can, z_rk45_can = load_banana('fig2_dop853_cyl')
 
 plt.figure(figsize=(2.4,3.2))
 plt.plot(z_rk45_can[:,0], z_rk45_can[:,2], ',', color='lightgray')

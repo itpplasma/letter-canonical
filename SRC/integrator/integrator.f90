@@ -9,6 +9,7 @@ module integrator
     use integrator_midpoint
     use rk45_cyl_integrator, only: rk45_cyl_integrator_t
     use rk45_can_integrator, only: rk45_can_integrator_t
+    use dop853_cyl_integrator, only: dop853_cyl_integrator_t
     use expl_impl_euler_integrator, only: expl_impl_euler_integrator_t
     use midpoint_integrator, only: midpoint_integrator_t
 
@@ -80,6 +81,8 @@ module integrator
 
         if (config%integ_type == "rk45" .and. config%spatial_coords == "cyl") then
             integ = rk45_cyl_integrator_t(1d8, config%ro0, config%rtol)
+        else if(config%integ_type == "dop853" .and. config%spatial_coords == "cyl") then
+            integ = dop853_cyl_integrator_t(1d8, config%ro0, config%rtol)
         else if (config%integ_type == "rk45" .and. &
                  config%spatial_coords == "albert") then
             integ = rk45_can_integrator_t(1d8, config%ro0, config%rtol)

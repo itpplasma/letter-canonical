@@ -31,6 +31,7 @@ set(SOURCES
     SRC/test_util.f90
     SRC/magfie.f90
     SRC/magfie_test.f90
+    SRC/magfie_cyl.f90
     SRC/magfie_tok.f90
     SRC/magfie_factory.f90
     SRC/psi_transform.f90
@@ -41,6 +42,7 @@ set(SOURCES
     SRC/field_can_cyl.f90
     SRC/field_can_albert.f90
     SRC/field_can.f90
+    SRC/external/dop853_module.F90
     SRC/integrator/integrator_base.f90
     SRC/integrator/integrator_rk45.f90
     SRC/integrator/integrator_euler0.f90
@@ -51,6 +53,7 @@ set(SOURCES
     SRC/integrator/rk45_can_integrator.f90
     SRC/integrator/expl_impl_euler_integrator.f90
     SRC/integrator/midpoint_integrator.f90
+    SRC/integrator/dop853_cyl_integrator.f90
     SRC/integrator/integrator.f90
     SRC/callback/callback_base.f90
     SRC/callback/cut_callback.f90
@@ -84,8 +87,8 @@ set(MAGFIE_SOURCES
     ../libneo/src/magfie/bdivfree.f90
 )
 
-add_library(field SHARED ${LIBNEO_SOURCES} ${MAGFIE_SOURCES})
-add_library(canonical SHARED ${SOURCES})
+add_library(field STATIC ${LIBNEO_SOURCES} ${MAGFIE_SOURCES})
+add_library(canonical STATIC ${SOURCES})
 target_link_libraries(canonical field blas lapack)
 
 add_executable(letter_canonical.x SRC/main.f90)

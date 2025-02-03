@@ -3,11 +3,11 @@
     input_file_tok = "field_divB0_rmp.inp"  ! default: field_divB0.inp
     spatial_coordinates = "cyl"         ! cyl, cyl_can, albert, flux, flux_can
     velocity_coordinate = "vpar"        ! vpar, pphi
-    integrator_type = "rk45"            ! rk45, expl_impl_euler
+    integrator_type = "dop853"          ! rk45, expl_impl_euler
     ntau = 160000                       ! number of time steps
     nskip = 1                           ! number of time steps to skip
     dtau = 4d2                          ! time step
-    rtol = 7.5d-11
+    rtol = 5d-11
 
     ! banana tip
     R0=154.0d0, phi0=-6.283d0, Z0=54.22d0, vpar0=0d0
