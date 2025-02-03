@@ -12,9 +12,9 @@ def load_data(prefix):
     H = data[:,2]
     return tau, pphi, H
 
-tau_midpoint, pphi_midpoint, H_midpoint = load_data('fig1_midpoint')
-tau_rk45_cyl, pphi_rk45_cyl, H_rk45_cyl = load_data('fig1_rk45_cyl')
-tau_rk45_can, pphi_rk45_can, H_rk45_can = load_data('fig1_dop853_cyl')
+tau_midpoint, pphi_midpoint, H_midpoint = load_data('fig1_midpoint')    #
+tau_rk45_cyl, pphi_rk45_cyl, H_rk45_cyl = load_data('fig1_rk45_cyl')    # 78147519 evals
+tau_rk45_can, pphi_rk45_can, H_rk45_can = load_data('fig1_dop853_cyl')  # 121267542 evals
 
 plt.figure()
 plt.plot(tau_rk45_cyl/tau_bounce, H_rk45_cyl/H_rk45_cyl[0], ',', color='darkgray')
