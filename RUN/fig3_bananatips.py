@@ -21,7 +21,7 @@ plt.xlabel(r'$R$ / cm')
 plt.ylabel(r'$Z$ / cm')
 
 plt.xlim([153.6, 154.2])
-plt.ylim([53, 61.5])
+plt.ylim([52.8, 61.5])
 exportpng('fig3_bananatips')
 
 # %%
