@@ -4,10 +4,10 @@
     spatial_coordinates = "cyl"         ! cyl, cyl_can, albert, flux, flux_can
     velocity_coordinate = "vpar"        ! vpar, pphi
     integrator_type = "dop853"          ! rk45, expl_impl_euler
-    ntau = 100000                       ! number of time steps
-    nskip = 10                          ! number of time steps to skip
-    dtau = 1d2                          ! time step
-    rtol = 5d-8
+    ntau = 160000                       ! number of time steps
+    nskip = 1                           ! number of time steps to skip
+    dtau = 4d2                          ! time step
+    rtol = 5d-11
 
     ! island-chain at resonant surface
     R0=154.0d0, phi0=-6.283d0, Z0=54.22d0, vpar0=1d0

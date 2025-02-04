@@ -4,12 +4,12 @@
     spatial_coordinates = "albert"
     velocity_coordinate = "pphi"
     integrator_type = "midpoint"
-    ntau = 1000000
-    nskip = 100
-    dtau = 1d1
+    ntau = 12800000
+    nskip = 10
+    dtau = 5d0
 
     ! need phi resolution now for the RMP
-    n_r=100, n_phi=32, n_z=150
+    n_r=200, n_phi=32, n_z=300
 
     ! island-chain at resonant surface
     R0=154.0d0, phi0=-6.283d0, Z0=54.22d0, vpar0=1d0
