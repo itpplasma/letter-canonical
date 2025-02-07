@@ -20,8 +20,8 @@ plt.plot(z_midpoint[:,0], z_midpoint[:,2], ',', color='black')
 plt.xlabel(r'$R$ / cm')
 plt.ylabel(r'$Z$ / cm')
 
-plt.xlim([125, 145])
-plt.ylim([-25, 15])
+plt.xlim([110, 240])
+plt.ylim([-60, 70])
 
 exportpng('fig2_islands')
 
