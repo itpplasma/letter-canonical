@@ -1,6 +1,8 @@
-Paper on Overleaf: https://www.overleaf.com/7388537417rqszybvwmksm#ccca0a
+Paper on Overleaf: <https://www.overleaf.com/7388537417rqszybvwmksm#ccca0a>
 
-    make paper
+```
+make paper
+```
 
 to clone.
 
