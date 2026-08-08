@@ -434,7 +434,12 @@ contains
 
     subroutine phi0_plus_write(t, z)
         real(dp), intent(in) :: t, z(:)
+        ! The output unit is shared across OpenMP threads (the per-thread
+        ! callback copies still invoke these module-level writers), so the
+        ! write must be serialized to avoid interleaving records.
+        !$omp critical (callback_write_phi0plus)
         write(phi0plus_unit, *) t, z
+        !$omp end critical (callback_write_phi0plus)
     end subroutine phi0_plus_write
 
 
@@ -450,7 +455,12 @@ contains
 
     subroutine phi0_minus_write(t, z)
         real(dp), intent(in) :: t, z(:)
+        ! The output unit is shared across OpenMP threads (the per-thread
+        ! callback copies still invoke these module-level writers), so the
+        ! write must be serialized to avoid interleaving records.
+        !$omp critical (callback_write_phi0minus)
         write(phi0minus_unit, *) t, z
+        !$omp end critical (callback_write_phi0minus)
     end subroutine phi0_minus_write
 
 
@@ -462,7 +472,12 @@ contains
 
     subroutine vpar0_plus_write(t, z)
         real(dp), intent(in) :: t, z(:)
+        ! The output unit is shared across OpenMP threads (the per-thread
+        ! callback copies still invoke these module-level writers), so the
+        ! write must be serialized to avoid interleaving records.
+        !$omp critical (callback_write_vpar0plus)
         write(vpar0plus_unit, *) t, z
+        !$omp end critical (callback_write_vpar0plus)
     end subroutine vpar0_plus_write
 
 
@@ -474,7 +489,12 @@ contains
 
     subroutine vpar0_minus_write(t, z)
         real(dp), intent(in) :: t, z(:)
+        ! The output unit is shared across OpenMP threads (the per-thread
+        ! callback copies still invoke these module-level writers), so the
+        ! write must be serialized to avoid interleaving records.
+        !$omp critical (callback_write_vpar0minus)
         write(vpar0minus_unit, *) t, z
+        !$omp end critical (callback_write_vpar0minus)
     end subroutine vpar0_minus_write
 
 
@@ -486,7 +506,12 @@ contains
 
     subroutine zplane_write(t, z)
         real(dp), intent(in) :: t, z(:)
+        ! The output unit is shared across OpenMP threads (the per-thread
+        ! callback copies still invoke these module-level writers), so the
+        ! write must be serialized to avoid interleaving records.
+        !$omp critical (callback_write_zplane)
         write(zplane_unit, *) t, z
+        !$omp end critical (callback_write_zplane)
     end subroutine zplane_write
 
 
