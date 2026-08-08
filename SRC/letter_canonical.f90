@@ -38,6 +38,13 @@ module letter_canonical
     type(symplectic_integrator_data_t) :: si
     type(field_can_data_t) :: f
 
+    ! Each OpenMP thread keeps its own copy of the polymorphic integrator and
+    ! the mutable phase-space state it relies on, so the parallel orbits in
+    ! trace_multiple_orbits do not race on shared module data.  (gfortran does
+    ! not support polymorphic/allocatable data on PRIVATE/FIRSTPRIVATE lists,
+    ! see the discussion in issue #1.)
+    !$omp threadprivate(integ, field_can_, mu, si, f)
+
     real(dp) :: rmu=1d30, ro0=20000d0*2d0  ! 20000 Gauss, 1cm Larmor radius
 
     real(dp) :: dtau=1d0, rtol=1d-13
@@ -254,16 +261,25 @@ contains
         integer :: i, j, kt, ierr
         real(dp) :: zstart(5), z(5), zcyl(5)
         real(dp) :: constant, v0, R, vpar
+        ! per-thread deep copy of the master-initialized callbacks.  The
+        ! polymorphic allocatables (integ, callbacks) cannot appear on
+        ! PRIVATE/FIRSTPRIVATE OpenMP lists (gfortran: "polymorphic arrays not
+        ! yet supported for firstprivate"), so each thread makes its own copy
+        ! with allocate(source=...) inside the parallel region instead.
+        type(callback_pointer_t), allocatable :: callbacks_local(:)
 
         v0 = sqrt(2.d0*energy_ev*ev/(n_d*p_mass))
         ro0 = v0*n_d*p_mass*clight/(n_e*e_charge)
         constant = (1-vpar0**2)*R0
 
-        !problem: openmp cannot deal with integ being a polymorphic array
-        !!$OMP PARALLEL DEFAULT(NONE) &
-        !!$OMP& SHARED(n_particles,constant,phi0,Z0,ntau,dtau,R0) &
-        !!$OMP& PRIVATE(i,R,vpar,zstart,z,kt,ierr,zcyl,callbacks,integ)
-        !!$OMP DO
+        ! integ, field_can_, mu, si and f are threadprivate (see module
+        ! declarations), so each thread rebuilds its own integrator in
+        ! init_integrator without racing on shared state.
+        !$OMP PARALLEL DEFAULT(NONE) &
+        !$OMP& SHARED(n_particles,constant,phi0,Z0,ntau,dtau,R0,callbacks) &
+        !$OMP& PRIVATE(i,R,vpar,zstart,z,kt,ierr,zcyl,callbacks_local)
+            allocate(callbacks_local, source=callbacks)
+        !$OMP DO
         do i = 1, n_particles
             print*, i, ' / ', n_particles
 
@@ -283,13 +299,14 @@ contains
                     !return
                 end if
                 call from_internal_coordinates(z, zcyl)
-                do j = 1, size(callbacks)
-                    call callbacks(j)%execute(kt*dtau, zcyl)
+                do j = 1, size(callbacks_local)
+                    call callbacks_local(j)%execute(kt*dtau, zcyl)
                 end do
             end do
         enddo
-        !!$OMP END DO
-        !!$OMP END PARALLEL
+        !$OMP END DO
+            deallocate(callbacks_local)
+        !$OMP END PARALLEL
     end subroutine trace_multiple_orbits
 
 
