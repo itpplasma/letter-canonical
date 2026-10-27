@@ -43,12 +43,12 @@ program test_biotsavart
             deinit_coils_data, clight
 
         real(dp), parameter :: tol = 1.0e-9
-        integer, parameter :: N_TEST = 3
+        integer, parameter :: N_TEST = 4
 
         type(coils_t) :: coils
         real(dp) :: x_test(3, N_TEST)
         real(dp), dimension(3) :: x, A, A_expected
-        real(dp) :: sqrt_term, L, R, AZ_expected
+        real(dp) :: L, R, AZ_expected
         integer :: i
 
         call print_test("compute_vector_potential")
@@ -56,6 +56,7 @@ program test_biotsavart
         x_test(:, 1) = [0.4, 0.3, 0.8]
         x_test(:, 2) = [0.0, 0.1, 0.3]
         x_test(:, 3) = [1e-5, 0.0, 0.0]
+        x_test(:, 4) = [2000.0_dp, 0.0_dp, 0.8_dp]
 
         call init_test_coils_data(coils)
 
@@ -63,8 +64,9 @@ program test_biotsavart
             x = x_test(:, i)
             L = large_distance
             R = Rcyl(x)
-            sqrt_term = sqrt(L**2 + R**2)
-            AZ_expected = 1.0d0/clight*log((L + sqrt_term)/(-L + sqrt_term))
+            ! Integral of 1/r from the lower to the upper segment endpoint.
+            AZ_expected = (asinh((L/2.0d0 - x(3))/R) + &
+                asinh((L/2.0d0 + x(3))/R))/clight
             A_expected = [0.0d0, 0.0d0, AZ_expected]
             A = compute_vector_potential(coils, x)
             print *, "A = ", A(3)*clight

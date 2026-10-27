@@ -91,6 +91,7 @@ module biotsavart
         real(dp), intent(in) :: x(3)
 
         real(dp) :: A(3), dx_i(3), dx_f(3), dl(3), R_i, R_f, L, eps, log_term
+        real(dp) :: along, transverse(3), rho
         integer :: i
 
         A = 0.0d0
@@ -108,7 +109,15 @@ module biotsavart
             R_f = sqrt(dx_f(1)**2 + dx_f(2)**2 + dx_f(3)**2)
             L = sqrt(dl(1)**2 + dl(2)**2 + dl(3)**2)
             eps = L / (R_i + R_f)
-            log_term = log((1.0d0 + eps) / (1.0d0 - eps))
+            along = dot_product(dx_i, dl)/L
+            transverse = dx_i - along*(dl/L)
+            rho = sqrt(sum(transverse**2))
+            ! The distance ratio loses its denominator close to the segment.
+            if (eps > 0.5d0 .and. rho > 0.0d0) then
+                include 'generated/segment_log.inc'
+            else
+                log_term = log((1.0d0 + eps) / (1.0d0 - eps))
+            end if
             A = A + (dl / (clight*L)) * log_term
         end do
     end function compute_vector_potential
