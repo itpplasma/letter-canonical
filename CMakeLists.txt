@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.10)
+cmake_minimum_required(VERSION 3.18)
 project(letter-canonical C Fortran)
 set(CMAKE_POSITION_INDEPENDENT_CODE ON)
 
@@ -61,30 +61,38 @@ set(SOURCES
     SRC/letter_canonical.f90
 )
 
+# This project uses selected libneo sources rather than its complete build.
+include(FetchContent)
+FetchContent_Declare(libneo
+    GIT_REPOSITORY https://github.com/itpplasma/libneo.git
+    GIT_TAG da0a410ecb16e693080fcfd65a26b720d4fbe830
+    SOURCE_SUBDIR letter-selected-sources)
+FetchContent_MakeAvailable(libneo)
+
 set(LIBNEO_SOURCES
-    ../libneo/src/libneo_kinds.f90
-    ../libneo/src/math_constants.f90
-    ../libneo/src/spl_three_to_five.f90
-    ../libneo/src/odeint_rkf45.f90
-    ../libneo/src/contrib/rkf45.f90
-    ../libneo/src/interpolate/interpolate.f90
-    ../libneo/src/binsrc.f90
-    ../libneo/src/plag_coeff.f90
+    ${libneo_SOURCE_DIR}/src/libneo_kinds.f90
+    ${libneo_SOURCE_DIR}/src/math_constants.f90
+    ${libneo_SOURCE_DIR}/src/spl_three_to_five.f90
+    ${libneo_SOURCE_DIR}/src/odeint_rkf45.f90
+    ${libneo_SOURCE_DIR}/src/contrib/rkf45.f90
+    ${libneo_SOURCE_DIR}/src/interpolate/interpolate.f90
+    ${libneo_SOURCE_DIR}/src/binsrc.f90
+    ${libneo_SOURCE_DIR}/src/plag_coeff.f90
 )
 
 set(MAGFIE_SOURCES
-    ../libneo/src/magfie/spline5_RZ.f90
-    ../libneo/src/magfie/theta_rz_mod.f90
-    ../libneo/src/magfie/extract_fluxcoord_mod.f90
-    ../libneo/src/magfie/amn_mod.f90
-    ../libneo/src/magfie/field_mod.f90
-    ../libneo/src/magfie/field_eq_mod.f90
-    ../libneo/src/magfie/field_c_mod.f90
-    ../libneo/src/magfie/input_files.f90
-    ../libneo/src/magfie/inthecore_mod.f90
-    ../libneo/src/magfie/field_divB0.f90
-    ../libneo/src/magfie/bdivfree_mod.f90
-    ../libneo/src/magfie/bdivfree.f90
+    ${libneo_SOURCE_DIR}/src/magfie/spline5_RZ.f90
+    ${libneo_SOURCE_DIR}/src/magfie/theta_rz_mod.f90
+    ${libneo_SOURCE_DIR}/src/magfie/extract_fluxcoord_mod.f90
+    ${libneo_SOURCE_DIR}/src/magfie/amn_mod.f90
+    ${libneo_SOURCE_DIR}/src/magfie/field_mod.f90
+    ${libneo_SOURCE_DIR}/src/magfie/field_eq_mod.f90
+    ${libneo_SOURCE_DIR}/src/magfie/field_c_mod.f90
+    ${libneo_SOURCE_DIR}/src/magfie/input_files.f90
+    ${libneo_SOURCE_DIR}/src/magfie/inthecore_mod.f90
+    ${libneo_SOURCE_DIR}/src/magfie/field_divB0.f90
+    ${libneo_SOURCE_DIR}/src/magfie/bdivfree_mod.f90
+    ${libneo_SOURCE_DIR}/src/magfie/bdivfree.f90
 )
 
 add_library(field STATIC ${LIBNEO_SOURCES} ${MAGFIE_SOURCES})
@@ -120,3 +128,9 @@ target_link_libraries(test_large.x canonical)
 
 add_executable(test_biotsavart.x SRC/test_biotsavart.f90)
 target_link_libraries(test_biotsavart.x canonical)
+
+enable_testing()
+add_test(NAME biotsavart COMMAND test_biotsavart.x)
+add_test(NAME callback COMMAND test_callback.x)
+add_test(NAME core COMMAND test.x)
+add_test(NAME integrator COMMAND test_integrator.x)
