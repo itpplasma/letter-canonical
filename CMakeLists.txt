@@ -134,3 +134,8 @@ add_test(NAME biotsavart COMMAND test_biotsavart.x)
 add_test(NAME callback COMMAND test_callback.x)
 add_test(NAME core COMMAND test.x)
 add_test(NAME integrator COMMAND test_integrator.x)
+
+find_package(Python3 REQUIRED COMPONENTS Interpreter)
+add_test(NAME parallel_orbits
+    COMMAND "${Python3_EXECUTABLE}" "${CMAKE_CURRENT_SOURCE_DIR}/test/test_parallel_orbits.py"
+        "$<TARGET_FILE:letter_canonical.x>")

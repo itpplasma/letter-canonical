@@ -58,6 +58,8 @@ module letter_canonical
 
     integer :: n_d = 4, n_e = 2
     integer :: n_particles
+    integer :: current_orbit = 1
+    !$omp threadprivate(current_orbit)
     logical :: poincare_shift = .true.
 
     real(dp), parameter :: p_mass=1.6726d-24
@@ -261,11 +263,9 @@ contains
         integer :: i, j, kt, ierr
         real(dp) :: zstart(5), z(5), zcyl(5)
         real(dp) :: constant, v0, R, vpar
-        ! per-thread deep copy of the master-initialized callbacks.  The
-        ! polymorphic allocatables (integ, callbacks) cannot appear on
-        ! PRIVATE/FIRSTPRIVATE OpenMP lists (gfortran: "polymorphic arrays not
-        ! yet supported for firstprivate"), so each thread makes its own copy
-        ! with allocate(source=...) inside the parallel region instead.
+        ! Callback interpolation history belongs to one orbit. Polymorphic
+        ! allocatables cannot appear on OpenMP PRIVATE/FIRSTPRIVATE lists,
+        ! so copy them with allocate(source=...) inside the orbit loop.
         type(callback_pointer_t), allocatable :: callbacks_local(:)
 
         v0 = sqrt(2.d0*energy_ev*ev/(n_d*p_mass))
@@ -277,10 +277,11 @@ contains
         ! init_integrator without racing on shared state.
         !$OMP PARALLEL DEFAULT(NONE) &
         !$OMP& SHARED(n_particles,constant,phi0,Z0,ntau,dtau,R0,callbacks) &
-        !$OMP& PRIVATE(i,R,vpar,zstart,z,kt,ierr,zcyl,callbacks_local)
-            allocate(callbacks_local, source=callbacks)
+        !$OMP& PRIVATE(i,j,R,vpar,zstart,z,kt,ierr,zcyl,callbacks_local)
         !$OMP DO
         do i = 1, n_particles
+            current_orbit = i
+            allocate(callbacks_local, source=callbacks)
             print*, i, ' / ', n_particles
 
             if (n_particles.gt.1) R = R0+(i-1)*2/(dble(n_particles)-1)
@@ -303,9 +304,9 @@ contains
                     call callbacks_local(j)%execute(kt*dtau, zcyl)
                 end do
             end do
+            deallocate(callbacks_local)
         enddo
         !$OMP END DO
-            deallocate(callbacks_local)
         !$OMP END PARALLEL
     end subroutine trace_multiple_orbits
 
@@ -438,7 +439,7 @@ contains
         ! callback copies still invoke these module-level writers), so the
         ! write must be serialized to avoid interleaving records.
         !$omp critical (callback_write_phi0plus)
-        write(phi0plus_unit, *) t, z
+        write(phi0plus_unit, *) t, z, current_orbit
         !$omp end critical (callback_write_phi0plus)
     end subroutine phi0_plus_write
 
@@ -459,7 +460,7 @@ contains
         ! callback copies still invoke these module-level writers), so the
         ! write must be serialized to avoid interleaving records.
         !$omp critical (callback_write_phi0minus)
-        write(phi0minus_unit, *) t, z
+        write(phi0minus_unit, *) t, z, current_orbit
         !$omp end critical (callback_write_phi0minus)
     end subroutine phi0_minus_write
 
@@ -476,7 +477,7 @@ contains
         ! callback copies still invoke these module-level writers), so the
         ! write must be serialized to avoid interleaving records.
         !$omp critical (callback_write_vpar0plus)
-        write(vpar0plus_unit, *) t, z
+        write(vpar0plus_unit, *) t, z, current_orbit
         !$omp end critical (callback_write_vpar0plus)
     end subroutine vpar0_plus_write
 
@@ -493,7 +494,7 @@ contains
         ! callback copies still invoke these module-level writers), so the
         ! write must be serialized to avoid interleaving records.
         !$omp critical (callback_write_vpar0minus)
-        write(vpar0minus_unit, *) t, z
+        write(vpar0minus_unit, *) t, z, current_orbit
         !$omp end critical (callback_write_vpar0minus)
     end subroutine vpar0_minus_write
 
@@ -510,7 +511,7 @@ contains
         ! callback copies still invoke these module-level writers), so the
         ! write must be serialized to avoid interleaving records.
         !$omp critical (callback_write_zplane)
-        write(zplane_unit, *) t, z
+        write(zplane_unit, *) t, z, current_orbit
         !$omp end critical (callback_write_zplane)
     end subroutine zplane_write
 
