@@ -38,6 +38,13 @@ module letter_canonical
     type(symplectic_integrator_data_t) :: si
     type(field_can_data_t) :: f
 
+    ! Each OpenMP thread keeps its own copy of the polymorphic integrator and
+    ! the mutable phase-space state it relies on, so the parallel orbits in
+    ! trace_multiple_orbits do not race on shared module data.  (gfortran does
+    ! not support polymorphic/allocatable data on PRIVATE/FIRSTPRIVATE lists,
+    ! see the discussion in issue #1.)
+    !$omp threadprivate(integ, field_can_, mu, si, f)
+
     real(dp) :: rmu=1d30, ro0=20000d0*2d0  ! 20000 Gauss, 1cm Larmor radius
 
     real(dp) :: dtau=1d0, rtol=1d-13
@@ -51,6 +58,8 @@ module letter_canonical
 
     integer :: n_d = 4, n_e = 2
     integer :: n_particles
+    integer :: current_orbit = 1
+    !$omp threadprivate(current_orbit)
     logical :: poincare_shift = .true.
 
     real(dp), parameter :: p_mass=1.6726d-24
@@ -254,17 +263,25 @@ contains
         integer :: i, j, kt, ierr
         real(dp) :: zstart(5), z(5), zcyl(5)
         real(dp) :: constant, v0, R, vpar
+        ! Callback interpolation history belongs to one orbit. Polymorphic
+        ! allocatables cannot appear on OpenMP PRIVATE/FIRSTPRIVATE lists,
+        ! so copy them with allocate(source=...) inside the orbit loop.
+        type(callback_pointer_t), allocatable :: callbacks_local(:)
 
         v0 = sqrt(2.d0*energy_ev*ev/(n_d*p_mass))
         ro0 = v0*n_d*p_mass*clight/(n_e*e_charge)
         constant = (1-vpar0**2)*R0
 
-        !problem: openmp cannot deal with integ being a polymorphic array
-        !!$OMP PARALLEL DEFAULT(NONE) &
-        !!$OMP& SHARED(n_particles,constant,phi0,Z0,ntau,dtau,R0) &
-        !!$OMP& PRIVATE(i,R,vpar,zstart,z,kt,ierr,zcyl,callbacks,integ)
-        !!$OMP DO
+        ! integ, field_can_, mu, si and f are threadprivate (see module
+        ! declarations), so each thread rebuilds its own integrator in
+        ! init_integrator without racing on shared state.
+        !$OMP PARALLEL DEFAULT(NONE) &
+        !$OMP& SHARED(n_particles,constant,phi0,Z0,ntau,dtau,R0,callbacks) &
+        !$OMP& PRIVATE(i,j,R,vpar,zstart,z,kt,ierr,zcyl,callbacks_local)
+        !$OMP DO
         do i = 1, n_particles
+            current_orbit = i
+            allocate(callbacks_local, source=callbacks)
             print*, i, ' / ', n_particles
 
             if (n_particles.gt.1) R = R0+(i-1)*2/(dble(n_particles)-1)
@@ -283,13 +300,14 @@ contains
                     !return
                 end if
                 call from_internal_coordinates(z, zcyl)
-                do j = 1, size(callbacks)
-                    call callbacks(j)%execute(kt*dtau, zcyl)
+                do j = 1, size(callbacks_local)
+                    call callbacks_local(j)%execute(kt*dtau, zcyl)
                 end do
             end do
+            deallocate(callbacks_local)
         enddo
-        !!$OMP END DO
-        !!$OMP END PARALLEL
+        !$OMP END DO
+        !$OMP END PARALLEL
     end subroutine trace_multiple_orbits
 
 
@@ -417,7 +435,12 @@ contains
 
     subroutine phi0_plus_write(t, z)
         real(dp), intent(in) :: t, z(:)
-        write(phi0plus_unit, *) t, z
+        ! The output unit is shared across OpenMP threads (the per-thread
+        ! callback copies still invoke these module-level writers), so the
+        ! write must be serialized to avoid interleaving records.
+        !$omp critical (callback_write_phi0plus)
+        write(phi0plus_unit, *) t, z, current_orbit
+        !$omp end critical (callback_write_phi0plus)
     end subroutine phi0_plus_write
 
 
@@ -433,7 +456,12 @@ contains
 
     subroutine phi0_minus_write(t, z)
         real(dp), intent(in) :: t, z(:)
-        write(phi0minus_unit, *) t, z
+        ! The output unit is shared across OpenMP threads (the per-thread
+        ! callback copies still invoke these module-level writers), so the
+        ! write must be serialized to avoid interleaving records.
+        !$omp critical (callback_write_phi0minus)
+        write(phi0minus_unit, *) t, z, current_orbit
+        !$omp end critical (callback_write_phi0minus)
     end subroutine phi0_minus_write
 
 
@@ -445,7 +473,12 @@ contains
 
     subroutine vpar0_plus_write(t, z)
         real(dp), intent(in) :: t, z(:)
-        write(vpar0plus_unit, *) t, z
+        ! The output unit is shared across OpenMP threads (the per-thread
+        ! callback copies still invoke these module-level writers), so the
+        ! write must be serialized to avoid interleaving records.
+        !$omp critical (callback_write_vpar0plus)
+        write(vpar0plus_unit, *) t, z, current_orbit
+        !$omp end critical (callback_write_vpar0plus)
     end subroutine vpar0_plus_write
 
 
@@ -457,7 +490,12 @@ contains
 
     subroutine vpar0_minus_write(t, z)
         real(dp), intent(in) :: t, z(:)
-        write(vpar0minus_unit, *) t, z
+        ! The output unit is shared across OpenMP threads (the per-thread
+        ! callback copies still invoke these module-level writers), so the
+        ! write must be serialized to avoid interleaving records.
+        !$omp critical (callback_write_vpar0minus)
+        write(vpar0minus_unit, *) t, z, current_orbit
+        !$omp end critical (callback_write_vpar0minus)
     end subroutine vpar0_minus_write
 
 
@@ -469,7 +507,12 @@ contains
 
     subroutine zplane_write(t, z)
         real(dp), intent(in) :: t, z(:)
-        write(zplane_unit, *) t, z
+        ! The output unit is shared across OpenMP threads (the per-thread
+        ! callback copies still invoke these module-level writers), so the
+        ! write must be serialized to avoid interleaving records.
+        !$omp critical (callback_write_zplane)
+        write(zplane_unit, *) t, z, current_orbit
+        !$omp end critical (callback_write_zplane)
     end subroutine zplane_write
 
 

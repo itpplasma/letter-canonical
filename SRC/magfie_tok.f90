@@ -189,6 +189,13 @@ module magfie_tok
     real(kind=real_kind) :: rm,zm,Brc,Bpc,Bzc,dBrdRc,dBrdpc,dBrdZc &
                         ,dBpdRc,dBpdpc,dBpdZc,dBzdRc,dBzdpc,dBzdZc,Arc,Apc,Azc
 
+    ! The libneo backend state that this routine reads and writes (psif, rtf,
+    ! btf, incore, spline tables and their ipoint/icp bookkeeping from
+    ! field_eq_mod, inthecore_mod and bdivfree_mod) is shared module data that
+    ! is not threadprivate.  Each orbit in trace_multiple_orbits runs in its
+    ! own OpenMP thread and evaluates the field concurrently, so serialize the
+    ! backend evaluation to keep multi-particle runs deterministic.
+    !$omp critical (magfie_tok_field)
     call stretch_coords(r,z,rm,zm)
 
     if(iequil.eq.0) then
@@ -223,6 +230,7 @@ module magfie_tok
         if (present(Az)) Az = Az + ampl*Azc
 
     end if
+    !$omp end critical (magfie_tok_field)
 
     end subroutine my_field
 
